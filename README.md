@@ -1,58 +1,140 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# ClinicSync
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+ClinicSync is an outpatient clinic management web application built with **Laravel 13**, **Blade**, **Tailwind CSS v4**, and **Spatie Laravel Permission**. It coordinates appointment scheduling, live clinic queuing, electronic medical records (EMR), prescriptions, and role-based clinic operations.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### Patient Portal (`patient`)
+- Dashboard with upcoming appointments and live queue status
+- Appointment booking with real-time physician slot availability and availability calendar
+- Appointment rescheduling and cancellation
+- Personal medical records view (encounters, vitals, prescriptions, allergies, and medical history)
+- In-app notification center and profile/password settings
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Physician Workspace (`physician`)
+- Daily consultation dashboard and live patient queue
+- Availability schedule management and daily patient limit configuration
+- Clinical encounter recording (chief complaint, diagnosis, assessment, treatment plan, clinical notes, vitals)
+- E-prescription issuance per encounter
+- Full patient chart review (medical history, allergies, and past encounters)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Reception & Clinic Operations (`receptionist`, `administrator`)
+- Live clinic queue management (walk-in registration, patient search, calling patients, status transitions)
+- Physician schedule management and availability calendar
+- Clinic operational reports
 
-## Learning Laravel
+### System Administration (`administrator`)
+- Includes all Reception & Clinic Operations capabilities
+- User management (create staff/user accounts and toggle active status)
+- System audit log viewer
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Tech Stack
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- **Backend:** PHP 8.3+, Laravel 13, Spatie Laravel Permission
+- **Frontend:** Blade templates, Tailwind CSS v4, Vite
+- **Database:** SQLite (default in `.env.example`) or any Laravel-supported RDBMS
+- **Testing & Quality:** PHPUnit 12, Laravel Pint
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+## Getting Started
 
-## Agentic Development
+### Prerequisites
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+- PHP `^8.3` with Composer
+- Node.js and npm
+
+### Installation
+
+1. Clone the repository and enter the project directory:
+   ```bash
+   git clone https://github.com/ryansalon/clinicsync.git
+   cd clinicsync
+   ```
+
+2. Run the automated setup script (installs Composer & npm dependencies, creates `.env`, generates the app key, runs migrations, and builds assets):
+   ```bash
+   composer run setup
+   ```
+
+   Or run the steps manually:
+   ```bash
+   composer install
+   cp .env.example .env
+   php artisan key:generate
+   php artisan migrate
+   npm install
+   npm run build
+   ```
+
+### Seeding Data
+
+#### Local Development (Demo Data)
+
+`DatabaseSeeder` runs `RoleSeeder`, `AdminSeeder`, and `DemoDataSeeder` (automatically skipped in `production`):
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+php artisan db:seed
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Seeded demo accounts (all use password `password`):
 
-## Contributing
+| Role | Email |
+| --- | --- |
+| System Administrator | `admin@clinicsync.test` |
+| Receptionist | `receptionist@clinicsync.test` |
+| Physician (General Medicine) | `physician1@clinicsync.test` |
+| Physician (Pediatrics) | `physician2@clinicsync.test` |
+| Patients | `patient1@clinicsync.test` – `patient5@clinicsync.test` |
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+#### Production Administrator
 
-## Code of Conduct
+Set `ADMIN_EMAIL`, `ADMIN_PASSWORD`, and optionally `ADMIN_NAME` in `.env`, then seed roles and the administrator account:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+php artisan db:seed --class=RoleSeeder
+php artisan db:seed --class=AdminSeeder
+```
 
-## Security Vulnerabilities
+## Running Locally
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Start the development environment:
+
+```bash
+composer run dev
+```
+
+Or run the Laravel server and Vite dev server separately:
+
+```bash
+php artisan serve
+npm run dev
+```
+
+### Queues & Scheduled Reminders
+
+Appointment confirmations, reschedules, and reminders are queued (`QUEUE_CONNECTION=database` by default) and scheduled in `routes/console.php`:
+- `appointments:send-reminders` runs daily at `18:00` (can also be run manually with `php artisan appointments:send-reminders --date=YYYY-MM-DD`).
+- `queue:work --stop-when-empty --max-time=55` runs every minute via the Laravel scheduler.
+
+To run the scheduler locally:
+
+```bash
+php artisan schedule:work
+```
+
+## Testing & Code Style
+
+Run the test suite:
+
+```bash
+composer run test
+```
+
+Format PHP files with Laravel Pint:
+
+```bash
+vendor/bin/pint
+```
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
