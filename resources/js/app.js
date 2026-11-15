@@ -11,13 +11,9 @@
  * - Double-submit guard with a visible busy state
  * - Password visibility toggles
  * - Debounced search/filter forms
- * - Light / dark theme toggle (preference kept in localStorage)
- * - Live queue polling
+ * - Live queue polling with sync status feedback
  * - Patient search combobox (walk-in registration)
- * - Ribbon Field WebGL background (ThreeUI port, login page)
  */
-
-import { mountRibbonField } from './ribbon-field.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const FOCUSABLE =
@@ -98,6 +94,11 @@ document.addEventListener('DOMContentLoaded', () => {
     /* Flash messages                                                       */
     /* ------------------------------------------------------------------ */
     const dismissFlash = (flash) => {
+        if (prefersReducedMotion()) {
+            flash.remove();
+            return;
+        }
+
         flash.style.transition = 'opacity 0.2s ease-out';
         flash.style.opacity = '0';
 
@@ -437,6 +438,15 @@ document.addEventListener('DOMContentLoaded', () => {
         let timer = null;
         let inFlight = false;
 
+        const setSyncText = (text, warn = false) => {
+            const label = document.querySelector(`[data-poll-status="${container.id}"]`);
+            if (!label) {
+                return;
+            }
+            label.textContent = text;
+            label.classList.toggle('text-amber-700', warn);
+        };
+
         const refresh = async () => {
             // Never yank content out from under someone who is using it.
             if (inFlight || document.hidden || container.contains(document.activeElement)) {
@@ -452,11 +462,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (response.status === 401 || response.status === 419) {
                     stop();
+                    setSyncText('Session paused', true);
                     if (!container.querySelector('[data-poll-expired]')) {
                         const note = document.createElement('div');
                         note.setAttribute('data-poll-expired', 'true');
                         note.setAttribute('role', 'status');
-                        note.className = 'mb-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800';
+                        note.className = 'mb-3 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-900';
                         note.textContent = 'Live updates paused — your session may have expired. Refresh or sign in to resume.';
                         container.prepend(note);
                     }
@@ -465,11 +476,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 if (!response.ok) {
+                    setSyncText('Reconnecting…', true);
                     return;
                 }
 
                 const payload = await response.json();
                 const html = typeof payload.html === 'string' ? payload.html : null;
+                const stamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                setSyncText(`Synced ${stamp}`, false);
 
                 if (html === null || html === lastHtml) {
                     return;
@@ -479,7 +493,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 container.innerHTML = html;
                 container.dispatchEvent(new CustomEvent('clinicsync:polled', { bubbles: true }));
             } catch (error) {
-                // Transient network failure — the next tick will retry.
+                setSyncText('Offline — retrying', true);
             } finally {
                 inFlight = false;
             }
@@ -675,27 +689,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     /* ------------------------------------------------------------------ */
-    /* Ribbon Field background (ThreeUI port, login page)                  */
+    /* Accessible slide-over / modal dialogs with focus trap               */
     /* ------------------------------------------------------------------ */
-    document.querySelectorAll('[data-ribbon-field]').forEach((host) => {
-        try {
-            mountRibbonField(host, {
-                speed: 1,
-                pointerAmount: 1,
-                smoothing: 0.035,
-                hue: 0,
-                saturation: 1,
-                brightness: 1,
-                opacity: 1,
-            });
-        } catch (error) {
-            // WebGL unavailable — the page keeps its flat background.
-        }
-    });
+    const appShell = document.getElementById('app-shell');
 
-    /* ------------------------------------------------------------------ */
-    /* Accessible slide-over / modal dialogs                              */
-    /* ------------------------------------------------------------------ */
     document.querySelectorAll('[data-dialog]').forEach((dialog) => {
         let opener = null;
 
@@ -703,6 +700,9 @@ document.addEventListener('DOMContentLoaded', () => {
             opener = trigger || document.activeElement;
             dialog.classList.remove('hidden');
             dialog.classList.add('flex');
+            if ('inert' in HTMLElement.prototype && appShell && !appShell.contains(dialog)) {
+                appShell.setAttribute('inert', '');
+            }
             const firstInput = dialog.querySelector('input:not([type="hidden"]), select, textarea, button');
             firstInput?.focus();
         };
@@ -710,9 +710,32 @@ document.addEventListener('DOMContentLoaded', () => {
         const close = () => {
             dialog.classList.add('hidden');
             dialog.classList.remove('flex');
+            appShell?.removeAttribute('inert');
             opener?.focus?.();
             opener = null;
         };
+
+        dialog.addEventListener('keydown', (event) => {
+            if (event.key !== 'Tab' || dialog.classList.contains('hidden')) {
+                return;
+            }
+
+            const focusable = Array.from(dialog.querySelectorAll(FOCUSABLE)).filter((el) => el.offsetParent !== null);
+            if (focusable.length === 0) {
+                return;
+            }
+
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+
+            if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault();
+                last.focus();
+            } else if (!event.shiftKey && document.activeElement === last) {
+                event.preventDefault();
+                first.focus();
+            }
+        });
 
         dialog.addEventListener('dialog:close', close);
         dialog.querySelectorAll('[data-dialog-close]').forEach((btn) => btn.addEventListener('click', close));
@@ -791,16 +814,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 button.classList.toggle('btn-secondary', !selected);
             });
 
-            root.querySelectorAll('[data-queue-row]').forEach((row) => {
+            const rows = root.querySelectorAll('[data-queue-row]');
+            let visibleCount = 0;
+
+            rows.forEach((row) => {
                 const status = row.dataset.status || '';
                 const haystack = (row.dataset.search || '').toLowerCase();
                 const statusMatch =
                     activeStatus === 'all'
                     || (activeStatus === 'waiting' ? status === 'pending' || status === 'confirmed' : status === activeStatus);
                 const queryMatch = query === '' || haystack.includes(query);
+                const visible = statusMatch && queryMatch;
 
-                row.hidden = !(statusMatch && queryMatch);
+                row.hidden = !visible;
+                if (visible) {
+                    visibleCount += 1;
+                }
             });
+
+            const emptyBanner = root.querySelector('[data-queue-filter-empty]');
+            if (emptyBanner) {
+                emptyBanner.classList.toggle('hidden', rows.length === 0 || visibleCount > 0);
+            }
         };
 
         tabButtons.forEach((button) => {

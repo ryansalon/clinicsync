@@ -9,10 +9,10 @@
             {{ $breadcrumb }}
         @endisset
 
-        <h1 class="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">{{ $title }}</h1>
+        <h1 class="text-xl font-semibold tracking-tight text-[#14201E] sm:text-2xl">{{ $title }}</h1>
 
         @if ($description)
-            <p class="mt-1 text-sm text-slate-500">{{ $description }}</p>
+            <p class="mt-1 text-sm text-[#465854]">{{ $description }}</p>
         @endif
 
         {{ $slot }}

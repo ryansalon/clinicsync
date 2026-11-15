@@ -3,14 +3,10 @@
 @section('title', 'Sign in')
 
 @section('content')
-    <p class="inline-flex items-center gap-2 font-guest-mono text-[11px] uppercase tracking-[0.16em] text-live">
-        <span class="h-1.5 w-1.5 rounded-full bg-live" aria-hidden="true"></span>
-        Patient &amp; Staff Portal
-    </p>
-    <h1 class="mt-2 text-3xl font-normal tracking-tight text-bright">Welcome back</h1>
-    <p class="mt-2 text-sm leading-relaxed text-read">Sign in with the email address registered with the clinic.</p>
+    <h1 class="text-2xl font-semibold tracking-tight text-[#14201E] sm:text-3xl">Welcome back</h1>
+    <p class="mt-1.5 text-sm leading-relaxed text-[#465854]">Sign in with the email address registered with the clinic.</p>
 
-    <form method="POST" action="{{ route('login') }}" class="mt-8 space-y-5">
+    <form method="POST" action="{{ route('login') }}" class="mt-7 space-y-5">
         @csrf
 
         <div>
@@ -29,7 +25,13 @@
         </div>
 
         <div>
-            <label for="password" class="label">Password</label>
+            <div class="mb-1.5 flex items-center justify-between gap-2">
+                <label for="password" class="label mb-0">Password</label>
+                <a href="{{ route('password.request') }}"
+                   class="text-xs font-medium text-[#0F766E] transition hover:underline">
+                    Forgot password?
+                </a>
+            </div>
             <div class="relative">
                 <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-meta">
                     <x-icon name="lock" class="h-[18px] w-[18px]" />
@@ -44,18 +46,12 @@
             @enderror
         </div>
 
-        <div class="flex items-center justify-between gap-3">
-            <div class="flex items-center">
-                <input id="remember" type="checkbox" name="remember" value="1"
-                       class="h-4 w-4 rounded accent-live">
-                <label for="remember" class="ml-2 cursor-pointer text-sm text-read">
-                    Remember me
-                </label>
-            </div>
-            <a href="{{ route('password.request') }}"
-               class="text-sm font-medium text-read hover:text-brand-strong">
-                Forgot password?
-            </a>
+        <div class="flex items-center">
+            <input id="remember" type="checkbox" name="remember" value="1"
+                   class="h-4 w-4 rounded border-[#C5D0CD] accent-[#0F766E]">
+            <label for="remember" class="ml-2 cursor-pointer text-sm text-read">
+                Keep me signed in on this device
+            </label>
         </div>
 
         <button type="submit" class="btn btn-primary w-full py-2.5 flex items-center justify-center gap-2">
@@ -64,15 +60,14 @@
         </button>
     </form>
 
-    <hr class="my-6 border-hairline">
-
-    <p class="text-center text-sm text-meta">
-        No account yet?
-        <a href="{{ route('register') }}" class="font-medium text-bright hover:text-brand-strong">
-            Register as a patient
+    <div class="mt-7 space-y-3 border-t border-hairline pt-6">
+        <a href="{{ route('register') }}"
+           class="btn btn-secondary w-full justify-between px-4 text-sm font-medium">
+            <span>New patient? Register an account</span>
+            <x-icon name="arrow-right" class="h-4 w-4 text-[#465854]" />
         </a>
-    </p>
-    <p class="mt-2 text-center text-xs text-meta">
-        Physicians and clinic staff sign in with clinic-issued credentials.
-    </p>
+        <p class="text-center text-xs text-meta">
+            Physicians and clinic staff sign in with clinic-issued credentials.
+        </p>
+    </div>
 @endsection

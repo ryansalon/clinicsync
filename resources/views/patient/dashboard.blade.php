@@ -3,126 +3,163 @@
 @section('title', 'Patient dashboard')
 
 @section('content')
-    <x-page-header title="Patient dashboard" description="A quick overview of your upcoming visits and medical records.">
+    <x-page-header title="Patient dashboard" description="Upcoming clinic visits, live queue progress, and medical summary · Clinic hours Mon–Sat, 08:00–17:00.">
         @if ($patient)
-            <div class="mt-2.5 flex flex-wrap items-center gap-1.5">
-                <span class="inline-flex items-center rounded-md border border-teal-200/80 bg-teal-50/80 px-2.5 py-0.5 font-mono text-xs font-semibold text-teal-800">
+            <div class="mt-3 inline-flex max-w-full flex-wrap items-center gap-x-5 gap-y-1.5 rounded-lg border border-[#DCE3E1] bg-white px-3.5 py-2 text-xs shadow-[0_1px_2px_rgba(20,32,30,0.03)]">
+                <span class="cs-num font-mono font-semibold text-[#0F766E]">
                     Record #{{ $patient->patient_number }}
                 </span>
-                <span class="inline-flex items-center rounded-md border border-slate-200/90 bg-white px-2.5 py-0.5 text-xs text-slate-600">
-                    {{ $patient->date_of_birth?->isoFormat('MMMM D, YYYY') ?? '—' }}
+                <span class="cs-num text-[#243330]">
+                    <span class="text-[#465854]">DOB:</span> {{ $patient->date_of_birth?->isoFormat('MMM D, YYYY') ?? '—' }}
                 </span>
-                <span class="inline-flex items-center rounded-md border border-slate-200/90 bg-white px-2.5 py-0.5 text-xs text-slate-600">
-                    {{ $patient->sex ? \Illuminate\Support\Str::headline($patient->sex) : '—' }}
+                <span class="text-[#243330]">
+                    <span class="text-[#465854]">Sex:</span> {{ $patient->sex ? \Illuminate\Support\Str::headline($patient->sex) : '—' }}
                 </span>
-                <span class="inline-flex items-center rounded-md border border-slate-200/90 bg-white px-2.5 py-0.5 text-xs text-slate-600">
-                    {{ $patient->blood_type ?: 'No blood type on file' }}
-                </span>
-                <span class="inline-flex items-center rounded-md border border-slate-200/90 bg-white px-2.5 py-0.5 text-xs text-slate-600">
-                    {{ $patient->address ?: 'No address on file' }}
+                <span class="text-[#243330]">
+                    <span class="text-[#465854]">Blood:</span> {{ $patient->blood_type ?: 'Not on file' }}
                 </span>
             </div>
         @endif
 
         <x-slot:actions>
             @if ($patient)
-                <div class="flex flex-wrap items-center gap-3">
-                    <a class="btn btn-primary" href="{{ route('patient.appointments.create') }}">
-                        <x-icon name="plus" class="h-4 w-4" />
-                        Book an appointment
-                    </a>
-                    <a class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 transition hover:text-teal-700 px-2 py-1.5"
-                       href="{{ route('patient.appointments.index') }}">
-                        <x-icon name="calendar" class="h-3.5 w-3.5 text-slate-400" />
-                        My appointments
-                    </a>
-                    <a class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 transition hover:text-teal-700 px-2 py-1.5"
-                       href="{{ route('patient.records') }}">
-                        <x-icon name="document" class="h-3.5 w-3.5 text-slate-400" />
-                        Medical records
-                    </a>
-                </div>
+                <a class="btn btn-primary" href="{{ route('patient.appointments.create') }}">
+                    <x-icon name="plus" class="h-4 w-4" />
+                    Book an appointment
+                </a>
+                <a class="btn btn-secondary" href="{{ route('patient.appointments.index') }}">
+                    <x-icon name="calendar" class="h-4 w-4" />
+                    My appointments
+                </a>
+                <a class="btn btn-ghost" href="{{ route('patient.records') }}">
+                    <x-icon name="document" class="h-4 w-4" />
+                    Medical records
+                </a>
             @endif
         </x-slot:actions>
     </x-page-header>
 
     @if ($patient)
         {{-- Live queue status (today's appointment) with polling --}}
-        <div id="live-queue-status" data-poll data-poll-url="{{ route('patient.dashboard') }}" data-poll-interval="30000">
+        <div id="live-queue-status" aria-live="polite" data-poll data-poll-url="{{ route('patient.dashboard') }}" data-poll-interval="30000">
             @include('patient.partials.queue-status')
         </div>
 
         @if ($needsProfileCompletion)
-            <div class="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-200/80 bg-amber-50/80 px-4 py-3 text-sm text-amber-900">
-                <div class="flex items-center gap-2.5">
-                    <x-icon name="exclamation-triangle" class="h-4 w-4 shrink-0 text-amber-600" />
-                    <span>Complete your blood type and emergency contact details for safer clinic triage.</span>
+            <x-alert type="warning" class="mb-6" title="Profile details incomplete">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <span>Add your blood type and emergency contact details for safer outpatient triage.</span>
+                    <a href="{{ route('profile.edit') }}" class="btn btn-secondary btn-sm">Update profile</a>
                 </div>
-                <a href="{{ route('profile.edit') }}" class="btn btn-secondary btn-sm">Update profile</a>
-            </div>
+            </x-alert>
         @endif
 
         @if ($activeAllergies->isNotEmpty())
-            <section class="mb-6 rounded-2xl border border-rose-200 bg-rose-50/90 p-5 shadow-sm">
-                <div class="flex items-start gap-3">
-                    <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-rose-100 text-rose-700">
-                        <x-icon name="exclamation-triangle" class="h-5 w-5" />
-                    </span>
-                    <div class="min-w-0 flex-1">
-                        <h3 class="text-sm font-semibold text-rose-900">Active allergies on file</h3>
-                        <p class="mt-0.5 text-xs text-rose-700">Please confirm these allergies with the physician and clinic staff during your visit.</p>
-                        <div class="mt-3 grid gap-2 sm:grid-cols-2">
-                            @foreach ($activeAllergies as $allergy)
-                                <div class="rounded-lg border border-rose-200 bg-white px-3 py-2">
-                                    <div class="flex flex-wrap items-center justify-between gap-2">
-                                        <span class="text-sm font-medium text-slate-900">{{ $allergy->allergen }}</span>
-                                        <span class="badge badge-{{ $allergy->severity }}">
-                                            {{ \Illuminate\Support\Str::headline($allergy->severity) }}
-                                        </span>
-                                    </div>
-                                    <p class="mt-0.5 text-xs text-slate-600">{{ $allergy->reaction }}</p>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-            </section>
+            <x-alert type="error" class="mb-6" title="Active allergies on file ({{ $activeAllergies->count() }})">
+                <p class="mb-2 text-xs">Confirm these sensitivities with clinic staff and your attending physician during check-in.</p>
+                <ul class="divide-y divide-[#9F1239]/15 border-t border-[#9F1239]/15">
+                    @foreach ($activeAllergies as $allergy)
+                        <li class="flex flex-wrap items-center justify-between gap-2 py-2 text-sm">
+                            <span>
+                                <strong class="font-semibold">{{ $allergy->allergen }}</strong>
+                                <span class="text-xs opacity-90"> — {{ $allergy->reaction ?: 'Reaction not specified' }}</span>
+                            </span>
+                            <span class="badge badge-{{ $allergy->severity }}">
+                                {{ \Illuminate\Support\Str::headline($allergy->severity) }}
+                            </span>
+                        </li>
+                    @endforeach
+                </ul>
+            </x-alert>
         @endif
 
-        {{-- Summary tiles --}}
-        <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
-            <x-stat label="Appointments" value="{{ $appointmentCount }}" icon="calendar" tone="teal" />
-            <x-stat label="Consultations" value="{{ $encounterCount }}" icon="clipboard-check" tone="sky" />
-            <x-stat label="Prescriptions" value="{{ $prescriptionCount }}" icon="document" tone="indigo" />
-            <x-stat label="Active allergies" value="{{ $activeAllergies->count() }}" icon="exclamation-triangle" tone="rose" />
+        {{-- Summary ledger --}}
+        <div class="ledger-strip sm:grid-cols-2 lg:grid-cols-4">
+            <a href="{{ route('patient.appointments.index') }}" class="ledger-cell group hover:bg-[#F4F7F6]">
+                <div class="flex items-start justify-between gap-2">
+                    <span class="text-[11px] font-semibold tracking-wider text-[#465854] uppercase">Appointments</span>
+                    <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-[#B5DCD4] bg-[#E6F4F1] text-[#0F766E]">
+                        <x-icon name="calendar" class="h-4 w-4" />
+                    </span>
+                </div>
+                <div class="flex items-end justify-between gap-2">
+                    <div>
+                        <p class="cs-num text-2xl font-semibold text-[#14201E]">{{ $appointmentCount }}</p>
+                        <p class="mt-0.5 text-xs text-[#465854]">Upcoming &amp; past visits</p>
+                    </div>
+                    <span class="text-xs font-medium text-[#0F766E] opacity-0 transition group-hover:opacity-100">View &rarr;</span>
+                </div>
+            </a>
+            <a href="{{ route('patient.records') }}" class="ledger-cell group hover:bg-[#F4F7F6]">
+                <div class="flex items-start justify-between gap-2">
+                    <span class="text-[11px] font-semibold tracking-wider text-[#465854] uppercase">Consultations</span>
+                    <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-[#DCE3E1] bg-[#EFF4F2] text-[#465854]">
+                        <x-icon name="clipboard" class="h-4 w-4" />
+                    </span>
+                </div>
+                <div class="flex items-end justify-between gap-2">
+                    <div>
+                        <p class="cs-num text-2xl font-semibold text-[#14201E]">{{ $encounterCount }}</p>
+                        <p class="mt-0.5 text-xs text-[#465854]">Physician summaries</p>
+                    </div>
+                    <span class="text-xs font-medium text-[#0F766E] opacity-0 transition group-hover:opacity-100">Records &rarr;</span>
+                </div>
+            </a>
+            <a href="{{ route('patient.records') }}#prescriptions" class="ledger-cell group hover:bg-[#F4F7F6]">
+                <div class="flex items-start justify-between gap-2">
+                    <span class="text-[11px] font-semibold tracking-wider text-[#465854] uppercase">Prescriptions</span>
+                    <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-[#DCE3E1] bg-[#EFF4F2] text-[#465854]">
+                        <x-icon name="document" class="h-4 w-4" />
+                    </span>
+                </div>
+                <div class="flex items-end justify-between gap-2">
+                    <div>
+                        <p class="cs-num text-2xl font-semibold text-[#14201E]">{{ $prescriptionCount }}</p>
+                        <p class="mt-0.5 text-xs text-[#465854]">Issued medications</p>
+                    </div>
+                    <span class="text-xs font-medium text-[#0F766E] opacity-0 transition group-hover:opacity-100">History &rarr;</span>
+                </div>
+            </a>
+            <div class="ledger-cell">
+                <div class="flex items-start justify-between gap-2">
+                    <span class="text-[11px] font-semibold tracking-wider text-[#465854] uppercase">Active allergies</span>
+                    <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border {{ $activeAllergies->isNotEmpty() ? 'border-rose-200 bg-rose-50 text-rose-800' : 'border-[#DCE3E1] bg-[#EFF4F2] text-[#465854]' }}">
+                        <x-icon name="exclamation-triangle" class="h-4 w-4" />
+                    </span>
+                </div>
+                <div>
+                    <p class="cs-num text-2xl font-semibold {{ $activeAllergies->isNotEmpty() ? 'text-[#9F1239]' : 'text-[#14201E]' }}">{{ $activeAllergies->count() }}</p>
+                    <p class="mt-0.5 text-xs text-[#465854]">Recorded sensitivities</p>
+                </div>
+            </div>
         </div>
 
         <div class="mt-6 grid gap-6 lg:grid-cols-3">
             {{-- Upcoming appointments --}}
             <section class="card lg:col-span-2">
-                <div class="card-header flex items-center justify-between gap-2">
-                    <h3 class="text-sm font-semibold tracking-tight text-slate-900">Upcoming appointments</h3>
-                    <span class="text-xs text-slate-500">{{ $upcoming->count() }} scheduled</span>
+                <div class="card-header flex flex-wrap items-center justify-between gap-2">
+                    <x-card-title>Upcoming appointments</x-card-title>
+                    <span class="cs-num text-xs text-[#465854]">{{ $upcoming->count() }} scheduled</span>
                 </div>
                 <div class="card-body p-0">
-                    {{-- Mobile stacked cards (below md) --}}
-                    <div class="divide-y divide-slate-100 md:hidden">
+                    {{-- Mobile stacked cards --}}
+                    <div class="divide-y divide-[#DCE3E1] md:hidden">
                         @forelse ($upcoming as $appointment)
-                            <article class="p-4 space-y-2.5">
+                            <article class="space-y-2.5 p-4">
                                 <div class="flex items-center justify-between gap-2">
-                                    <span class="font-medium text-xs text-slate-900">
+                                    <span class="cs-num text-xs font-medium text-[#14201E]">
                                         {{ $appointment->appointment_date->isoFormat('ddd, MMM D, YYYY') }}
                                     </span>
                                     <span class="badge badge-{{ $appointment->status }}">{{ \Illuminate\Support\Str::headline($appointment->status) }}</span>
                                 </div>
                                 <div class="flex items-center justify-between gap-2">
-                                    <div class="flex items-center gap-2">
+                                    <div class="flex items-center gap-2.5">
                                         @if ($appointment->physician?->user?->name)
                                             <x-avatar :name="$appointment->physician->user->name" size="sm" />
                                         @endif
                                         <div>
-                                            <p class="text-sm font-medium text-slate-900">Dr. {{ $appointment->physician?->user?->name ?? '—' }}</p>
-                                            <p class="text-xs text-slate-500">
+                                            <p class="text-sm font-medium text-[#14201E]">Dr. {{ $appointment->physician?->user?->name ?? '—' }}</p>
+                                            <p class="cs-num text-xs text-[#465854]">
                                                 {{ \Illuminate\Support\Carbon::parse($appointment->start_time)->isoFormat('h:mm A') }}
                                                 @if ($appointment->end_time)
                                                     – {{ \Illuminate\Support\Carbon::parse($appointment->end_time)->isoFormat('h:mm A') }}
@@ -140,7 +177,7 @@
                         @empty
                             <div class="p-6">
                                 <x-empty icon="calendar" title="No upcoming appointments."
-                                         description="Your booked visits will appear here with their queue numbers.">
+                                         description="Booked clinic visits and queue numbers appear here.">
                                     <x-slot:action>
                                         <a class="btn btn-primary" href="{{ route('patient.appointments.create') }}">
                                             <x-icon name="plus" class="h-4 w-4" />
@@ -152,42 +189,44 @@
                         @endforelse
                     </div>
 
-                    {{-- Desktop table (md and up) --}}
+                    {{-- Desktop table --}}
                     <div class="hidden overflow-x-auto md:block">
-                        <table class="min-w-full">
-                            <thead>
-                                <tr>
-                                    <th class="table-head">Date</th>
-                                    <th class="table-head">Time</th>
-                                    <th class="table-head">Physician</th>
-                                    <th class="table-head">Queue</th>
-                                    <th class="table-head">Status</th>
-                                    <th class="table-head text-right">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-100">
-                                @forelse ($upcoming as $appointment)
+                        @if ($upcoming->isNotEmpty())
+                            <table class="min-w-full">
+                                <caption class="sr-only">Upcoming patient appointments</caption>
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="table-head">Date</th>
+                                        <th scope="col" class="table-head">Time</th>
+                                        <th scope="col" class="table-head">Physician</th>
+                                        <th scope="col" class="table-head">Queue</th>
+                                        <th scope="col" class="table-head">Status</th>
+                                        <th scope="col" class="table-head text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-[#DCE3E1]">
+                                    @foreach ($upcoming as $appointment)
                                     <tr class="table-row">
-                                        <td class="table-cell whitespace-nowrap">{{ $appointment->appointment_date->isoFormat('dddd, MMM D, YYYY') }}</td>
-                                        <td class="table-cell whitespace-nowrap">
+                                        <td class="table-cell cs-num whitespace-nowrap text-[#14201E]">{{ $appointment->appointment_date->isoFormat('ddd, MMM D, YYYY') }}</td>
+                                        <td class="table-cell cs-num whitespace-nowrap text-[#14201E]">
                                             {{ \Illuminate\Support\Carbon::parse($appointment->start_time)->isoFormat('h:mm A') }}
                                             @if ($appointment->end_time)
-                                                <span class="text-slate-400">– {{ \Illuminate\Support\Carbon::parse($appointment->end_time)->isoFormat('h:mm A') }}</span>
+                                                <span class="text-[#465854]">– {{ \Illuminate\Support\Carbon::parse($appointment->end_time)->isoFormat('h:mm A') }}</span>
                                             @endif
                                         </td>
                                         <td class="table-cell">
-                                            <div class="flex items-center gap-3">
+                                            <div class="flex items-center gap-2.5">
                                                 @if ($appointment->physician?->user?->name)
                                                     <x-avatar :name="$appointment->physician->user->name" size="sm" />
                                                 @endif
-                                                <span class="whitespace-nowrap">Dr. {{ $appointment->physician?->user?->name ?? '—' }}</span>
+                                                <span class="whitespace-nowrap text-[#14201E]">Dr. {{ $appointment->physician?->user?->name ?? '—' }}</span>
                                             </div>
                                         </td>
-                                        <td class="table-cell whitespace-nowrap font-medium text-slate-900">#{{ $appointment->queue_number }}</td>
-                                        <td class="table-cell">
+                                        <td class="table-cell cs-num font-mono font-semibold text-[#0F766E] whitespace-nowrap">#{{ $appointment->queue_number }}</td>
+                                        <td class="table-cell whitespace-nowrap">
                                             <span class="badge badge-{{ $appointment->status }}">{{ \Illuminate\Support\Str::headline($appointment->status) }}</span>
                                         </td>
-                                        <td class="table-cell text-right">
+                                        <td class="table-cell whitespace-nowrap text-right">
                                             <div class="inline-flex items-center gap-1.5">
                                                 @if ($appointment->isCancellable())
                                                     <a class="btn btn-secondary btn-sm" href="{{ route('patient.appointments.reschedule', $appointment) }}">
@@ -201,23 +240,22 @@
                                             </div>
                                         </td>
                                     </tr>
-                                @empty
-                                    <tr>
-                                        <td class="px-4 py-10" colspan="6">
-                                            <x-empty icon="calendar" title="No upcoming appointments."
-                                                     description="Your booked visits will appear here with their queue numbers.">
-                                                <x-slot:action>
-                                                    <a class="btn btn-primary" href="{{ route('patient.appointments.create') }}">
-                                                        <x-icon name="plus" class="h-4 w-4" />
-                                                        Book one now
-                                                    </a>
-                                                </x-slot:action>
-                                            </x-empty>
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        @else
+                            <div class="p-8">
+                                <x-empty icon="calendar" title="No upcoming appointments."
+                                         description="Booked clinic visits and queue numbers appear here.">
+                                    <x-slot:action>
+                                        <a class="btn btn-primary" href="{{ route('patient.appointments.create') }}">
+                                            <x-icon name="plus" class="h-4 w-4" />
+                                            Book one now
+                                        </a>
+                                    </x-slot:action>
+                                </x-empty>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </section>
@@ -226,72 +264,79 @@
             <div class="space-y-6">
                 <section class="card">
                     <div class="card-header">
-                        <h3 class="text-sm font-semibold tracking-tight text-slate-900">Latest consultation</h3>
+                        <x-card-title>Latest consultation</x-card-title>
                     </div>
                     <div class="card-body">
                         @if ($latestEncounter)
-                            <p class="text-sm font-semibold text-slate-900">
+                            <p class="text-sm font-semibold text-[#14201E]">
                                 {{ $latestEncounter->diagnosis ?: 'Diagnosis not yet recorded' }}
                             </p>
                             @if ($latestEncounter->diagnosis_code)
-                                <p class="mt-0.5 text-xs text-slate-500">Code {{ $latestEncounter->diagnosis_code }}</p>
+                                <p class="cs-num mt-0.5 font-mono text-xs text-[#465854]">Code {{ $latestEncounter->diagnosis_code }}</p>
                             @endif
-                            <p class="mt-3 text-sm text-slate-600">{{ $latestEncounter->encountered_at->isoFormat('dddd, MMM D, YYYY') }}</p>
-                            <div class="mt-1 flex items-center gap-2.5">
+                            <p class="cs-num mt-3 text-sm text-[#465854]">{{ $latestEncounter->encountered_at->isoFormat('dddd, MMM D, YYYY') }}</p>
+                            <div class="mt-1.5 flex items-center gap-2.5">
                                 @if ($latestEncounter->physician?->user?->name)
                                     <x-avatar :name="$latestEncounter->physician->user->name" size="sm" />
                                 @endif
-                                <p class="text-sm text-slate-600">Dr. {{ $latestEncounter->physician?->user?->name ?? '—' }}</p>
+                                <p class="text-sm text-[#14201E]">Dr. {{ $latestEncounter->physician?->user?->name ?? '—' }}</p>
                             </div>
-                            <p class="mt-0.5 text-xs text-slate-500">Encounter {{ $latestEncounter->encounter_number }}</p>
+                            <p class="cs-num mt-1 font-mono text-xs text-[#465854]">{{ $latestEncounter->encounter_number }}</p>
 
-                            <div class="mt-4 flex items-center justify-between gap-3">
+                            <div class="mt-4 flex items-center justify-between gap-3 border-t border-[#DCE3E1] pt-3">
                                 <span class="badge badge-{{ $latestEncounter->status }}">
                                     {{ \Illuminate\Support\Str::headline($latestEncounter->status) }}
                                 </span>
-                                <a href="{{ route('patient.records') }}" class="inline-flex items-center gap-1 text-sm font-medium text-teal-600 transition hover:text-teal-700">
+                                <a href="{{ route('patient.records') }}" class="inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-[#0F766E] hover:underline">
                                     View records
                                     <x-icon name="arrow-right" class="h-4 w-4" />
                                 </a>
                             </div>
                         @else
                             <x-empty icon="clipboard" title="No consultations yet."
-                                     description="Your consultation history will appear here after your first visit." />
+                                     description="Your consultation history appears here after your first visit." />
                         @endif
                     </div>
                 </section>
 
                 <section class="card">
-                    <div class="card-header flex items-center justify-between gap-2">
-                        <h3 class="text-sm font-semibold tracking-tight text-slate-900">Recent prescriptions</h3>
-                        <a href="{{ route('patient.records') }}" class="text-xs font-semibold text-teal-600 hover:text-teal-700">All records</a>
+                    <div class="card-header flex flex-wrap items-center justify-between gap-2">
+                        <x-card-title>Recent prescriptions</x-card-title>
+                        <a href="{{ route('patient.records') }}#prescriptions" class="text-xs font-semibold text-[#0F766E] hover:underline">All records</a>
                     </div>
-                    <div class="card-body">
-                        @forelse ($recentPrescriptions as $rx)
-                            <div class="border-b border-slate-100 py-2.5 first:pt-0 last:border-0 last:pb-0">
-                                <div class="flex items-center justify-between gap-2">
-                                    <p class="text-sm font-semibold text-slate-900">{{ $rx->medication_name }}</p>
-                                    <span class="font-mono text-[11px] text-slate-500">{{ $rx->strength }}</span>
-                                </div>
-                                <p class="mt-0.5 text-xs text-slate-600">{{ $rx->instructions ?: 'Follow physician directions.' }}</p>
-                                <p class="mt-1 text-[11px] text-slate-400">
-                                    {{ $rx->issued_at?->isoFormat('MMM D, YYYY') ?? '—' }}
-                                    · Dr. {{ $rx->physician?->user?->name ?? '—' }}
-                                </p>
+                    <div class="card-body p-0">
+                        @if ($recentPrescriptions->isNotEmpty())
+                            <ul class="divide-y divide-[#DCE3E1]">
+                                @foreach ($recentPrescriptions as $rx)
+                                    <li class="px-5 py-3">
+                                        <div class="flex items-center justify-between gap-2">
+                                            <p class="text-sm font-semibold text-[#14201E]">{{ $rx->medication_name }}</p>
+                                            <span class="cs-num font-mono text-xs text-[#465854]">{{ $rx->strength }}</span>
+                                        </div>
+                                        <p class="mt-0.5 text-xs text-[#465854]">{{ $rx->instructions ?: 'Follow physician directions.' }}</p>
+                                        <p class="cs-num mt-1 text-xs text-[#465854]">
+                                            {{ $rx->issued_at?->isoFormat('MMM D, YYYY') ?? '—' }}
+                                            · Dr. {{ $rx->physician?->user?->name ?? '—' }}
+                                        </p>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @else
+                            <div class="px-5 py-2">
+                                <x-empty icon="document" title="No prescriptions issued yet."
+                                         description="Medications prescribed during consultations appear here." />
                             </div>
-                        @empty
-                            <p class="text-xs text-slate-500">No prescriptions issued yet.</p>
-                        @endforelse
+                        @endif
                     </div>
                 </section>
             </div>
         </div>
 
         {{-- Physician availability calendar --}}
-        <section class="mt-6 card">
-            <div class="card-header flex items-center justify-between gap-2">
-                <h3 class="text-sm font-semibold tracking-tight text-slate-900">Physician availability</h3>
-                <a class="text-xs font-semibold text-teal-600 hover:text-teal-700" href="{{ route('patient.appointments.create') }}">Book a visit</a>
+        <section class="card mt-6">
+            <div class="card-header flex flex-wrap items-center justify-between gap-2">
+                <x-card-title>Physician availability</x-card-title>
+                <a class="text-xs font-semibold text-[#0F766E] hover:underline" href="{{ route('patient.appointments.create') }}">Book a visit</a>
             </div>
             <div class="card-body">
                 <x-availability-calendar
@@ -302,6 +347,6 @@
         </section>
     @else
         <x-empty icon="user" title="Patient profile not linked"
-                 description="Your account is not yet linked to a patient record. Please visit the clinic reception to complete your registration." />
+                 description="Your account is not yet linked to a patient record. Visit clinic reception to complete registration." />
     @endif
 @endsection

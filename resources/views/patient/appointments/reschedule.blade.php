@@ -4,31 +4,33 @@
 
 @section('content')
     <x-page-header title="Reschedule appointment"
-                   description="Pick a new date and time for this visit. Your queue number will be re-issued for the new slot." />
+                   description="Pick a new clinic date and slot. A new queue number is issued for the updated time." />
 
     <div class="mx-auto max-w-3xl space-y-6">
-        {{-- Current appointment summary --}}
         <section class="card">
             <div class="card-body flex flex-wrap items-center justify-between gap-4">
                 <div class="flex items-center gap-3">
                     <x-avatar :name="$appointment->physician?->user?->name ?? 'Physician'" />
                     <div class="leading-tight">
-                        <p class="text-sm font-semibold text-slate-900">Dr. {{ $appointment->physician?->user?->name ?? '—' }}</p>
-                        <p class="text-xs text-slate-500">
+                        <p class="text-sm font-semibold text-[#14201E]">Dr. {{ $appointment->physician?->user?->name ?? '—' }}</p>
+                        <p class="cs-num text-xs text-[#465854]">
                             {{ $appointment->physician?->specialization ?? '—' }}
                             · Currently {{ $appointment->appointment_date->isoFormat('MMM D, YYYY') }}
                             at {{ date('g:i A', strtotime($appointment->start_time)) }}
                         </p>
                     </div>
                 </div>
-                <span class="chip">
-                    <x-icon name="clock" class="h-4 w-4 text-slate-400" />
-                    {{ max((int) $appointment->physician?->appointment_slot_minutes, 1) }}-minute slot · Queue #{{ $appointment->queue_number }}
+                <span class="chip cs-num font-mono text-xs">
+                    <x-icon name="clock" class="h-4 w-4 text-[#465854]" />
+                    {{ max((int) $appointment->physician?->appointment_slot_minutes, 1) }}-min slot · Queue #{{ $appointment->queue_number }}
                 </span>
             </div>
         </section>
 
-        <div class="card">
+        <section class="card">
+            <div class="card-header">
+                <x-card-title>New date and time</x-card-title>
+            </div>
             <div class="card-body">
                 <form method="POST" action="{{ route('patient.appointments.reschedule.update', $appointment) }}" class="space-y-5">
                     @csrf
@@ -37,7 +39,7 @@
                     <div>
                         <label for="appointment_date" class="label">New appointment date</label>
                         <input id="appointment_date" type="date" name="appointment_date"
-                               class="input @error('appointment_date') input-invalid @enderror"
+                               class="input cs-num @error('appointment_date') input-invalid @enderror"
                                min="{{ now()->format('Y-m-d') }}"
                                max="{{ now()->addDays(\App\Services\PhysicianAvailability::BOOKING_HORIZON_DAYS)->toDateString() }}"
                                value="{{ old('appointment_date', $appointment->appointment_date->toDateString()) }}" required>
@@ -51,11 +53,11 @@
                         <input type="hidden" name="start_time" id="start_time"
                                value="{{ old('start_time', substr($appointment->start_time, 0, 5)) }}">
                         <div id="slot-grid" aria-live="polite" class="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
-                            <p class="col-span-full rounded-lg border border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-center text-sm text-slate-500">
+                            <p class="col-span-full rounded-md border border-dashed border-[#DCE3E1] bg-[#F4F7F6] px-4 py-8 text-center text-sm text-[#465854]">
                                 Loading available slots…
                             </p>
                         </div>
-                        <p id="capacity-note" class="mt-2 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-medium text-rose-700" role="alert" hidden></p>
+                        <p id="capacity-note" class="mt-2 rounded-md border border-[#9F1239]/25 bg-[#FCE7EA] px-3 py-2 text-sm font-medium text-[#9F1239]" role="alert" hidden></p>
                         <p id="slot-helper" class="helper"></p>
                         <p id="slot-error" class="field-error" role="alert" hidden></p>
                         @error('start_time')
@@ -63,7 +65,7 @@
                         @enderror
                     </div>
 
-                    <div class="flex flex-wrap items-center gap-3 border-t border-slate-200 pt-5">
+                    <div class="flex flex-wrap items-center gap-3 border-t border-[#DCE3E1] pt-5">
                         <button type="submit" class="btn btn-primary">
                             <x-icon name="refresh" class="h-4 w-4" />
                             Confirm new time
@@ -75,7 +77,7 @@
                     </div>
                 </form>
             </div>
-        </div>
+        </section>
     </div>
 @endsection
 
@@ -99,11 +101,11 @@
                 return;
             }
 
-            var NO_SLOTS_MESSAGE = 'No open slots on this date. Please try another date.';
+            var NO_SLOTS_MESSAGE = 'No open slots on this date. Pick another date.';
             var LOADING_MESSAGE = 'Loading available slots…';
-            var AVAILABLE_CLASS = 'rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm font-medium text-slate-700 shadow-xs transition hover:border-teal-400 hover:bg-teal-50 hover:text-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500';
-            var SELECTED_CLASS = 'rounded-lg border border-teal-600 bg-teal-600 px-3 py-2.5 text-sm font-semibold text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500';
-            var DISABLED_CLASS = 'rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-medium text-slate-400 cursor-not-allowed';
+            var AVAILABLE_CLASS = 'cs-num min-h-11 rounded-md border border-[#DCE3E1] bg-white px-3 py-2 text-sm font-medium text-[#14201E] transition hover:border-[#0F766E] hover:bg-[#E6F4F1] hover:text-[#0F766E] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0F766E]';
+            var SELECTED_CLASS = 'cs-num min-h-11 rounded-md border border-[#0F766E] bg-[#0F766E] px-3 py-2 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0F766E]';
+            var DISABLED_CLASS = 'cs-num min-h-11 rounded-md border border-[#DCE3E1] bg-[#F4F7F6] px-3 py-2 text-sm font-medium text-[#465854]/70 line-through cursor-not-allowed';
 
             function setError(message) {
                 if (!errorBox) return;
@@ -116,8 +118,6 @@
                 }
             }
 
-            // Warn before submit when the picked date has no room left, using the
-            // same wording the server would reject the reschedule with.
             function setCapacityNote(payload) {
                 if (!capacityNote) return;
 
@@ -134,9 +134,9 @@
                     var who = payload.physician_name ? 'Dr. ' + payload.physician_name : 'This physician';
                     var limit = payload.daily_patient_limit;
                     capacityNote.textContent = 'This date is full — ' + who + ' can cater at most '
-                        + limit + ' patient' + (limit === 1 ? '' : 's') + ' a day. Please pick another date.';
+                        + limit + ' patient' + (limit === 1 ? '' : 's') + ' a day. Pick another date.';
                 } else {
-                    capacityNote.textContent = 'No open slots remain on this date. Please pick another date.';
+                    capacityNote.textContent = 'No open slots remain on this date. Pick another date.';
                 }
 
                 capacityNote.hidden = false;
@@ -145,7 +145,7 @@
             function showMessage(message, helperText) {
                 slotContainer.innerHTML = '';
                 var paragraph = document.createElement('p');
-                paragraph.className = 'col-span-full rounded-lg border border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-center text-sm text-slate-500';
+                paragraph.className = 'col-span-full rounded-md border border-dashed border-[#DCE3E1] bg-[#F4F7F6] px-4 py-8 text-center text-sm text-[#465854]';
                 paragraph.textContent = message;
                 slotContainer.appendChild(paragraph);
                 if (helper) helper.textContent = helperText || '';
@@ -210,7 +210,7 @@
                         selectSlot(chosen);
                     } else {
                         hiddenStart.value = '';
-                        setError('Your previous time is no longer available. Please pick a new slot.');
+                        setError('Your previous time is no longer available. Pick a new slot.');
                     }
                 }
             }
@@ -222,15 +222,13 @@
 
                 if (!physicianId || !date) {
                     setError('');
-                    showMessage('Select a date to see available slots.');
+                    showMessage('Select a date to load open slots.');
                     return;
                 }
 
                 setError('');
                 showMessage(LOADING_MESSAGE);
 
-                // The appointment itself is excluded, so a full day still shows
-                // the slot the patient already holds.
                 fetch(availabilityUrl + '?physician_id=' + encodeURIComponent(physicianId)
                     + '&date=' + encodeURIComponent(date)
                     + '&appointment_id=' + encodeURIComponent(appointmentId))
@@ -242,8 +240,8 @@
                     })
                     .then(renderSlots)
                     .catch(function () {
-                        showMessage('Select a date to see available slots.');
-                        setError('We could not load available slots. Please try again.');
+                        showMessage('Select a date to load open slots.');
+                        setError('Could not load available slots. Try again.');
                     });
             }
 
@@ -253,7 +251,7 @@
                 rescheduleForm.addEventListener('submit', function (event) {
                     if (!hiddenStart.value) {
                         event.preventDefault();
-                        setError('Please select an available time slot.');
+                        setError('Select an available time slot.');
                         if (slotContainer) {
                             if (window.clinicScrollTo) {
                                 window.clinicScrollTo(slotContainer);

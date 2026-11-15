@@ -2,6 +2,11 @@
 
 @section('title', 'Encounter details')
 
+@php
+    $vitals = $encounter->vitals;
+    $totalInches = ! empty($vitals?->height_cm) ? (int) round($vitals->height_cm / 2.54) : null;
+@endphp
+
 @section('content')
     <x-breadcrumb :items="[
         ['label' => 'Encounter log', 'href' => route('physician.encounters.index')],
@@ -41,8 +46,8 @@
             <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
                 <div>
                     <p class="section-title">Encounter #</p>
-                    <p class="mt-1 text-sm font-semibold text-slate-900">{{ $encounter->encounter_number }}</p>
-                    <p class="mt-0.5 text-xs text-slate-500">
+                    <p class="mt-1 font-mono text-sm font-semibold text-[#14201E]">{{ $encounter->encounter_number }}</p>
+                    <p class="mt-0.5 cs-num text-xs text-[#465854]">
                         {{ $encounter->encountered_at->isoFormat('MMM D, YYYY') }} · {{ $encounter->encountered_at->format('g:i A') }}
                     </p>
                 </div>
@@ -50,7 +55,7 @@
                     <p class="section-title">Physician</p>
                     <div class="mt-1.5 flex items-center gap-3">
                         <x-avatar :name="$encounter->physician->user->name" size="md" />
-                        <p class="min-w-0 text-sm font-semibold text-slate-900">{{ $encounter->physician->user->name }}</p>
+                        <p class="min-w-0 text-sm font-semibold text-[#14201E]">{{ $encounter->physician->user->name }}</p>
                     </div>
                 </div>
                 <div>
@@ -58,12 +63,12 @@
                     <div class="mt-1.5 flex items-center gap-3">
                         <x-avatar :name="$encounter->patient->user->name" size="md" />
                         <div class="min-w-0">
-                            <p class="text-sm font-semibold text-slate-900">{{ $encounter->patient->user->name }}</p>
-                            <p class="text-xs text-slate-500">{{ $encounter->patient->patient_number }}</p>
+                            <p class="text-sm font-semibold text-[#14201E]">{{ $encounter->patient->user->name }}</p>
+                            <p class="font-mono text-xs text-[#465854]">{{ $encounter->patient->patient_number }}</p>
                         </div>
                     </div>
                     <a href="{{ route('physician.patients.show', $encounter->patient) }}"
-                       class="mt-2 inline-flex items-center gap-1 text-xs font-medium text-teal-600 transition hover:text-teal-700">
+                       class="mt-2 inline-flex items-center gap-1 text-xs font-medium text-[#0F766E] hover:underline">
                         View full record
                         <x-icon name="arrow-right" class="h-3.5 w-3.5" />
                     </a>
@@ -77,185 +82,167 @@
     </div>
 
     {{-- Clinical record --}}
-    <div class="mt-6 card">
+    <div class="card mt-6">
         <div class="card-header">
-            <h3 class="text-sm font-semibold text-slate-900">Clinical record</h3>
-            <p class="mt-0.5 text-xs text-slate-500">Diagnosis, assessment and plan for this visit.</p>
+            <h2 class="text-sm font-semibold text-[#14201E]">Clinical record</h2>
+            <p class="mt-0.5 text-xs text-[#465854]">Diagnosis, assessment and plan for this visit.</p>
         </div>
-        <div class="card-body space-y-5">
-            <div>
+        <div class="divide-y divide-[#DCE3E1] px-5">
+            <div class="py-4">
                 <p class="section-title">Chief complaint</p>
-                @if ($encounter->chief_complaint)
-                    <p class="mt-1 text-sm text-slate-700">{{ $encounter->chief_complaint }}</p>
-                @else
-                    <p class="mt-1 text-sm text-slate-400">Not recorded.</p>
-                @endif
+                <p class="mt-1 text-sm {{ $encounter->chief_complaint ? 'text-[#243330]' : 'text-[#465854]' }}">
+                    {{ $encounter->chief_complaint ?: 'Not recorded' }}
+                </p>
             </div>
 
-            <div class="divider"></div>
-
-            <div>
+            <div class="py-4">
                 <p class="section-title">Diagnosis</p>
                 @if ($encounter->diagnosis)
-                    <p class="mt-1 text-sm font-medium text-slate-900">
+                    <p class="mt-1 text-sm font-medium text-[#14201E]">
                         {{ $encounter->diagnosis }}
                         @if ($encounter->diagnosis_code)
-                            <span class="ml-1 align-middle inline-flex items-center rounded bg-slate-100 px-1.5 py-0.5 text-xs font-medium text-slate-500">{{ $encounter->diagnosis_code }}</span>
+                            <span class="ml-1 inline-flex items-center rounded bg-[#EFF4F2] px-1.5 py-0.5 align-middle font-mono text-xs font-medium text-[#0F766E]">{{ $encounter->diagnosis_code }}</span>
                         @endif
                     </p>
                 @else
-                    <p class="mt-1 text-sm text-slate-400">Not recorded.</p>
+                    <p class="mt-1 text-sm text-[#465854]">Not recorded</p>
                 @endif
             </div>
 
-            <div class="divider"></div>
-
-            <div>
+            <div class="py-4">
                 <p class="section-title">Assessment</p>
-                @if ($encounter->assessment)
-                    <p class="mt-1 whitespace-pre-line text-sm text-slate-700">{{ $encounter->assessment }}</p>
-                @else
-                    <p class="mt-1 text-sm text-slate-400">Not recorded.</p>
-                @endif
+                <p class="mt-1 whitespace-pre-line text-sm {{ $encounter->assessment ? 'text-[#243330]' : 'text-[#465854]' }}">
+                    {{ $encounter->assessment ?: 'Not recorded' }}
+                </p>
             </div>
 
-            <div class="divider"></div>
-
-            <div>
+            <div class="py-4">
                 <p class="section-title">Treatment plan</p>
-                @if ($encounter->treatment_plan)
-                    <p class="mt-1 whitespace-pre-line text-sm text-slate-700">{{ $encounter->treatment_plan }}</p>
-                @else
-                    <p class="mt-1 text-sm text-slate-400">Not recorded.</p>
-                @endif
+                <p class="mt-1 whitespace-pre-line text-sm {{ $encounter->treatment_plan ? 'text-[#243330]' : 'text-[#465854]' }}">
+                    {{ $encounter->treatment_plan ?: 'Not recorded' }}
+                </p>
             </div>
 
-            <div class="divider"></div>
-
-            <div>
+            <div class="py-4">
                 <p class="section-title">Clinical notes</p>
-                @if ($encounter->clinical_notes)
-                    <p class="mt-1 whitespace-pre-line text-sm text-slate-700">{{ $encounter->clinical_notes }}</p>
-                @else
-                    <p class="mt-1 text-sm text-slate-400">Not recorded.</p>
-                @endif
+                <p class="mt-1 whitespace-pre-line text-sm {{ $encounter->clinical_notes ? 'text-[#243330]' : 'text-[#465854]' }}">
+                    {{ $encounter->clinical_notes ?: 'Not recorded' }}
+                </p>
             </div>
         </div>
     </div>
 
-    {{-- Vitals --}}
-    <div class="mt-6 card">
+    {{-- Flat hairline Vitals grid (no nested rounded boxes) --}}
+    <div class="card mt-6 overflow-hidden">
         <div class="card-header flex flex-wrap items-center justify-between gap-2">
             <div>
-                <h3 class="text-sm font-semibold text-slate-900">Vitals</h3>
-                <p class="mt-0.5 text-xs text-slate-500">Recorded during this encounter.</p>
+                <h2 class="text-sm font-semibold text-[#14201E]">Vitals</h2>
+                <p class="mt-0.5 text-xs text-[#465854]">Recorded during this encounter.</p>
             </div>
             <span class="chip">
-                <x-icon name="heart-pulse" class="h-4 w-4 text-slate-400" />
-                {{ $encounter->vitals !== null ? 'Recorded' : 'Not recorded' }}
+                <x-icon name="heart-pulse" class="h-4 w-4 text-[#0F766E]" />
+                {{ $vitals !== null ? 'Recorded' : 'Not recorded' }}
             </span>
         </div>
-        <div class="card-body">
-            @if ($encounter->vitals === null)
+        @if ($vitals === null)
+            <div class="card-body">
                 <x-empty icon="heart-pulse" title="No vitals recorded"
-                         description="Vitals were not captured during this encounter." />
-            @else
-                @php($vitals = $encounter->vitals)
-                <dl class="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                    <div class="rounded-lg border border-slate-200 bg-slate-50 p-3">
-                        <dt class="section-title">Temperature</dt>
-                        <dd class="mt-1 text-sm font-semibold text-slate-900">
-                            {{ $vitals->temperature_c ?? '—' }}<span class="ml-1 text-xs font-normal text-slate-500">°C</span>
-                        </dd>
+                         description="You can add vitals below using “Update encounter”." />
+            </div>
+        @else
+            <dl class="grid grid-cols-2 divide-x divide-y divide-[#DCE3E1] sm:grid-cols-4">
+                <div class="p-4">
+                    <dt class="section-title">Temperature</dt>
+                    <dd class="mt-1 cs-num text-sm font-semibold text-[#14201E]">
+                        {{ $vitals->temperature_c ?? '—' }}<span class="ml-1 text-xs font-normal text-[#465854]">°C</span>
+                    </dd>
+                </div>
+                <div class="p-4">
+                    <dt class="section-title">Blood pressure</dt>
+                    <dd class="mt-1 cs-num text-sm font-semibold text-[#14201E]">
+                        {{ $vitals->systolic_bp && $vitals->diastolic_bp ? $vitals->systolic_bp.'/'.$vitals->diastolic_bp : '—' }}<span class="ml-1 text-xs font-normal text-[#465854]">mmHg</span>
+                    </dd>
+                </div>
+                <div class="p-4">
+                    <dt class="section-title">Heart rate</dt>
+                    <dd class="mt-1 cs-num text-sm font-semibold text-[#14201E]">
+                        {{ $vitals->heart_rate ?? '—' }}<span class="ml-1 text-xs font-normal text-[#465854]">bpm</span>
+                    </dd>
+                </div>
+                <div class="p-4">
+                    <dt class="section-title">Respiratory rate</dt>
+                    <dd class="mt-1 cs-num text-sm font-semibold text-[#14201E]">
+                        {{ $vitals->respiratory_rate ?? '—' }}<span class="ml-1 text-xs font-normal text-[#465854]">/min</span>
+                    </dd>
+                </div>
+                <div class="p-4">
+                    <dt class="section-title">Weight</dt>
+                    <dd class="mt-1 cs-num text-sm font-semibold text-[#14201E]">
+                        {{ $vitals->weight_kg ?? '—' }}<span class="ml-1 text-xs font-normal text-[#465854]">kg</span>
+                    </dd>
+                </div>
+                <div class="p-4">
+                    <dt class="section-title">Height</dt>
+                    <dd class="mt-1 cs-num text-sm font-semibold text-[#14201E]">
+                        {{ $vitals->height_cm ?? '—' }}<span class="ml-1 text-xs font-normal text-[#465854]">cm</span>
+                        @if ($totalInches !== null)
+                            <span class="ml-1 text-xs font-normal text-[#465854]">
+                                ({{ intdiv($totalInches, 12) }}&#8242;{{ $totalInches % 12 }}&#8243;)
+                            </span>
+                        @endif
+                    </dd>
+                </div>
+                <div class="p-4">
+                    <dt class="section-title">SpO₂</dt>
+                    <dd class="mt-1 cs-num text-sm font-semibold text-[#14201E]">
+                        {{ $vitals->spo2 ?? '—' }}<span class="ml-1 text-xs font-normal text-[#465854]">%</span>
+                    </dd>
+                </div>
+                @if ($vitals->bmi !== null)
+                    <div class="bg-[#E6F4F1]/60 p-4">
+                        <dt class="section-title text-[#0F766E]">BMI</dt>
+                        <dd class="mt-1 cs-num text-sm font-semibold text-[#0F766E]">{{ number_format($vitals->bmi, 1) }}</dd>
                     </div>
-                    <div class="rounded-lg border border-slate-200 bg-slate-50 p-3">
-                        <dt class="section-title">Blood pressure</dt>
-                        <dd class="mt-1 text-sm font-semibold text-slate-900">
-                            {{ $vitals->systolic_bp && $vitals->diastolic_bp ? $vitals->systolic_bp.'/'.$vitals->diastolic_bp : '—' }}<span class="ml-1 text-xs font-normal text-slate-500">mmHg</span>
-                        </dd>
-                    </div>
-                    <div class="rounded-lg border border-slate-200 bg-slate-50 p-3">
-                        <dt class="section-title">Heart rate</dt>
-                        <dd class="mt-1 text-sm font-semibold text-slate-900">
-                            {{ $vitals->heart_rate ?? '—' }}<span class="ml-1 text-xs font-normal text-slate-500">bpm</span>
-                        </dd>
-                    </div>
-                    <div class="rounded-lg border border-slate-200 bg-slate-50 p-3">
-                        <dt class="section-title">Respiratory rate</dt>
-                        <dd class="mt-1 text-sm font-semibold text-slate-900">
-                            {{ $vitals->respiratory_rate ?? '—' }}<span class="ml-1 text-xs font-normal text-slate-500">/min</span>
-                        </dd>
-                    </div>
-                    <div class="rounded-lg border border-slate-200 bg-slate-50 p-3">
-                        <dt class="section-title">Weight</dt>
-                        <dd class="mt-1 text-sm font-semibold text-slate-900">
-                            {{ $vitals->weight_kg ?? '—' }}<span class="ml-1 text-xs font-normal text-slate-500">kg</span>
-                        </dd>
-                    </div>
-                    <div class="rounded-lg border border-slate-200 bg-slate-50 p-3">
-                        <dt class="section-title">Height</dt>
-                        <dd class="mt-1 text-sm font-semibold text-slate-900">
-                            {{ $vitals->height_cm ?? '—' }}<span class="ml-1 text-xs font-normal text-slate-500">cm</span>
-                            @if (! empty($vitals->height_cm))
-                                @php($totalInches = (int) round($vitals->height_cm / 2.54))
-                                <span class="ml-1 text-xs font-normal text-slate-400">
-                                    ({{ intdiv($totalInches, 12) }}&#8242;{{ $totalInches % 12 }}&#8243;)
-                                </span>
-                            @endif
-                        </dd>
-                    </div>
-                    <div class="rounded-lg border border-slate-200 bg-slate-50 p-3">
-                        <dt class="section-title">SpO₂</dt>
-                        <dd class="mt-1 text-sm font-semibold text-slate-900">
-                            {{ $vitals->spo2 ?? '—' }}<span class="ml-1 text-xs font-normal text-slate-500">%</span>
-                        </dd>
-                    </div>
-                    @if ($vitals->bmi !== null)
-                        <div class="rounded-lg border border-teal-200 bg-teal-50 p-3">
-                            <dt class="section-title text-teal-700">BMI</dt>
-                            <dd class="mt-1 text-sm font-semibold text-teal-800">{{ number_format($vitals->bmi, 1) }}</dd>
-                        </div>
-                    @endif
-                </dl>
-            @endif
-        </div>
+                @endif
+            </dl>
+        @endif
     </div>
 
     {{-- Prescriptions --}}
-    <div class="mt-6 card">
+    <div class="card mt-6">
         <div class="card-header flex flex-wrap items-center justify-between gap-2">
             <div>
-                <h3 class="text-sm font-semibold text-slate-900">Prescriptions</h3>
-                <p class="mt-0.5 text-xs text-slate-500">Medications issued for this encounter.</p>
+                <h2 class="text-sm font-semibold text-[#14201E]">Prescriptions</h2>
+                <p class="mt-0.5 text-xs text-[#465854]">Medications issued for this encounter.</p>
             </div>
-            <span class="chip">
-                <x-icon name="document" class="h-4 w-4 text-slate-400" />
+            <span class="chip cs-num">
+                <x-icon name="document" class="h-4 w-4 text-[#465854]" />
                 {{ $encounter->prescriptions->count() }} issued
             </span>
         </div>
         <div class="card-body">
             @forelse ($encounter->prescriptions as $prescription)
-                <div class="{{ $loop->last ? '' : 'mb-4 border-b border-slate-100 pb-4' }}">
+                <div class="{{ $loop->last ? '' : 'mb-4 border-b border-[#DCE3E1] pb-4' }}">
                     <div class="flex flex-wrap items-center justify-between gap-2">
-                        <p class="flex items-center gap-2 text-sm font-semibold text-slate-900">
-                            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-teal-50 text-teal-600">
+                        <p class="flex items-center gap-2 text-sm font-semibold text-[#14201E]">
+                            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#E6F4F1] text-[#0F766E]">
                                 <x-icon name="document" class="h-4 w-4" />
                             </span>
                             {{ $prescription->medication_name }}{{ $prescription->strength ? ' '.$prescription->strength : '' }}
                         </p>
-                        <span class="chip">{{ $prescription->prescription_number }}</span>
+                        <span class="chip font-mono">{{ $prescription->prescription_number }}</span>
                     </div>
-                    <p class="mt-1.5 text-sm text-slate-600">
+                    <p class="mt-1.5 cs-num text-sm text-[#243330]">
                         {{ collect([
                             $prescription->dosage,
                             $prescription->frequency,
                             $prescription->route ? \Illuminate\Support\Str::headline($prescription->route) : null,
                             $prescription->duration,
                         ])->filter()->implode(' · ') ?: '—' }}
-                        <span class="text-slate-400">·</span> Qty: {{ $prescription->quantity ?? '—' }}
+                        <span class="text-[#465854]">·</span> Qty: {{ $prescription->quantity ?? '—' }}
                     </p>
                     @if ($prescription->instructions)
-                        <p class="mt-1 text-sm text-slate-500">{{ $prescription->instructions }}</p>
+                        <p class="mt-1 text-sm text-[#465854]">{{ $prescription->instructions }}</p>
                     @endif
                 </div>
             @empty
@@ -270,8 +257,8 @@
         {{-- Issue prescription --}}
         <div class="card self-start">
             <div class="card-header">
-                <h3 class="text-sm font-semibold text-slate-900">Issue prescription</h3>
-                <p class="mt-0.5 text-xs text-slate-500">Attach a new medication to this encounter.</p>
+                <h2 class="text-sm font-semibold text-[#14201E]">Issue prescription</h2>
+                <p class="mt-0.5 text-xs text-[#465854]">Attach a medication to this encounter.</p>
             </div>
 
             <form method="POST" action="{{ route('physician.prescriptions.store', $encounter) }}" data-dirty-guard>
@@ -281,7 +268,7 @@
                     <p class="section-title">Medication</p>
 
                     <div>
-                        <label for="medication_name" class="label">Medication name <span class="text-rose-500">*</span></label>
+                        <label for="medication_name" class="label">Medication name <span class="text-rose-700">*</span></label>
                         <input id="medication_name" name="medication_name" type="text" required
                                class="input @error('medication_name') input-invalid @enderror"
                                value="{{ old('medication_name') }}" placeholder="e.g. Amoxicillin">
@@ -357,7 +344,7 @@
                     <div>
                         <label for="quantity" class="label">Quantity</label>
                         <input id="quantity" name="quantity" type="number" min="1"
-                               class="input @error('quantity') input-invalid @enderror"
+                               class="input cs-num @error('quantity') input-invalid @enderror"
                                value="{{ old('quantity') }}" placeholder="e.g. 21">
                         @error('quantity')
                             <p class="field-error">{{ $message }}</p>
@@ -378,7 +365,7 @@
                     </div>
                 </div>
 
-                <div class="flex justify-end border-t border-slate-200 px-5 py-4">
+                <div class="flex justify-end border-t border-[#DCE3E1] px-5 py-4">
                     <button type="submit" class="btn btn-primary">
                         <x-icon name="plus" class="h-4 w-4" />
                         Issue prescription
@@ -387,11 +374,11 @@
             </form>
         </div>
 
-        {{-- Update encounter --}}
+        {{-- Update encounter + vitals amendment --}}
         <div class="card self-start">
             <div class="card-header">
-                <h3 class="text-sm font-semibold text-slate-900">Update encounter</h3>
-                <p class="mt-0.5 text-xs text-slate-500">Amend the diagnosis, plan or clinical notes.</p>
+                <h2 class="text-sm font-semibold text-[#14201E]">Update encounter &amp; vitals</h2>
+                <p class="mt-0.5 text-xs text-[#465854]">Amend the diagnosis, clinical notes, or vitals.</p>
             </div>
 
             <form method="POST" action="{{ route('physician.encounters.update', $encounter) }}" data-dirty-guard>
@@ -411,24 +398,26 @@
                         @enderror
                     </div>
 
-                    <div>
-                        <label for="diagnosis" class="label">Diagnosis <span class="text-rose-500">*</span></label>
-                        <input id="diagnosis" name="diagnosis" type="text" required
-                               class="input @error('diagnosis') input-invalid @enderror"
-                               value="{{ old('diagnosis', $encounter->diagnosis) }}">
-                        @error('diagnosis')
-                            <p class="field-error">{{ $message }}</p>
-                        @enderror
-                    </div>
+                    <div class="grid gap-4 sm:grid-cols-3">
+                        <div class="sm:col-span-2">
+                            <label for="diagnosis" class="label">Diagnosis <span class="text-rose-700">*</span></label>
+                            <input id="diagnosis" name="diagnosis" type="text" required
+                                   class="input @error('diagnosis') input-invalid @enderror"
+                                   value="{{ old('diagnosis', $encounter->diagnosis) }}">
+                            @error('diagnosis')
+                                <p class="field-error">{{ $message }}</p>
+                            @enderror
+                        </div>
 
-                    <div>
-                        <label for="diagnosis_code" class="label">Diagnosis code</label>
-                        <input id="diagnosis_code" name="diagnosis_code" type="text"
-                               class="input @error('diagnosis_code') input-invalid @enderror"
-                               value="{{ old('diagnosis_code', $encounter->diagnosis_code) }}" placeholder="ICD-10, optional">
-                        @error('diagnosis_code')
-                            <p class="field-error">{{ $message }}</p>
-                        @enderror
+                        <div>
+                            <label for="diagnosis_code" class="label">Diagnosis code</label>
+                            <input id="diagnosis_code" name="diagnosis_code" type="text"
+                                   class="input font-mono @error('diagnosis_code') input-invalid @enderror"
+                                   value="{{ old('diagnosis_code', $encounter->diagnosis_code) }}" placeholder="ICD-10">
+                            @error('diagnosis_code')
+                                <p class="field-error">{{ $message }}</p>
+                            @enderror
+                        </div>
                     </div>
 
                     <div>
@@ -454,22 +443,68 @@
 
                     <div>
                         <label for="clinical_notes" class="label">Clinical notes</label>
-                        <textarea id="clinical_notes" name="clinical_notes" rows="3"
+                        <textarea id="clinical_notes" name="clinical_notes" rows="2"
                                   class="input @error('clinical_notes') input-invalid @enderror">{{ old('clinical_notes', $encounter->clinical_notes) }}</textarea>
                         @error('clinical_notes')
                             <p class="field-error">{{ $message }}</p>
                         @enderror
                     </div>
 
-                    <label for="mark_completed" class="label flex items-center gap-2">
+                    <fieldset class="rounded-lg border border-[#DCE3E1] bg-[#F4F7F6] p-3.5">
+                        <legend class="section-title px-1">Amend vitals</legend>
+                        <div class="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                            <div>
+                                <label for="edit_temperature_c" class="label">Temp (°C)</label>
+                                <input id="edit_temperature_c" name="temperature_c" type="number" step="0.1"
+                                       class="input cs-num" value="{{ old('temperature_c', $vitals?->temperature_c) }}">
+                            </div>
+                            <div>
+                                <label for="edit_systolic_bp" class="label">Systolic</label>
+                                <input id="edit_systolic_bp" name="systolic_bp" type="number"
+                                       class="input cs-num" value="{{ old('systolic_bp', $vitals?->systolic_bp) }}">
+                            </div>
+                            <div>
+                                <label for="edit_diastolic_bp" class="label">Diastolic</label>
+                                <input id="edit_diastolic_bp" name="diastolic_bp" type="number"
+                                       class="input cs-num" value="{{ old('diastolic_bp', $vitals?->diastolic_bp) }}">
+                            </div>
+                            <div>
+                                <label for="edit_heart_rate" class="label">HR (bpm)</label>
+                                <input id="edit_heart_rate" name="heart_rate" type="number"
+                                       class="input cs-num" value="{{ old('heart_rate', $vitals?->heart_rate) }}">
+                            </div>
+                            <div>
+                                <label for="edit_respiratory_rate" class="label">RR (/min)</label>
+                                <input id="edit_respiratory_rate" name="respiratory_rate" type="number"
+                                       class="input cs-num" value="{{ old('respiratory_rate', $vitals?->respiratory_rate) }}">
+                            </div>
+                            <div>
+                                <label for="edit_spo2" class="label">SpO₂ (%)</label>
+                                <input id="edit_spo2" name="spo2" type="number" min="40" max="100"
+                                       class="input cs-num" value="{{ old('spo2', $vitals?->spo2) }}">
+                            </div>
+                            <div>
+                                <label for="edit_weight_kg" class="label">Weight (kg)</label>
+                                <input id="edit_weight_kg" name="weight_kg" type="number" step="0.1" min="1" max="500"
+                                       class="input cs-num" value="{{ old('weight_kg', $vitals?->weight_kg) }}">
+                            </div>
+                            <div>
+                                <label for="edit_height_cm" class="label">Height (cm)</label>
+                                <input id="edit_height_cm" name="height_cm" type="number" step="0.1" min="30" max="260"
+                                       class="input cs-num" value="{{ old('height_cm', $vitals?->height_cm) }}">
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <label for="mark_completed" class="label flex cursor-pointer items-center gap-2">
                         <input id="mark_completed" name="mark_completed" type="checkbox" value="1"
-                               class="h-4 w-4 shrink-0 rounded border-slate-300 text-teal-600 focus:ring-teal-500"
+                               class="h-4 w-4 shrink-0 rounded border-[#C5D0CD] accent-[#0F766E]"
                                @checked(old('mark_completed', $encounter->status === 'completed'))>
                         Mark this encounter as completed and close the appointment
                     </label>
                 </div>
 
-                <div class="flex justify-end border-t border-slate-200 px-5 py-4">
+                <div class="flex justify-end border-t border-[#DCE3E1] px-5 py-4">
                     <button type="submit" class="btn btn-secondary">
                         <x-icon name="check" class="h-4 w-4" />
                         Save changes

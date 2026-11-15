@@ -9,10 +9,10 @@
         <x-icon :name="$icon" class="h-6 w-6" />
     </span>
 
-    <h3 class="mt-4 text-sm font-semibold text-slate-900">{{ $title }}</h3>
+    <h2 class="mt-4 text-sm font-semibold text-[#14201E]">{{ $title }}</h2>
 
     @if ($description)
-        <p class="mt-1 max-w-sm text-sm text-slate-500">{{ $description }}</p>
+        <p class="mt-1 max-w-sm text-sm text-[#465854]">{{ $description }}</p>
     @endif
 
     @isset($action)

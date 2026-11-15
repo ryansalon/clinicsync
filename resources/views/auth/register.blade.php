@@ -3,8 +3,8 @@
 @section('title', 'Register')
 
 @section('content')
-    <h1 class="text-3xl font-normal tracking-tight text-bright">Patient registration</h1>
-    <p class="mt-2 text-sm leading-relaxed text-read">Create an account to book appointments and view your medical records.</p>
+    <h1 class="text-2xl font-semibold tracking-tight text-[#14201E] sm:text-3xl">Patient registration</h1>
+    <p class="mt-2 text-sm leading-relaxed text-[#465854]">Create an account to book appointments and view your medical records.</p>
 
     <form method="POST" action="{{ route('register') }}" class="mt-8 space-y-5">
         @csrf
@@ -66,13 +66,13 @@
                 || old('emergency_contact_name') || old('emergency_contact_phone') || old('emergency_contact_relationship');
         @endphp
 
-        <details class="rounded-panel border border-hairline bg-ground/60 p-4" @if ($hasOptionalInput) open @endif>
-            <summary class="flex cursor-pointer list-none items-center justify-between text-xs font-semibold uppercase tracking-[0.12em] text-meta hover:text-bright">
+        <details class="rounded-lg border border-[#DCE3E1] bg-[#F4F7F6]/70 p-4" @if ($hasOptionalInput) open @endif>
+            <summary class="flex min-h-8 cursor-pointer list-none items-center justify-between text-xs font-semibold uppercase tracking-[0.1em] text-[#465854] hover:text-[#14201E]">
                 <span>Optional demographics &amp; emergency contact</span>
-                <span class="text-[11px] font-normal normal-case text-meta">Can be added later</span>
+                <span class="text-[11px] font-normal normal-case text-[#465854]">Can be added later</span>
             </summary>
 
-            <div class="mt-4 space-y-4">
+            <div class="mt-4 space-y-4 border-t border-[#DCE3E1] pt-4">
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                         <label for="civil_status" class="label">Civil status</label>
@@ -105,8 +105,8 @@
                     @enderror
                 </div>
 
-                <fieldset class="rounded-panel border border-hairline bg-ground p-4">
-                    <legend class="px-1 font-guest-mono text-[11px] font-normal uppercase tracking-[0.14em] text-meta">Emergency contact</legend>
+                <fieldset class="border-t border-[#DCE3E1] pt-3">
+                    <legend class="pr-2 font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-[#465854]">Emergency contact</legend>
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div>
                             <label for="emergency_contact_name" class="label">Contact name</label>

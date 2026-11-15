@@ -22,7 +22,7 @@
         <button type="button" data-cal-prev disabled class="btn btn-secondary btn-sm" aria-label="Previous month">
             <x-icon name="chevron-left" class="h-4 w-4" />
         </button>
-        <p data-cal-label class="text-sm font-semibold text-slate-900" aria-live="polite">&nbsp;</p>
+        <p data-cal-label class="text-sm font-semibold text-[#14201E]" aria-live="polite">&nbsp;</p>
         <button type="button" data-cal-next disabled class="btn btn-secondary btn-sm" aria-label="Next month">
             <x-icon name="chevron-right" class="h-4 w-4" />
         </button>
@@ -30,19 +30,19 @@
 
     <div class="grid grid-cols-7 gap-1">
         @foreach (['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'] as $weekdayLabel)
-            <span class="text-center text-[11px] font-semibold tracking-wider text-slate-400 uppercase">{{ $weekdayLabel }}</span>
+            <span class="text-center text-[11px] font-semibold tracking-wider text-[#465854] uppercase">{{ $weekdayLabel }}</span>
         @endforeach
     </div>
 
     <div data-cal-grid class="grid grid-cols-7 gap-1"></div>
 
-    <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-slate-500">
-        <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-teal-500"></span> Available</span>
-        <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-rose-500"></span> Full</span>
-        <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-slate-300"></span> No availability</span>
+    <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-[#465854]">
+        <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-[#0F766E]"></span> Available</span>
+        <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-rose-600"></span> Full</span>
+        <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-[#C5D0CD]"></span> No availability</span>
     </div>
 
-    <div data-cal-panel class="rounded-lg border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">
+    <div data-cal-panel class="rounded-lg border border-dashed border-[#C5D0CD] bg-[#EFF4F2]/55 px-4 py-6 text-center text-sm text-[#465854]">
         Loading physician availability…
     </div>
 </div>
@@ -55,15 +55,15 @@
             var MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
             var WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-            var DAY_BASE = 'flex h-9 w-full items-center justify-center rounded-lg text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-teal-500 max-md:min-h-11';
-            var DAY_PAST = 'bg-slate-50 text-slate-300 cursor-not-allowed';
-            var DAY_AVAILABLE = 'bg-teal-50 text-teal-700 hover:bg-teal-100';
-            var DAY_FULL = 'bg-rose-50 text-rose-600 hover:bg-rose-100';
-            var DAY_NONE = 'bg-slate-50 text-slate-400 hover:bg-slate-100';
-            var DAY_SELECTED = 'btn-primary shadow-sm';
-            var DAY_TODAY = 'border border-teal-500';
-            var PANEL_IDLE = 'rounded-lg border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-center';
-            var PANEL_LIST = 'rounded-lg border border-slate-200 bg-slate-50 p-3';
+            var DAY_BASE = 'flex h-9 w-full items-center justify-center rounded-lg text-sm font-medium cs-num transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F766E] max-md:min-h-11';
+            var DAY_PAST = 'bg-[#EFF4F2]/60 text-[#465854]/60 cursor-not-allowed';
+            var DAY_AVAILABLE = 'bg-[#E6F4F1] text-[#0F766E] hover:bg-[#D5ECE7]';
+            var DAY_FULL = 'bg-rose-50 text-rose-800 hover:bg-rose-100';
+            var DAY_NONE = 'bg-[#EFF4F2] text-[#465854] hover:bg-[#DFE7E4]';
+            var DAY_SELECTED = 'btn-primary shadow-xs';
+            var DAY_TODAY = 'border border-[#0F766E]';
+            var PANEL_IDLE = 'rounded-lg border border-dashed border-[#C5D0CD] bg-[#EFF4F2]/55 px-4 py-6 text-center';
+            var PANEL_LIST = 'rounded-lg border border-[#DCE3E1] bg-[#F4F7F6] p-3';
 
             var roots = document.querySelectorAll('[data-availability-calendar]');
 
@@ -334,7 +334,7 @@
 
                 function buildBookFooter() {
                     var footer = document.createElement('div');
-                    footer.className = 'mt-3 border-t border-slate-200 pt-3';
+                    footer.className = 'mt-3 border-t border-[#DCE3E1] pt-3';
 
                     var button = document.createElement('button');
                     button.type = 'button';
@@ -386,7 +386,7 @@
                     var dateObject = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
                     var title = document.createElement('p');
 
-                    title.className = 'text-sm font-semibold text-slate-900';
+                    title.className = 'text-sm font-semibold text-[#14201E]';
                     title.textContent = WEEKDAY_NAMES[dateObject.getDay()] + ', ' + MONTH_NAMES[dateObject.getMonth()] + ' ' + dateObject.getDate() + ', ' + dateObject.getFullYear();
 
                     return title;
@@ -394,18 +394,18 @@
 
                 function buildPhysicianRow(doctor, info) {
                     var row = document.createElement('div');
-                    row.className = 'flex flex-wrap items-center justify-between gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2.5'
-                        + (chosenPhysician === doctor.id ? ' ring-2 ring-teal-500' : '');
+                    row.className = 'flex flex-wrap items-center justify-between gap-2 rounded-md border border-[#DCE3E1] bg-white px-3 py-2.5'
+                        + (chosenPhysician === doctor.id ? ' ring-2 ring-[#0F766E]' : '');
 
                     var details = document.createElement('div');
                     details.className = 'min-w-0';
 
                     var name = document.createElement('p');
-                    name.className = 'text-sm font-medium text-slate-900';
+                    name.className = 'text-sm font-medium text-[#14201E]';
                     name.textContent = 'Dr. ' + doctor.name;
 
                     var specialization = document.createElement('p');
-                    specialization.className = 'text-xs text-slate-500';
+                    specialization.className = 'text-xs text-[#465854]';
                     specialization.textContent = doctor.specialization;
 
                     details.appendChild(name);
@@ -413,7 +413,7 @@
 
                     if (info.state === 'available') {
                         var slotsLeft = document.createElement('p');
-                        slotsLeft.className = 'text-xs font-medium text-teal-700';
+                        slotsLeft.className = 'cs-num text-xs font-medium text-[#0F766E]';
                         slotsLeft.textContent = info.remaining + ' slot' + (info.remaining === 1 ? '' : 's') + ' left on this date';
                         details.appendChild(slotsLeft);
                     }
@@ -434,7 +434,7 @@
                         side.appendChild(fullBadge);
                     } else {
                         var notAvailable = document.createElement('span');
-                        notAvailable.className = 'text-xs text-slate-400';
+                        notAvailable.className = 'text-xs text-[#465854]';
                         notAvailable.textContent = 'Not available this day';
                         side.appendChild(notAvailable);
                     }
@@ -453,6 +453,9 @@
                         button.textContent = 'Select';
                         button.addEventListener('click', function () {
                             choosePhysician(doctor.id);
+                            if (mode === 'reveal') {
+                                revealBooking();
+                            }
                         });
 
                         return button;

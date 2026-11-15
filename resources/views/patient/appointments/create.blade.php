@@ -3,16 +3,16 @@
 @section('title', 'Book an appointment')
 
 @section('content')
-    <x-page-header title="Book an appointment" description="Pick a date to see which physicians are available, then press Book appointment to choose your time slot." />
+    <x-page-header title="Book an appointment" description="Select an available clinic date to reveal open time slots · Mon–Sat, 08:00–17:00." />
 
     <div class="mx-auto max-w-3xl">
-        {{-- Step 1 — availability calendar, the first thing the patient sees --}}
-        <div class="card">
+        {{-- Step 1 — availability calendar --}}
+        <section class="card">
             <div class="card-header flex flex-wrap items-center justify-between gap-2">
-                <h3 class="text-sm font-semibold tracking-tight text-slate-900">Step 1 — Pick a date</h3>
+                <x-card-title>Step 1 — Pick a clinic date</x-card-title>
                 <span class="chip">
-                    <x-icon name="calendar" class="h-3.5 w-3.5 text-slate-400" />
-                    See who is available
+                    <x-icon name="calendar" class="h-3.5 w-3.5 text-[#0F766E]" />
+                    Tap any date to choose a physician & slot
                 </span>
             </div>
             <div class="card-body">
@@ -24,12 +24,12 @@
                     reveal-target="booking-form"
                     :selected-date="$selectedDate" />
             </div>
-        </div>
+        </section>
 
-        {{-- Step 2 — the booking form, revealed once a date is chosen --}}
-        <div class="card mt-6 {{ $formVisible ? '' : 'hidden' }}" id="booking-form" tabindex="-1">
+        {{-- Step 2 — booking form --}}
+        <section class="card mt-6 {{ $formVisible ? '' : 'hidden' }}" id="booking-form" tabindex="-1">
             <div class="card-header">
-                <h3 class="text-sm font-semibold tracking-tight text-slate-900">Step 2 — Choose your physician and time</h3>
+                <x-card-title>Step 2 — Choose your physician and time</x-card-title>
             </div>
             <div class="card-body">
                 <form method="POST" action="{{ route('patient.appointments.store') }}" class="space-y-5">
@@ -54,7 +54,7 @@
                         <div>
                             <label for="appointment_date" class="label">Appointment date</label>
                             <input id="appointment_date" type="date" name="appointment_date"
-                                   class="input @error('appointment_date') input-invalid @enderror"
+                                   class="input cs-num @error('appointment_date') input-invalid @enderror"
                                    min="{{ now()->format('Y-m-d') }}"
                                    max="{{ now()->addDays(\App\Services\PhysicianAvailability::BOOKING_HORIZON_DAYS)->toDateString() }}"
                                    value="{{ old('appointment_date', $selectedDate ?? null) }}" required>
@@ -64,8 +64,8 @@
                         </div>
                         <div class="flex items-end">
                             <p class="helper flex items-start gap-1.5">
-                                <x-icon name="information-circle" class="mt-0.5 h-4 w-4 shrink-0" />
-                                <span>Slots are generated from the physician's clinic schedule. Times shown are in the clinic's local time.</span>
+                                <x-icon name="information-circle" class="mt-0.5 h-4 w-4 shrink-0 text-[#0F766E]" />
+                                <span>Slots reflect the physician's clinic hours in local clinic time.</span>
                             </p>
                         </div>
                     </div>
@@ -74,11 +74,11 @@
                         <label for="start_time" class="label">Appointment time</label>
                         <input type="hidden" name="start_time" id="start_time" value="{{ old('start_time') }}">
                         <div id="slot-grid" aria-live="polite" class="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
-                            <p class="col-span-full rounded-lg border border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-center text-sm text-slate-500">
-                                Select a physician and date to see available slots.
+                            <p class="col-span-full rounded-md border border-dashed border-[#DCE3E1] bg-[#F4F7F6] px-4 py-8 text-center text-sm text-[#465854]">
+                                Select a physician and date to load open slots.
                             </p>
                         </div>
-                        <p id="capacity-note" class="mt-2 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-medium text-rose-700" role="alert" hidden></p>
+                        <p id="capacity-note" class="mt-2 rounded-md border border-[#9F1239]/25 bg-[#FCE7EA] px-3 py-2 text-sm font-medium text-[#9F1239]" role="alert" hidden></p>
                         <p id="slot-helper" class="helper"></p>
                         <p id="slot-error" class="field-error" role="alert" hidden></p>
                         @error('start_time')
@@ -97,20 +97,20 @@
                     </div>
 
                     <div>
-                        <label for="reason" class="label">Reason for the visit <span class="font-normal text-slate-400">(optional)</span></label>
-                        <textarea id="reason" name="reason" rows="4" class="input @error('reason') input-invalid @enderror"
+                        <label for="reason" class="label">Reason for the visit <span class="font-normal text-[#465854]">(optional)</span></label>
+                        <textarea id="reason" name="reason" rows="3" class="input @error('reason') input-invalid @enderror"
                                   placeholder="Anything else the physician should know before your visit…">{{ old('reason') }}</textarea>
                         @error('reason')
                             <p class="field-error">{{ $message }}</p>
                         @enderror
                     </div>
 
-                    <div id="booking-summary" class="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-600" hidden>
-                        <p class="font-semibold text-slate-900">Booking summary</p>
-                        <p id="booking-summary-text" class="mt-0.5"></p>
+                    <div id="booking-summary" class="rounded-md border border-[#DCE3E1] bg-[#F4F7F6] px-4 py-3 text-xs text-[#465854]" hidden>
+                        <p class="font-semibold text-[#14201E]">Booking summary</p>
+                        <p id="booking-summary-text" class="cs-num mt-0.5 text-[#14201E]"></p>
                     </div>
 
-                    <div class="flex flex-wrap items-center gap-3 border-t border-slate-200 pt-5">
+                    <div class="flex flex-wrap items-center gap-3 border-t border-[#DCE3E1] pt-5">
                         <button type="submit" class="btn btn-primary">
                             <x-icon name="calendar" class="h-4 w-4" />
                             Book appointment
@@ -122,7 +122,7 @@
                     </div>
                 </form>
             </div>
-        </div>
+        </section>
     </div>
 @endsection
 
@@ -145,12 +145,12 @@
                 return;
             }
 
-            var IDLE_MESSAGE = 'Select a physician and date to see available slots.';
-            var NO_SLOTS_MESSAGE = 'No open slots on this date. Please try another date.';
+            var IDLE_MESSAGE = 'Select a physician and date to load open slots.';
+            var NO_SLOTS_MESSAGE = 'No open slots on this date. Pick another date.';
             var LOADING_MESSAGE = 'Loading available slots…';
-            var AVAILABLE_CLASS = 'rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm font-medium text-slate-700 shadow-xs transition hover:border-teal-400 hover:bg-teal-50 hover:text-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500';
-            var SELECTED_CLASS = 'btn btn-primary w-full justify-center py-2.5';
-            var DISABLED_CLASS = 'rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-medium text-slate-400 cursor-not-allowed';
+            var AVAILABLE_CLASS = 'cs-num min-h-11 rounded-md border border-[#DCE3E1] bg-white px-3 py-2 text-sm font-medium text-[#14201E] transition hover:border-[#0F766E] hover:bg-[#E6F4F1] hover:text-[#0F766E] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0F766E]';
+            var SELECTED_CLASS = 'cs-num min-h-11 rounded-md border border-[#0F766E] bg-[#0F766E] px-3 py-2 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0F766E]';
+            var DISABLED_CLASS = 'cs-num min-h-11 rounded-md border border-[#DCE3E1] bg-[#F4F7F6] px-3 py-2 text-sm font-medium text-[#465854]/70 line-through cursor-not-allowed';
             var summaryBox = document.getElementById('booking-summary');
             var summaryText = document.getElementById('booking-summary-text');
 
@@ -180,8 +180,6 @@
                 }
             }
 
-            // Warn before submit when the picked date has no room left, using the
-            // same wording the server would reject the booking with.
             function setCapacityNote(payload) {
                 if (!capacityNote) return;
 
@@ -198,9 +196,9 @@
                     var who = payload.physician_name ? 'Dr. ' + payload.physician_name : 'This physician';
                     var limit = payload.daily_patient_limit;
                     capacityNote.textContent = 'This date is full — ' + who + ' can cater at most '
-                        + limit + ' patient' + (limit === 1 ? '' : 's') + ' a day. Please pick another date.';
+                        + limit + ' patient' + (limit === 1 ? '' : 's') + ' a day. Pick another date.';
                 } else {
-                    capacityNote.textContent = 'No open slots remain on this date. Please pick another date.';
+                    capacityNote.textContent = 'No open slots remain on this date. Pick another date.';
                 }
 
                 capacityNote.hidden = false;
@@ -209,7 +207,7 @@
             function showMessage(message, helperText) {
                 slotContainer.innerHTML = '';
                 var paragraph = document.createElement('p');
-                paragraph.className = 'col-span-full rounded-lg border border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-center text-sm text-slate-500';
+                paragraph.className = 'col-span-full rounded-md border border-dashed border-[#DCE3E1] bg-[#F4F7F6] px-4 py-8 text-center text-sm text-[#465854]';
                 paragraph.textContent = message;
                 slotContainer.appendChild(paragraph);
                 if (helper) helper.textContent = helperText || '';
@@ -293,7 +291,6 @@
                 }
 
                 updateSummary();
-
                 setError('');
                 showMessage(LOADING_MESSAGE);
 
@@ -307,7 +304,7 @@
                     .then(renderSlots)
                     .catch(function () {
                         showMessage(IDLE_MESSAGE);
-                        setError('We could not load available slots. Please try again.');
+                        setError('Could not load available slots. Try again.');
                     });
             }
 
@@ -318,7 +315,7 @@
                 bookingForm.addEventListener('submit', function (event) {
                     if (!hiddenStart.value) {
                         event.preventDefault();
-                        setError('Please select an available time slot.');
+                        setError('Select an available time slot.');
                         if (slotContainer) {
                             if (window.clinicScrollTo) {
                                 window.clinicScrollTo(slotContainer);
@@ -330,7 +327,6 @@
                 });
             }
 
-            // Re-populate slots when returning to the form with validation errors.
             loadSlots();
         })();
     </script>

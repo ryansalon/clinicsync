@@ -10,6 +10,7 @@
         </x-slot:actions>
     </x-page-header>
 
+    {{-- Single unified allergy alert at top of workspace (eliminates duplicate card) --}}
     @if ($allergies->isNotEmpty())
         <x-alert type="error" class="mb-6" title="Active allergies on file ({{ $allergies->count() }})">
             <ul class="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs">
@@ -23,159 +24,12 @@
         </x-alert>
     @endif
 
-    <div class="grid gap-6 lg:grid-cols-3">
-        {{-- Left column: patient record at a glance --}}
-        <div class="space-y-6 lg:col-span-2">
-            {{-- Patient summary --}}
+    <div class="grid gap-6 lg:grid-cols-12">
+        {{-- Primary workspace (7/12): Consultation SOAP & Vitals --}}
+        <div class="lg:col-span-7">
             <div class="card">
                 <div class="card-header">
-                    <x-card-title>Patient</x-card-title>
-                    <div class="mt-2 flex items-center gap-3">
-                        <x-avatar :name="$patient->user->name" size="lg" />
-                        <div class="min-w-0">
-                            <p class="text-base font-semibold tracking-tight text-slate-900">{{ $patient->user->name }}</p>
-                            <p class="text-xs text-slate-500">{{ $patient->patient_number }}</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <dl class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
-                        <div>
-                            <dt class="section-title">Age</dt>
-                            <dd class="mt-1 text-sm text-slate-700">{{ $patient->age ?? '—' }} years old</dd>
-                        </div>
-                        <div>
-                            <dt class="section-title">Sex</dt>
-                            <dd class="mt-1 text-sm text-slate-700">{{ $patient->sex ? \Illuminate\Support\Str::headline($patient->sex) : '—' }}</dd>
-                        </div>
-                        <div>
-                            <dt class="section-title">Blood type</dt>
-                            <dd class="mt-1 text-sm text-slate-700">{{ $patient->blood_type ?: '—' }}</dd>
-                        </div>
-                        <div>
-                            <dt class="section-title">Civil status</dt>
-                            <dd class="mt-1 text-sm text-slate-700">{{ $patient->civil_status ? \Illuminate\Support\Str::headline($patient->civil_status) : '—' }}</dd>
-                        </div>
-                        <div class="sm:col-span-2">
-                            <dt class="section-title">Address</dt>
-                            <dd class="mt-1 text-sm text-slate-700">{{ $patient->address ?: '—' }}</dd>
-                        </div>
-                        <div class="sm:col-span-2 lg:col-span-3">
-                            <dt class="section-title">Emergency contact</dt>
-                            <dd class="mt-1 text-sm text-slate-700">
-                                {{ $patient->emergency_contact_name ?: '—' }}
-                                @if ($patient->emergency_contact_phone)
-                                    <span class="text-slate-500">· {{ $patient->emergency_contact_phone }}</span>
-                                @endif
-                            </dd>
-                        </div>
-                    </dl>
-                </div>
-            </div>
-
-            {{-- Allergies --}}
-            <div class="card">
-                <div class="card-header flex flex-wrap items-center justify-between gap-2">
-                    <x-card-title description="Active allergies only.">Allergies</x-card-title>
-                    <span class="chip">
-                        <x-icon name="exclamation-triangle" class="h-4 w-4 text-slate-400" />
-                        {{ $allergies->count() }} on file
-                    </span>
-                </div>
-                <div class="card-body">
-                    @forelse ($allergies as $allergy)
-                        <div class="rounded-lg border border-rose-200 bg-rose-50 p-3 {{ $loop->last ? '' : 'mb-3' }}">
-                            <div class="flex flex-wrap items-center justify-between gap-2">
-                                <p class="text-sm font-semibold text-rose-800">{{ $allergy->allergen }}</p>
-                                <span class="badge badge-{{ $allergy->severity }}">
-                                    {{ \Illuminate\Support\Str::headline($allergy->severity) }}
-                                </span>
-                            </div>
-                            <p class="mt-1 text-sm text-rose-700">{{ $allergy->reaction }}</p>
-                        </div>
-                    @empty
-                        <x-empty icon="shield-check" title="No known active allergies"
-                                 description="No active allergies are recorded for this patient." />
-                    @endforelse
-                </div>
-            </div>
-
-            {{-- Medical history --}}
-            <div class="card">
-                <div class="card-header">
-                    <x-card-title description="Past conditions recorded by the clinic.">Medical history</x-card-title>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead>
-                            <tr>
-                                <th class="table-head">Condition</th>
-                                <th class="table-head">Type</th>
-                                <th class="table-head">Year</th>
-                                <th class="table-head">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($histories as $history)
-                                <tr class="table-row">
-                                    <td class="table-cell font-medium text-slate-900">{{ $history->condition_name }}</td>
-                                    <td class="table-cell">{{ \Illuminate\Support\Str::headline($history->type) }}</td>
-                                    <td class="table-cell">{{ $history->year_diagnosed ?? '—' }}</td>
-                                    <td class="table-cell">{{ $history->status ? \Illuminate\Support\Str::headline($history->status) : '—' }}</td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="4" class="px-4 py-12">
-                                        <x-empty icon="document" title="No medical history recorded"
-                                                 description="Past conditions recorded by the clinic will appear here." />
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            {{-- Previous consultations --}}
-            <div class="card">
-                <div class="card-header flex flex-wrap items-center justify-between gap-3">
-                    <x-card-title description="Most recent 5 encounters.">Previous consultations</x-card-title>
-                    <a href="{{ route('physician.patients.show', $patient) }}"
-                       class="inline-flex items-center gap-1 text-sm font-medium text-teal-600 transition hover:text-teal-700">
-                        Full record
-                        <x-icon name="arrow-right" class="h-4 w-4" />
-                    </a>
-                </div>
-                <div class="divide-y divide-slate-100">
-                    @forelse ($previousEncounters as $previous)
-                        <div class="flex flex-wrap items-center justify-between gap-3 px-5 py-3.5 transition-colors hover:bg-slate-50/70">
-                            <div class="min-w-0">
-                                <p class="text-sm">
-                                    <a href="{{ route('physician.encounters.show', $previous) }}" class="font-medium text-slate-900 transition hover:text-teal-700">{{ $previous->encounter_number }}</a>
-                                    <span class="ml-2 text-xs text-slate-500">{{ $previous->encountered_at->isoFormat('MMM D, YYYY') }}</span>
-                                </p>
-                                <p class="mt-0.5 truncate text-sm text-slate-600">
-                                    {{ $previous->diagnosis }}
-                                    <span class="text-xs text-slate-400">· {{ $previous->physician->user->name }}</span>
-                                </p>
-                            </div>
-                            <span class="badge badge-{{ $previous->status }}">{{ \Illuminate\Support\Str::headline($previous->status) }}</span>
-                        </div>
-                    @empty
-                        <div class="px-5 py-6">
-                            <x-empty icon="clipboard" title="No previous consultations"
-                                     description="This patient's consultation history will appear here." />
-                        </div>
-                    @endforelse
-                </div>
-            </div>
-        </div>
-
-        {{-- Right column: consultation form --}}
-        <div>
-            <div class="card">
-                <div class="card-header">
-                    <x-card-title description="Record the diagnosis, plan and vitals for this visit.">Consultation form</x-card-title>
+                    <x-card-title description="Record the diagnosis, clinical plan, and vitals. Save first to issue prescriptions on the encounter chart.">Consultation form</x-card-title>
                 </div>
 
                 <form method="POST" action="{{ route('physician.encounters.store', $appointment) }}" data-dirty-guard>
@@ -195,24 +49,26 @@
                             @enderror
                         </div>
 
-                        <div>
-                            <label for="diagnosis" class="label">Diagnosis <span class="text-rose-500">*</span></label>
-                            <input id="diagnosis" name="diagnosis" type="text" required
-                                   class="input @error('diagnosis') input-invalid @enderror"
-                                   value="{{ old('diagnosis') }}" placeholder="Primary diagnosis">
-                            @error('diagnosis')
-                                <p class="field-error">{{ $message }}</p>
-                            @enderror
-                        </div>
+                        <div class="grid gap-4 sm:grid-cols-3">
+                            <div class="sm:col-span-2">
+                                <label for="diagnosis" class="label">Diagnosis <span class="text-rose-700">*</span></label>
+                                <input id="diagnosis" name="diagnosis" type="text" required
+                                       class="input @error('diagnosis') input-invalid @enderror"
+                                       value="{{ old('diagnosis') }}" placeholder="Primary diagnosis">
+                                @error('diagnosis')
+                                    <p class="field-error">{{ $message }}</p>
+                                @enderror
+                            </div>
 
-                        <div>
-                            <label for="diagnosis_code" class="label">Diagnosis code</label>
-                            <input id="diagnosis_code" name="diagnosis_code" type="text"
-                                   class="input @error('diagnosis_code') input-invalid @enderror"
-                                   value="{{ old('diagnosis_code') }}" placeholder="ICD-10, optional">
-                            @error('diagnosis_code')
-                                <p class="field-error">{{ $message }}</p>
-                            @enderror
+                            <div>
+                                <label for="diagnosis_code" class="label">Diagnosis code</label>
+                                <input id="diagnosis_code" name="diagnosis_code" type="text"
+                                       class="input font-mono @error('diagnosis_code') input-invalid @enderror"
+                                       value="{{ old('diagnosis_code') }}" placeholder="ICD-10">
+                                @error('diagnosis_code')
+                                    <p class="field-error">{{ $message }}</p>
+                                @enderror
+                            </div>
                         </div>
 
                         <div>
@@ -240,32 +96,30 @@
 
                         <div>
                             <label for="clinical_notes" class="label">Clinical notes</label>
-                            <textarea id="clinical_notes" name="clinical_notes" rows="3"
+                            <textarea id="clinical_notes" name="clinical_notes" rows="2"
                                       class="input @error('clinical_notes') input-invalid @enderror"
-                                      placeholder="Additional notes">{{ old('clinical_notes') }}</textarea>
+                                      placeholder="Additional observations">{{ old('clinical_notes') }}</textarea>
                             @error('clinical_notes')
                                 <p class="field-error">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <fieldset class="rounded-lg border border-slate-200 bg-slate-50/60 p-4">
+                        <fieldset class="rounded-lg border border-[#DCE3E1] bg-[#F4F7F6] p-4">
                             <legend class="section-title px-1">Vitals</legend>
 
                             @php
-                                // Rebuild the ft/in fields from a submitted centimeter value
-                                // when the form is re-rendered after a validation error.
                                 $legacyCm = old('height_cm');
                                 $presetFeet = old('height_feet', is_numeric($legacyCm) ? (int) floor($legacyCm / 30.48) : '');
                                 $presetInches = old('height_inches', is_numeric($legacyCm) ? round((($legacyCm / 2.54) - ((int) floor($legacyCm / 30.48)) * 12), 1) : '');
                             @endphp
 
-                            <div class="mt-3 grid grid-cols-2 gap-4">
+                            <div class="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-3">
                                 <div>
                                     <label for="temperature_c" class="label">Temperature</label>
                                     <div class="relative">
                                         <input id="temperature_c" name="temperature_c" type="number" step="0.1"
-                                               class="input pr-14 @error('temperature_c') input-invalid @enderror"
-                                               value="{{ old('temperature_c') }}" placeholder="e.g. 37.2">
+                                               class="input cs-num pr-12 @error('temperature_c') input-invalid @enderror"
+                                               value="{{ old('temperature_c') }}" placeholder="37.2">
                                         <span class="input-unit">°C</span>
                                     </div>
                                     @error('temperature_c')
@@ -277,8 +131,8 @@
                                     <label for="systolic_bp" class="label">Systolic BP</label>
                                     <div class="relative">
                                         <input id="systolic_bp" name="systolic_bp" type="number"
-                                               class="input pr-16 @error('systolic_bp') input-invalid @enderror"
-                                               value="{{ old('systolic_bp') }}" placeholder="e.g. 120">
+                                               class="input cs-num pr-16 @error('systolic_bp') input-invalid @enderror"
+                                               value="{{ old('systolic_bp') }}" placeholder="120">
                                         <span class="input-unit">mmHg</span>
                                     </div>
                                     @error('systolic_bp')
@@ -290,8 +144,8 @@
                                     <label for="diastolic_bp" class="label">Diastolic BP</label>
                                     <div class="relative">
                                         <input id="diastolic_bp" name="diastolic_bp" type="number"
-                                               class="input pr-16 @error('diastolic_bp') input-invalid @enderror"
-                                               value="{{ old('diastolic_bp') }}" placeholder="e.g. 80">
+                                               class="input cs-num pr-16 @error('diastolic_bp') input-invalid @enderror"
+                                               value="{{ old('diastolic_bp') }}" placeholder="80">
                                         <span class="input-unit">mmHg</span>
                                     </div>
                                     @error('diastolic_bp')
@@ -303,8 +157,8 @@
                                     <label for="heart_rate" class="label">Heart rate</label>
                                     <div class="relative">
                                         <input id="heart_rate" name="heart_rate" type="number"
-                                               class="input pr-14 @error('heart_rate') input-invalid @enderror"
-                                               value="{{ old('heart_rate') }}" placeholder="e.g. 84">
+                                               class="input cs-num pr-14 @error('heart_rate') input-invalid @enderror"
+                                               value="{{ old('heart_rate') }}" placeholder="84">
                                         <span class="input-unit">bpm</span>
                                     </div>
                                     @error('heart_rate')
@@ -316,8 +170,8 @@
                                     <label for="respiratory_rate" class="label">Respiratory rate</label>
                                     <div class="relative">
                                         <input id="respiratory_rate" name="respiratory_rate" type="number"
-                                               class="input pr-14 @error('respiratory_rate') input-invalid @enderror"
-                                               value="{{ old('respiratory_rate') }}" placeholder="e.g. 18">
+                                               class="input cs-num pr-14 @error('respiratory_rate') input-invalid @enderror"
+                                               value="{{ old('respiratory_rate') }}" placeholder="18">
                                         <span class="input-unit">/min</span>
                                     </div>
                                     @error('respiratory_rate')
@@ -326,11 +180,24 @@
                                 </div>
 
                                 <div>
+                                    <label for="spo2" class="label">SpO₂</label>
+                                    <div class="relative">
+                                        <input id="spo2" name="spo2" type="number" min="40" max="100"
+                                               class="input cs-num pr-10 @error('spo2') input-invalid @enderror"
+                                               value="{{ old('spo2') }}" placeholder="98">
+                                        <span class="input-unit">%</span>
+                                    </div>
+                                    @error('spo2')
+                                        <p class="field-error">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div>
                                     <label for="weight_kg" class="label">Weight</label>
                                     <div class="relative">
                                         <input id="weight_kg" name="weight_kg" type="number" step="0.1" min="1" max="500"
-                                               class="input pr-12 @error('weight_kg') input-invalid @enderror"
-                                               value="{{ old('weight_kg') }}" placeholder="e.g. 62.5">
+                                               class="input cs-num pr-12 @error('weight_kg') input-invalid @enderror"
+                                               value="{{ old('weight_kg') }}" placeholder="62.5">
                                         <span class="input-unit">kg</span>
                                     </div>
                                     @error('weight_kg')
@@ -338,19 +205,21 @@
                                     @enderror
                                 </div>
 
-                                {{-- Height is entered in feet & inches; the record stores cm --}}
+                                {{-- Height in feet & inches with explicit label on each field --}}
                                 <div class="col-span-2">
-                                    <label for="height_feet" class="label">Height</label>
+                                    <p class="label">Height</p>
                                     <div class="flex items-center gap-2">
                                         <div class="relative flex-1">
+                                            <label for="height_feet" class="sr-only">Height in feet</label>
                                             <input id="height_feet" name="height_feet" type="number" min="0" max="8" step="1"
-                                                   class="input pr-12 @error('height_feet') input-invalid @enderror @error('height_cm') input-invalid @enderror"
+                                                   class="input cs-num pr-10 @error('height_feet') input-invalid @enderror @error('height_cm') input-invalid @enderror"
                                                    value="{{ $presetFeet }}" placeholder="5">
                                             <span class="input-unit">ft</span>
                                         </div>
                                         <div class="relative flex-1">
+                                            <label for="height_inches" class="sr-only">Height in inches</label>
                                             <input id="height_inches" name="height_inches" type="number" min="0" max="11.9" step="0.5"
-                                                   class="input pr-12 @error('height_inches') input-invalid @enderror @error('height_cm') input-invalid @enderror"
+                                                   class="input cs-num pr-10 @error('height_inches') input-invalid @enderror @error('height_cm') input-invalid @enderror"
                                                    value="{{ $presetInches }}" placeholder="10">
                                             <span class="input-unit">in</span>
                                         </div>
@@ -367,31 +236,18 @@
                                         <p class="field-error">{{ $message }}</p>
                                     @enderror
                                 </div>
-
-                                <div>
-                                    <label for="spo2" class="label">SpO₂</label>
-                                    <div class="relative">
-                                        <input id="spo2" name="spo2" type="number" min="40" max="100"
-                                               class="input pr-12 @error('spo2') input-invalid @enderror"
-                                               value="{{ old('spo2') }}" placeholder="e.g. 98">
-                                        <span class="input-unit">%</span>
-                                    </div>
-                                    @error('spo2')
-                                        <p class="field-error">{{ $message }}</p>
-                                    @enderror
-                                </div>
                             </div>
                         </fieldset>
 
-                        <label for="mark_completed" class="label flex items-center gap-2">
+                        <label for="mark_completed" class="label flex cursor-pointer items-center gap-2">
                             <input id="mark_completed" name="mark_completed" type="checkbox" value="1"
-                                   class="h-4 w-4 shrink-0 rounded border-slate-300 text-teal-600 focus:ring-teal-500"
+                                   class="h-4 w-4 shrink-0 rounded border-[#C5D0CD] accent-[#0F766E]"
                                    @checked(old('mark_completed'))>
-                            Mark this consultation as completed and close the appointment
+                            Mark this consultation as completed and close the appointment (you can still add prescriptions right after saving)
                         </label>
                     </div>
 
-                    <div class="sticky bottom-0 z-10 flex items-center justify-end gap-3 rounded-b-xl border-t border-slate-200 bg-white/95 px-5 py-4 backdrop-blur">
+                    <div class="sticky bottom-0 z-10 flex items-center justify-end gap-3 rounded-b-xl border-t border-[#DCE3E1] bg-white/95 px-5 py-4 backdrop-blur-xs">
                         <a href="{{ route('physician.dashboard') }}" class="btn btn-secondary">
                             <x-icon name="x" class="h-4 w-4" />
                             Cancel
@@ -404,6 +260,116 @@
                 </form>
             </div>
         </div>
+
+        {{-- Reference rail (5/12): Patient Chart at a glance --}}
+        <aside class="space-y-5 lg:col-span-5">
+            <div class="card">
+                <div class="card-header flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <x-avatar :name="$patient->user->name" size="md" />
+                        <div class="min-w-0">
+                            <h2 class="text-sm font-semibold tracking-tight text-[#14201E]">{{ $patient->user->name }}</h2>
+                            <p class="font-mono text-xs text-[#465854]">{{ $patient->patient_number }}</p>
+                        </div>
+                    </div>
+                    <a href="{{ route('physician.patients.show', $patient) }}"
+                       class="text-xs font-semibold text-[#0F766E] hover:underline">
+                        Full chart &rarr;
+                    </a>
+                </div>
+                <div class="card-body">
+                    <dl class="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+                        <div>
+                            <dt class="section-title">Age / Sex</dt>
+                            <dd class="mt-0.5 text-[#14201E] cs-num">
+                                {{ $patient->age ?? '—' }} yrs · {{ $patient->sex ? \Illuminate\Support\Str::headline($patient->sex) : '—' }}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="section-title">Blood type</dt>
+                            <dd class="mt-0.5 font-mono text-[#14201E]">{{ $patient->blood_type ?: '—' }}</dd>
+                        </div>
+                        <div>
+                            <dt class="section-title">Civil status</dt>
+                            <dd class="mt-0.5 text-[#243330]">{{ $patient->civil_status ? \Illuminate\Support\Str::headline($patient->civil_status) : '—' }}</dd>
+                        </div>
+                        <div>
+                            <dt class="section-title">Emergency contact</dt>
+                            <dd class="mt-0.5 text-[#243330]">
+                                {{ $patient->emergency_contact_name ?: '—' }}
+                                @if ($patient->emergency_contact_phone)
+                                    <span class="block font-mono text-xs text-[#465854]">{{ $patient->emergency_contact_phone }}</span>
+                                @endif
+                            </dd>
+                        </div>
+                        <div class="col-span-2">
+                            <dt class="section-title">Address</dt>
+                            <dd class="mt-0.5 text-[#243330]">{{ $patient->address ?: '—' }}</dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <x-card-title description="Past conditions recorded by the clinic.">Medical history</x-card-title>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <caption class="sr-only">Patient medical history</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col" class="table-head">Condition</th>
+                                <th scope="col" class="table-head">Year</th>
+                                <th scope="col" class="table-head">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($histories as $history)
+                                <tr class="table-row">
+                                    <td class="table-cell">
+                                        <p class="font-medium text-[#14201E]">{{ $history->condition_name }}</p>
+                                        <p class="text-xs text-[#465854]">{{ \Illuminate\Support\Str::headline($history->type) }}</p>
+                                    </td>
+                                    <td class="table-cell cs-num">{{ $history->year_diagnosed ?? '—' }}</td>
+                                    <td class="table-cell">{{ $history->status ? \Illuminate\Support\Str::headline($history->status) : '—' }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="3" class="px-4 py-8 text-center text-xs text-[#465854]">
+                                        No medical history recorded.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <x-card-title description="Most recent 5 encounters.">Previous consultations</x-card-title>
+                </div>
+                <div class="divide-y divide-[#DCE3E1]">
+                    @forelse ($previousEncounters as $previous)
+                        <div class="flex items-start justify-between gap-3 px-5 py-3 transition-colors hover:bg-[#F4F7F6]">
+                            <div class="min-w-0">
+                                <p class="text-sm">
+                                    <a href="{{ route('physician.encounters.show', $previous) }}" class="font-mono font-medium text-[#0F766E] hover:underline">{{ $previous->encounter_number }}</a>
+                                    <span class="ml-2 cs-num text-xs text-[#465854]">{{ $previous->encountered_at->isoFormat('MMM D, YYYY') }}</span>
+                                </p>
+                                <p class="mt-0.5 truncate text-xs text-[#243330]">
+                                    {{ $previous->diagnosis }} · Dr. {{ $previous->physician->user->name }}
+                                </p>
+                            </div>
+                            <span class="badge badge-{{ $previous->status }}">{{ \Illuminate\Support\Str::headline($previous->status) }}</span>
+                        </div>
+                    @empty
+                        <p class="px-5 py-8 text-center text-xs text-[#465854]">No previous consultations on file.</p>
+                    @endforelse
+                </div>
+            </div>
+        </aside>
     </div>
 @endsection
 
@@ -427,7 +393,6 @@
                 var feet = parseFloat(feetInput.value) || 0;
                 var inches = parseFloat(inchesInput.value) || 0;
 
-                // Carry over whole feet when inches reach12.
                 if (inches >= 12) {
                     feet += Math.floor(inches / 12);
                     inches = inches % 12;
@@ -437,18 +402,14 @@
 
                 if (feet === 0 && inches === 0) {
                     hiddenCm.value = '';
-
                     if (preview) {
                         preview.textContent = DEFAULT_HINT;
                     }
-
                     return;
                 }
 
                 var cm = Math.round((feet * 30.48 + inches * 2.54) * 10) / 10;
-
                 hiddenCm.value = String(cm);
-
                 if (preview) {
                     preview.textContent = 'Recorded as ≈ ' + cm + ' cm';
                 }
@@ -456,8 +417,6 @@
 
             feetInput.addEventListener('input', normalizeHeight);
             inchesInput.addEventListener('input', normalizeHeight);
-
-            // Reflect any prefilled values (e.g. after a validation error).
             normalizeHeight();
         })();
     </script>

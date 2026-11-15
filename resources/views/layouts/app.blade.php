@@ -9,7 +9,7 @@
     {{ Vite::fonts(['geist', 'geist-mono']) }}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="min-h-screen bg-[#f3f6f9] text-slate-800 antialiased">
+<body class="min-h-screen overflow-x-hidden bg-[#F4F7F6] text-[#243330] antialiased">
 
     @php
         /** Shell data ($currentUser, $currentUserPhoto, $currentRoleLabel, $recentNotifications,
@@ -23,37 +23,42 @@
     @endphp
 
     <a href="#main-content"
-       class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-lg focus:bg-teal-600 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white">
+       class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-lg focus:bg-[#0F766E] focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white">
         Skip to content
     </a>
 
     {{-- Mobile backdrop --}}
-    <div class="fixed inset-0 z-40 hidden bg-black/60 backdrop-blur-sm md:hidden"
+    <div class="fixed inset-0 z-40 hidden bg-black/55 backdrop-blur-xs md:hidden"
          data-sidebar-backdrop data-sidebar-close></div>
 
     <div id="app-shell" class="flex h-dvh overflow-hidden">
-        {{-- Sidebar --}}
+        {{-- Bright Sage-Mineral Navigation Rail (#EAEFED) --}}
         <aside id="app-sidebar"
-               class="fixed inset-y-0 left-0 z-50 hidden w-72 flex-col border-r border-slate-200/85 bg-white md:static md:flex md:w-64 md:shrink-0">
-            {{-- Brand --}}
-            <div class="flex h-16 shrink-0 items-center gap-3 border-b border-slate-200/80 px-5">
-                <img src="{{ asset('images/cpsc-logo2.png') }}"
-                     alt="CPSC"
-                     width="474" height="474"
-                     class="h-9 w-9 shrink-0 object-contain"
-                     decoding="async">
-                <div class="min-w-0 leading-tight">
-                    <p class="truncate text-sm font-bold tracking-tight text-slate-900">ClinicSync</p>
-                    <p class="truncate text-[11px] font-medium text-slate-500">CPSC Outpatient Clinic</p>
+               class="fixed inset-y-0 left-0 z-50 hidden w-72 flex-col border-r border-[#DCE3E1] bg-[#EAEFED] text-[#14201E] md:static md:flex md:w-64 md:shrink-0">
+            {{-- Co-branded clinic header mark --}}
+            <div class="flex h-16 shrink-0 items-center justify-between gap-2 border-b border-[#DCE3E1] px-4">
+                <div class="flex min-w-0 items-center gap-2.5">
+                    <span class="flex h-9 w-9 shrink-0 items-center justify-center">
+                        <img src="{{ asset('images/cpsc-logo2.png') }}"
+                             alt="CPSC"
+                             width="474" height="474"
+                             class="h-full w-full object-contain"
+                             decoding="async">
+                    </span>
+                    <div class="min-w-0 leading-tight">
+                        <p class="truncate text-sm font-semibold tracking-tight text-[#14201E]">ClinicSync</p>
+                        <p class="truncate font-mono text-[10px] tracking-wide text-[#465854] uppercase">CPSC Clinic</p>
+                    </div>
                 </div>
-                <button type="button" class="ml-auto rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 md:hidden"
-                        data-sidebar-close aria-label="Close menu">
+                <button type="button"
+                        class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg text-[#243330] transition hover:bg-[#DFE7E4] hover:text-[#14201E] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F766E] md:hidden"
+                        data-sidebar-close aria-label="Close navigation menu">
                     <x-icon name="x" />
                 </button>
             </div>
 
-            {{-- Navigation --}}
-            <nav class="flex-1 space-y-1 overflow-y-auto px-3 py-4 text-sm">
+            {{-- Primary Navigation --}}
+            <nav aria-label="Primary navigation" class="flex-1 space-y-1 overflow-y-auto px-3 py-4 text-sm">
                 @role('patient')
                     <p class="nav-group-label">Patient portal</p>
                     <a href="{{ route('patient.dashboard') }}"
@@ -123,22 +128,28 @@
                 @endrole
             </nav>
 
+            {{-- Clinic operating notice inside rail footer --}}
+            <div class="mx-3 mb-2 rounded-lg border border-[#DCE3E1] bg-white/80 px-3 py-2 text-[11px] text-[#465854]">
+                <p class="font-mono font-semibold uppercase tracking-wider text-[#0F766E]">Clinic Desk</p>
+                <p class="mt-0.5 cs-num">Mon–Sat · 08:00–17:00</p>
+            </div>
+
             {{-- Signed-in user --}}
-            <div class="shrink-0 border-t border-slate-200/80 p-3">
-                <div class="flex items-center gap-1 rounded-xl border border-slate-200/80 bg-slate-50/85 p-1">
+            <div class="shrink-0 border-t border-[#DCE3E1] p-3">
+                <div class="flex items-center gap-1 rounded-xl border border-[#DCE3E1] bg-white p-1">
                     <a href="{{ route('profile.edit') }}" title="Profile settings"
-                       class="group flex min-w-0 flex-1 items-center gap-2.5 rounded-lg p-1.5 transition hover:bg-white">
+                       class="group flex min-h-11 min-w-0 flex-1 items-center gap-2.5 rounded-lg p-1.5 transition hover:bg-[#EFF4F2] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F766E]">
                         <x-avatar :name="$currentUser->name" :photo="$currentUserPhoto" />
                         <div class="min-w-0 flex-1 leading-tight">
-                            <p class="truncate text-sm font-semibold text-slate-900">{{ $currentUser->name }}</p>
-                            <p class="truncate text-xs text-slate-500">{{ $currentRoleLabel }}</p>
+                            <p class="truncate text-sm font-semibold text-[#14201E]">{{ $currentUser->name }}</p>
+                            <p class="truncate text-xs text-[#465854]">{{ $currentRoleLabel }}</p>
                         </div>
-                        <x-icon name="cog" class="h-4 w-4 shrink-0 text-slate-500 transition group-hover:text-teal-500" />
+                        <x-icon name="cog" class="h-4 w-4 shrink-0 text-[#465854] transition group-hover:text-[#0F766E]" />
                     </a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" title="Sign out" aria-label="Sign out"
-                                class="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-rose-600">
+                                class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg text-[#465854] transition hover:bg-[#EFF4F2] hover:text-rose-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F766E] md:min-h-9 md:min-w-9">
                             <x-icon name="logout" class="h-[18px] w-[18px]" />
                         </button>
                     </form>
@@ -147,27 +158,35 @@
         </aside>
 
         <div class="flex min-w-0 flex-1 flex-col overflow-hidden">
-            {{-- Top bar --}}
-            <header class="z-30 flex h-16 shrink-0 items-center gap-3 border-b border-slate-200 bg-white/85 px-4 backdrop-blur sm:px-6">
+            {{-- Calm daylight utility top bar (avoids repeating page h1 twice) --}}
+            <header class="z-30 flex h-14 shrink-0 items-center gap-3 border-b border-[#DCE3E1] bg-white px-4 sm:px-6">
                 <button type="button"
-                        class="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 md:hidden"
-                        data-sidebar-open aria-controls="app-sidebar" aria-expanded="false" aria-label="Open menu">
+                        class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg text-[#243330] transition hover:bg-[#EFF4F2] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F766E] md:hidden"
+                        data-sidebar-open aria-controls="app-sidebar" aria-expanded="false" aria-label="Open navigation menu">
                     <x-icon name="bars-3" />
                 </button>
 
-                <p class="min-w-0 flex-1 truncate text-base font-semibold tracking-tight text-slate-900">
-                    @yield('title', 'ClinicSync')
-                </p>
+                <div class="flex min-w-0 flex-1 items-center gap-2.5">
+                    <p class="truncate text-sm font-semibold text-[#14201E] md:hidden">
+                        @yield('title', 'ClinicSync')
+                    </p>
+                    <div class="hidden items-center gap-2 md:inline-flex">
+                        <span class="text-xs font-semibold tracking-tight text-[#14201E]">CPSC Outpatient Clinic</span>
+                        <span class="rounded-md border border-[#DCE3E1] bg-[#F4F7F6] px-2 py-0.5 text-[11px] font-medium text-[#465854]">
+                            {{ $currentRoleLabel }}
+                        </span>
+                    </div>
+                </div>
 
                 {{-- Notifications --}}
                 <div class="relative" data-dropdown>
                     <button type="button" data-dropdown-trigger aria-label="Notifications"
                             aria-haspopup="true" aria-expanded="false" aria-controls="notification-menu"
-                            class="relative rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/60">
+                            class="relative inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg text-[#243330] transition hover:bg-[#EFF4F2] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F766E] md:min-h-9 md:min-w-9">
                         <x-icon name="bell" />
                         @if ($unreadNotificationCount > 0)
                             <span aria-hidden="true"
-                                  class="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] leading-none font-bold text-white ring-2 ring-white">
+                                  class="cs-num absolute top-0.5 right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-600 px-1 text-[10px] leading-none font-bold text-white ring-2 ring-white md:-top-0.5 md:-right-0.5">
                                 {{ $unreadNotificationCount > 9 ? '9+' : $unreadNotificationCount }}
                             </span>
                             <span class="sr-only">{{ $unreadNotificationCount }} unread</span>
@@ -175,13 +194,14 @@
                     </button>
 
                     <div id="notification-menu" data-dropdown-menu
-                         class="absolute right-0 z-50 mt-2 hidden w-80 origin-top-right rounded-xl border border-slate-200 bg-white shadow-lg ring-1 ring-slate-950/5">
-                        <div class="flex items-center justify-between gap-2 border-b border-slate-100 px-4 py-3">
-                            <p class="text-sm font-semibold text-slate-900">Notifications</p>
+                         class="absolute right-0 z-50 mt-2 hidden w-[min(22rem,calc(100vw-2rem))] origin-top-right rounded-xl border border-[#DCE3E1] bg-white shadow-lg ring-1 ring-black/5">
+                        <div class="flex items-center justify-between gap-2 border-b border-[#DCE3E1] px-4 py-3">
+                            <p class="text-sm font-semibold text-[#14201E]">Notifications</p>
                             @if ($unreadNotificationCount > 0)
                                 <form method="POST" action="{{ route('notifications.read-all') }}">
                                     @csrf
-                                    <button type="submit" class="text-xs font-semibold text-teal-600 transition hover:text-teal-700">
+                                    <button type="submit"
+                                            class="inline-flex min-h-8 items-center rounded-md px-2 text-xs font-semibold text-[#0F766E] transition hover:bg-[#EFF4F2] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F766E]">
                                         Mark all read
                                     </button>
                                 </form>
@@ -213,32 +233,32 @@
                                         $notificationUrl = route('physician.dashboard');
                                     }
                                 @endphp
-                                <div class="flex items-start gap-3 rounded-lg px-3 py-2.5 transition hover:bg-slate-50 {{ $isUnread ? 'bg-teal-50/70 hover:bg-teal-50' : '' }}">
-                                    <span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full {{ $isUnread ? 'bg-teal-100 text-teal-600' : 'bg-slate-100 text-slate-500' }}">
+                                <div class="flex items-start gap-3 rounded-lg px-3 py-2.5 transition hover:bg-[#F4F7F6] {{ $isUnread ? 'bg-[#E6F4F1]/65' : '' }}">
+                                    <span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full {{ $isUnread ? 'bg-[#0F766E] text-white' : 'bg-[#EFF4F2] text-[#465854]' }}">
                                         <x-icon :name="$notificationIcon" class="h-4 w-4" />
                                     </span>
                                     @if ($notificationUrl)
-                                        <a href="{{ $notificationUrl }}" class="group min-w-0 flex-1">
-                                            <p class="text-[10px] font-semibold tracking-wider text-slate-500 uppercase transition group-hover:text-teal-600">{{ $notificationTitle }}</p>
-                                            <p class="mt-0.5 text-sm break-words text-slate-700 transition group-hover:text-slate-900">
+                                        <a href="{{ $notificationUrl }}" class="group min-w-0 flex-1 focus:outline-none focus-visible:underline">
+                                            <p class="text-[10px] font-semibold tracking-wider text-[#465854] uppercase transition group-hover:text-[#0F766E]">{{ $notificationTitle }}</p>
+                                            <p class="mt-0.5 text-sm break-words text-[#243330] transition group-hover:text-[#14201E]">
                                                 {{ $notification->data['message'] ?? 'Notification' }}
                                             </p>
-                                            <p class="mt-1 text-[11px] text-slate-500">{{ $notification->created_at->diffForHumans() }}</p>
+                                            <p class="mt-1 text-[11px] text-[#465854]">{{ $notification->created_at->diffForHumans() }}</p>
                                         </a>
                                     @else
                                         <div class="min-w-0 flex-1">
-                                            <p class="text-[10px] font-semibold tracking-wider text-slate-500 uppercase">{{ $notificationTitle }}</p>
-                                            <p class="mt-0.5 text-sm break-words text-slate-700">
+                                            <p class="text-[10px] font-semibold tracking-wider text-[#465854] uppercase">{{ $notificationTitle }}</p>
+                                            <p class="mt-0.5 text-sm break-words text-[#243330]">
                                                 {{ $notification->data['message'] ?? 'Notification' }}
                                             </p>
-                                            <p class="mt-1 text-[11px] text-slate-500">{{ $notification->created_at->diffForHumans() }}</p>
+                                            <p class="mt-1 text-[11px] text-[#465854]">{{ $notification->created_at->diffForHumans() }}</p>
                                         </div>
                                     @endif
                                     @if ($isUnread)
                                         <form method="POST" action="{{ route('notifications.read', $notification) }}" class="shrink-0">
                                             @csrf
                                             <button type="submit" title="Mark as read" aria-label="Mark as read"
-                                                    class="rounded-md p-1 text-slate-500 transition hover:bg-slate-100 hover:text-teal-600">
+                                                    class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md text-[#465854] transition hover:bg-[#EFF4F2] hover:text-[#0F766E] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F766E] md:min-h-8 md:min-w-8">
                                                 <x-icon name="check" class="h-4 w-4" />
                                             </button>
                                         </form>
@@ -246,16 +266,16 @@
                                 </div>
                             @empty
                                 <div class="px-4 py-8 text-center">
-                                    <span class="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+                                    <span class="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-[#EFF4F2] text-[#465854]">
                                         <x-icon name="bell" class="h-5 w-5" />
                                     </span>
-                                    <p class="mt-3 text-sm font-medium text-slate-900">You're all caught up</p>
-                                    <p class="mt-0.5 text-xs text-slate-500">Appointment updates and reminders appear here.</p>
+                                    <p class="mt-3 text-sm font-medium text-[#14201E]">You're all caught up</p>
+                                    <p class="mt-0.5 text-xs text-[#465854]">Appointment updates and reminders appear here.</p>
                                 </div>
                             @endforelse
                         </div>
 
-                        <div class="flex items-center justify-between border-t border-slate-100 px-4 py-2.5 text-xs text-slate-500">
+                        <div class="flex items-center justify-between border-t border-[#DCE3E1] px-4 py-2.5 text-xs text-[#465854]">
                             <span>
                                 @if ($recentNotifications->count() >= 6)
                                     Showing 6 most recent
@@ -264,17 +284,17 @@
                                 @endif
                             </span>
                             @role('patient')
-                                <a href="{{ route('patient.appointments.index') }}" class="font-semibold text-teal-600 transition hover:text-teal-700">
+                                <a href="{{ route('patient.appointments.index') }}" class="font-semibold text-[#0F766E] transition hover:underline">
                                     View appointments &rarr;
                                 </a>
                             @endrole
                             @role('physician')
-                                <a href="{{ route('physician.dashboard') }}" class="font-semibold text-teal-600 transition hover:text-teal-700">
+                                <a href="{{ route('physician.dashboard') }}" class="font-semibold text-[#0F766E] transition hover:underline">
                                     View queue &rarr;
                                 </a>
                             @endrole
                             @hasanyrole('administrator|receptionist')
-                                <a href="{{ route('admin.queue.index') }}" class="font-semibold text-teal-600 transition hover:text-teal-700">
+                                <a href="{{ route('admin.queue.index') }}" class="font-semibold text-[#0F766E] transition hover:underline">
                                     Daily queue &rarr;
                                 </a>
                             @endhasanyrole
@@ -282,19 +302,15 @@
                     </div>
                 </div>
 
-                <span class="chip hidden sm:inline-flex border-teal-200/70 bg-teal-50/70 text-teal-800">
-                    {{ $currentRoleLabel }}
-                </span>
-
-                <span class="chip hidden lg:inline-flex">
-                    <x-icon name="calendar" class="h-4 w-4 text-slate-400" />
+                <span class="chip hidden lg:inline-flex cs-num">
+                    <x-icon name="calendar" class="h-4 w-4 text-[#465854]" />
                     {{ now()->isoFormat('dddd, MMM D, YYYY') }}
                 </span>
             </header>
 
             {{-- Page content --}}
-            <main id="main-content" class="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6 lg:p-8">
-                <div class="mx-auto w-full max-w-7xl">
+            <main id="main-content" class="min-w-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain p-4 sm:p-6 lg:p-7">
+                <div class="mx-auto w-full min-w-0 max-w-7xl">
                     @include('partials.flash')
                     @yield('content')
                 </div>
@@ -305,13 +321,13 @@
     {{-- Confirmation modal for destructive actions --}}
     <div id="confirm-modal" class="fixed inset-0 z-[60] hidden items-center justify-center p-4"
          role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title" aria-describedby="confirm-modal-message">
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" data-confirm-dismiss></div>
-        <div class="relative w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-xl">
-            <span class="flex h-11 w-11 items-center justify-center rounded-full bg-rose-50 text-rose-600">
+        <div class="absolute inset-0 bg-black/55 backdrop-blur-xs" data-confirm-dismiss></div>
+        <div class="relative w-full max-w-md rounded-xl border border-[#DCE3E1] bg-white p-6 shadow-xl">
+            <span class="flex h-11 w-11 items-center justify-center rounded-full bg-rose-50 text-rose-700">
                 <x-icon name="exclamation-triangle" />
             </span>
-            <h3 id="confirm-modal-title" class="mt-4 text-base font-semibold text-slate-900">Are you sure?</h3>
-            <p id="confirm-modal-message" class="mt-1 text-sm text-slate-500"></p>
+            <h2 id="confirm-modal-title" class="mt-4 text-base font-semibold text-[#14201E]">Are you sure?</h2>
+            <p id="confirm-modal-message" class="mt-1 text-sm text-[#465854]"></p>
             <div class="mt-6 flex justify-end gap-3">
                 <button type="button" class="btn btn-secondary" data-confirm-dismiss>Cancel</button>
                 <button type="button" class="btn btn-danger" id="confirm-modal-go">Confirm</button>

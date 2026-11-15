@@ -214,6 +214,30 @@ class EmrAccessTest extends TestCase
         $this->assertSame(62.5, (float) $vitals->weight_kg);
     }
 
+    public function test_a_physician_can_browse_and_search_their_encounter_log(): void
+    {
+        [, $patient] = $this->patientAccount();
+        [$physicianUser, $physician] = $this->physicianAccount();
+        $encounter = $this->recordEncounter($patient, $physician, 'Tension-type headache');
+
+        $this->actingAs($physicianUser)
+            ->get(route('physician.encounters.index'))
+            ->assertOk()
+            ->assertSee($encounter->encounter_number)
+            ->assertSee('Tension-type headache');
+
+        $this->actingAs($physicianUser)
+            ->get(route('physician.encounters.index', ['q' => 'Tension']))
+            ->assertOk()
+            ->assertSee('Search: Tension')
+            ->assertSee($encounter->encounter_number);
+
+        $this->actingAs($physicianUser)
+            ->get(route('physician.encounters.index', ['q' => 'nomatch-xyz']))
+            ->assertOk()
+            ->assertSee('No encounters matched your query.');
+    }
+
     /**
      * @return array{0: User, 1: Patient}
      */

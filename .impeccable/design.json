@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-16T00:05:00Z",
+  "title": "Design System: ClinicSync",
+  "extensions": {
+    "colorMeta": {
+      "clinical-teal": {
+        "role": "primary",
+        "displayName": "Clinical Teal",
+        "canonical": "#0F766E",
+        "tonalRamp": ["#093E3A", "#0D5D57", "#0F766E", "#148B82", "#319F96", "#B5DCD4", "#D5ECE7", "#E6F4F1"]
+      },
+      "porcelain-canvas": {
+        "role": "neutral",
+        "displayName": "Coastal Porcelain",
+        "canonical": "#F4F7F6",
+        "tonalRamp": ["#14201E", "#243330", "#465854", "#6E7E7A", "#C5D0CD", "#DCE3E1", "#DFE7E4", "#EAEFED", "#EFF4F2", "#F4F7F6"]
+      },
+      "exam-paper": {
+        "role": "neutral",
+        "displayName": "Exam Paper",
+        "canonical": "#FFFFFF",
+        "tonalRamp": ["#14201E", "#465854", "#7C8A86", "#C5D0CD", "#DCE3E1", "#EFF4F2", "#F4F7F6", "#FFFFFF"]
+      },
+      "allergy-crimson": {
+        "role": "semantic",
+        "displayName": "Allergy Crimson",
+        "canonical": "#9F1239",
+        "tonalRamp": ["#4C0519", "#7F0D2D", "#9F1239", "#B91C1C", "#BE123C", "#E11D48", "#FB7185", "#FECDD3", "#FCE7EA"]
+      },
+      "clinical-green": {
+        "role": "semantic",
+        "displayName": "Clinical Green",
+        "canonical": "#15803D",
+        "tonalRamp": ["#064E3B", "#047857", "#15803D", "#16A34A", "#86EFAC", "#DCFCE7", "#ECFDF5"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Guest Hero Display", "purpose": "Guest portal editorial heading on tablet viewports." },
+      "display-lg": { "displayName": "Guest Hero Display Large", "purpose": "Guest portal editorial heading on desktop viewports." },
+      "headline": { "displayName": "Page Title", "purpose": "Single H1 per route inside PageHeader without eyebrow kickers." },
+      "lead": { "displayName": "Guest Lead Copy", "purpose": "Guest panel introductory copy beside clinic hours." },
+      "title": { "displayName": "Card Title", "purpose": "Section H2 headers inside clinical cards and dialogs." },
+      "body": { "displayName": "Clinical Copy", "purpose": "Encounter notes, patient instructions, and ledger rows." },
+      "label": { "displayName": "Field & Column Label", "purpose": "Uppercase tracked labels for inputs, table headers, and ledger cells." },
+      "micro": { "displayName": "Compact Ledger Eyebrow", "purpose": "Queue badge micro labels, rail section headers, and report day bars." },
+      "mono": { "displayName": "Clinical Tabular Mono", "purpose": "Encounter IDs, queue tickets, timestamps, and vital readings." }
+    },
+    "shadows": [
+      { "name": "overlay-sheet", "value": "0 20px 25px -5px rgba(20, 32, 30, 0.12), 0 8px 10px -6px rgba(20, 32, 30, 0.08)", "purpose": "Transient dialogs and dropdown panels only." }
+    ],
+    "motion": [
+      { "name": "ease-clinical", "value": "cubic-bezier(0.22, 1, 0.36, 1)", "purpose": "Crisp state transitions, suppressed under prefers-reduced-motion." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Primary clinic action such as booking a slot or saving an encounter.",
+      "html": "<button class=\"ds-btn-primary\" type=\"button\">Save encounter</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 2.75rem; padding: 0.625rem 1rem; border-radius: 6px; background: #0F766E; color: #FFFFFF; font-family: Geist, sans-serif; font-size: 0.875rem; font-weight: 600; border: 1px solid #0F766E; cursor: pointer; transition: background-color 150ms ease; } .ds-btn-primary:hover { background: #0D5D57; } .ds-btn-primary:focus-visible { outline: 2px solid #0F766E; outline-offset: 2px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Secondary workspace navigation and cancellation controls.",
+      "html": "<button class=\"ds-btn-secondary\" type=\"button\">View chart</button>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 2.75rem; padding: 0.625rem 1rem; border-radius: 6px; background: #FFFFFF; color: #14201E; font-family: Geist, sans-serif; font-size: 0.875rem; font-weight: 600; border: 1px solid #DCE3E1; cursor: pointer; transition: background-color 150ms ease, border-color 150ms ease; } .ds-btn-secondary:hover { background: #F4F7F6; border-color: #C5D0CD; } .ds-btn-secondary:focus-visible { outline: 2px solid #0F766E; outline-offset: 2px; }"
+    },
+    {
+      "name": "Metric Ledger Strip",
+      "kind": "custom",
+      "refersTo": "card-ledger",
+      "description": "Horizontal hairline-divided summary strip replacing multi-card KPI grids.",
+      "html": "<dl class=\"ds-ledger\"><div class=\"ds-cell\"><dt class=\"ds-label\">Waiting</dt><dd class=\"ds-val\">4</dd></div><div class=\"ds-cell\"><dt class=\"ds-label\">Calling</dt><dd class=\"ds-val\">#12</dd></div></dl>",
+      "css": ".ds-ledger { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); background: #FFFFFF; border: 1px solid #DCE3E1; border-radius: 8px; overflow: hidden; margin: 0; } .ds-cell { padding: 0.875rem 1.25rem; border-right: 1px solid #DCE3E1; } .ds-cell:last-child { border-right: 0; } .ds-label { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #465854; } .ds-val { margin: 0.25rem 0 0; font-size: 1.5rem; font-weight: 600; color: #14201E; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Clinical Input",
+      "kind": "input",
+      "description": "High-contrast form control on exam paper with clinical teal focus outline.",
+      "html": "<input class=\"ds-input\" type=\"text\" placeholder=\"e.g. Acute bronchitis\" />",
+      "css": ".ds-input { width: 100%; min-height: 2.75rem; padding: 0.5rem 0.75rem; border-radius: 6px; border: 1px solid #DCE3E1; background: #FFFFFF; color: #14201E; caret-color: #0F766E; font-size: 0.875rem; } .ds-input:focus { outline: 2px solid #0F766E; outline-offset: 0; border-color: #0F766E; }"
+    },
+    {
+      "name": "Allergy Alert",
+      "kind": "card",
+      "description": "High-visibility clinical warning band free of thick decorative side stripes.",
+      "html": "<div class=\"ds-alert-error\" role=\"alert\"><strong>Active allergy:</strong> Penicillin (Severe anaphylaxis)</div>",
+      "css": ".ds-alert-error { padding: 0.875rem 1rem; border-radius: 8px; border: 1px solid rgba(159, 18, 57, 0.25); background: #FCE7EA; color: #9F1239; font-size: 0.875rem; line-height: 1.45; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Civic Outpatient Chart",
+    "overview": "ClinicSync treats clinic operations software as a crisp paper medical chart digitized without ornament. Triage receptionists, physicians, and outpatients share one strictly light-only interface anchored by a bright sage-mineral navigation rail (#EAEFED), a coastal porcelain canvas (#F4F7F6), exam-paper surfaces (#FFFFFF), 1px cool-stone hairlines (#DCE3E1), and Clinical Teal (#0F766E) action controls.",,
+    "keyCharacteristics": [
+      "Strictly light-only polarity matched to clinic desks and exam rooms.",
+      "1px stone hairlines and hairline ledger strips instead of decorative shadows or nested cards.",
+      "Tabular Geist Mono numerals across queue tickets, vitals, and encounter identifiers.",
+      "Minimum 44px hit targets on mobile triage controls, slot pickers, and modal dismissals."
+    ],
+    "rules": [
+      { "name": "The Single-Signal Rule", "body": "Reserve saturated semantic hues strictly for status badges, active allergy alerts, and live calling actions.", "section": "colors" },
+      { "name": "The Strict Heading Ladder Rule", "body": "Pages carry a single H1 inside PageHeader; card sections use H2; sub-entries inside cards use H3.", "section": "typography" },
+      { "name": "The No-Nested-Cards Rule", "body": "Never nest bordered rounded cards inside cards; separate inner groupings with 1px hairlines.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do use .cs-num (tabular-nums) on every queue number, vital sign, timestamp, and encounter ID.",
+      "Do keep neutral ink contrast at #14201E or #465854 (>= 4.5:1 on light surfaces).",
+      "Do pair every desktop table with a screen-reader caption, scope=\"col\" headers, and mobile stacked cards."
+    ],
+    "donts": [
+      "Don't introduce dark mode toggles, glassmorphism blurs over workspace cards, or >1px left/right border stripes.",
+      "Don't place eyebrow kickers directly above H1 page headings.",
+      "Don't show arrival guidance on completed, cancelled, or no-show appointments."
+    ]
+  }
+}

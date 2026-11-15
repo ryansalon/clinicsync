@@ -9,123 +9,118 @@
     {{ Vite::fonts(['geist', 'geist-mono']) }}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body data-shell="guest" class="guest-light min-h-screen bg-ground font-guest text-read antialiased">
+<body data-shell="guest" class="guest-light min-h-screen bg-[#D5ECE7] font-guest text-[#243330] antialiased">
 
 @php
     $logoUrl = asset('images/logocsasd.png');
     $sealUrl = asset('images/cpsc-logo2.png');
 @endphp
-{{-- Ribbon Field WebGL background (ThreeUI `ribbon-field` port). --}}
-<div class="shader-frame" aria-hidden="true">
-    <div data-ribbon-field></div>
-</div>
-<div class="relative z-10 flex min-h-screen">
-    {{-- Brand panel (transparent: the fixed Ribbon Field layer shows through).
-         Header, main copy and footer share one left axis (the panel padding). --}}
-    <div class="relative hidden w-1/2 flex-col overflow-hidden border-r border-hairline p-8 [@media(min-height:760px)]:p-10 lg:sticky lg:top-0 lg:flex lg:h-screen [@media(min-height:900px)]:p-12">
-        {{-- Static pools of white light over a veil that calms the Ribbon
-             Field behind the brand copy (keeps small text at 4.5:1). --}}
-        <div class="brand-scrim pointer-events-none absolute inset-0"></div>
 
-        {{-- Main copy + transparent logo lockup aligned to one left axis. --}}
-        <div class="relative flex min-h-0 flex-1 items-center py-8 [@media(min-height:900px)]:py-10">
-            <div class="w-full">
-                <div class="mb-6 flex items-center gap-4 [@media(min-height:900px)]:mb-7 [@media(min-height:900px)]:gap-5">
-                    <img src="{{ $logoUrl }}"
-                         alt="ClinicSync"
-                         width="597" height="497"
-                         class="h-14 w-auto object-contain [@media(min-height:900px)]:h-16"
-                         fetchpriority="high" decoding="async">
-                    <span class="h-11 w-px shrink-0 bg-hairline-2 [@media(min-height:900px)]:h-12" aria-hidden="true"></span>
-                    <img src="{{ $sealUrl }}"
-                         alt="Camiguin Polytechnic State College seal"
-                         width="474" height="474"
-                         class="h-14 w-14 shrink-0 object-contain [@media(min-height:900px)]:h-16 [@media(min-height:900px)]:w-16"
-                         decoding="async">
-                </div>
+<a href="#guest-main"
+   class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-lg focus:bg-[#0F766E] focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white">
+    Skip to sign in form
+</a>
 
-                <p class="font-guest-mono text-[11px] uppercase tracking-[0.18em] text-live">
-                    Outpatient Clinic Management
-                </p>
+<div class="flex min-h-screen flex-col lg:flex-row">
+    {{-- Deep Clinical Teal architectural clinic anchor (#093E3A -> #0F766E) --}}
+    <aside class="relative hidden w-1/2 flex-col justify-between overflow-hidden border-r border-[#093E3A] bg-gradient-to-br from-[#093E3A] via-[#0D5D57] to-[#0F766E] p-10 text-white lg:sticky lg:top-0 lg:flex lg:h-screen xl:p-12">
+        <div class="pointer-events-none absolute inset-0 civic-grid-pattern opacity-100" aria-hidden="true"></div>
 
-                <p class="mt-5 max-w-[19ch] text-[2.75rem] leading-[1.04] tracking-[-0.03em] [@media(min-height:760px)]:text-[3.25rem] [@media(min-height:900px)]:text-[3.75rem]">
-                    <span class="font-semibold text-bright">Campus healthcare,</span>
-                    <span class="text-live">thoughtfully organized.</span>
-                </p>
-
-                <p class="mt-5 max-w-lg text-sm leading-relaxed text-read [@media(min-height:900px)]:text-[15px]">
-                    Book consultations, follow your queue in real time, and keep every medical record
-                    in one secure place — built for the Camiguin Polytechnic State College clinic.
-                </p>
-
-                <ul class="mt-7 max-w-lg space-y-3 text-sm [@media(min-height:900px)]:mt-8">
-                    <li class="flex items-start gap-3.5 rounded-xl border border-teal-200/70 bg-white/85 px-4 py-3.5 shadow-[0_2px_10px_-4px_rgba(15,23,42,0.06)] backdrop-blur-sm">
-                        <span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-teal-200 bg-teal-50 text-live">
-                            <x-icon name="check" class="h-3.5 w-3.5" />
-                        </span>
-                        <span class="text-read">Book appointments online and receive an instant queue number.</span>
-                    </li>
-                    <li class="flex items-start gap-3.5 rounded-xl border border-teal-200/70 bg-white/85 px-4 py-3.5 shadow-[0_2px_10px_-4px_rgba(15,23,42,0.06)] backdrop-blur-sm">
-                        <span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-teal-200 bg-teal-50 text-live">
-                            <x-icon name="check" class="h-3.5 w-3.5" />
-                        </span>
-                        <span class="text-read">Physicians record encounters, vitals and prescriptions as they happen.</span>
-                    </li>
-                    <li class="flex items-start gap-3.5 rounded-xl border border-teal-200/70 bg-white/85 px-4 py-3.5 shadow-[0_2px_10px_-4px_rgba(15,23,42,0.06)] backdrop-blur-sm">
-                        <span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-teal-200 bg-teal-50 text-live">
-                            <x-icon name="check" class="h-3.5 w-3.5" />
-                        </span>
-                        <span class="text-read">Patients follow their care journey with a complete medical history.</span>
-                    </li>
-                </ul>
+        <div class="relative flex flex-1 flex-col justify-center">
+            {{-- Transparent ClinicSync + CPSC brand lockup with alpha-following light contour --}}
+            <div class="inline-flex w-fit items-center gap-4">
+                <img src="{{ $logoUrl }}"
+                     alt="ClinicSync"
+                     width="597" height="497"
+                     class="h-14 w-auto object-contain [filter:drop-shadow(0_0_1.5px_rgba(255,255,255,0.95))_drop-shadow(0_0_4px_rgba(255,255,255,0.55))] xl:h-16"
+                     fetchpriority="high" decoding="async">
+                <span class="h-10 w-px shrink-0 bg-[#B5DCD4]/50" aria-hidden="true"></span>
+                <img src="{{ $sealUrl }}"
+                     alt="Camiguin Polytechnic State College seal"
+                     width="474" height="474"
+                     class="h-14 w-14 shrink-0 object-contain [filter:drop-shadow(0_0_1.5px_rgba(255,255,255,0.92))_drop-shadow(0_2px_6px_rgba(9,62,58,0.35))] xl:h-16 xl:w-16"
+                     decoding="async">
             </div>
+
+            <p class="mt-8 max-w-[18ch] text-[2.75rem] font-semibold leading-[1.06] tracking-[-0.03em] text-white xl:text-[3.35rem]">
+                Campus care, <span class="text-[#B5DCD4]">charted cleanly.</span>
+            </p>
+
+            <p class="mt-4 max-w-lg text-[15px] leading-relaxed text-[#E6F4F1]">
+                Coordinating scheduled appointments, walk-in triage, physician consultations,
+                and longitudinal medical records for the Camiguin Polytechnic State College outpatient clinic.
+            </p>
+
+            <dl class="mt-8 max-w-lg divide-y divide-[#B5DCD4]/25 border-y border-[#B5DCD4]/25">
+                <div class="flex items-start gap-3.5 py-3.5">
+                    <span class="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-[#B5DCD4]/35 bg-[#093E3A]/70 text-[#B5DCD4]">
+                        <x-icon name="list" class="h-4 w-4" />
+                    </span>
+                    <div>
+                        <dt class="text-sm font-medium text-white">Live triage queue coordination</dt>
+                        <dd class="mt-0.5 text-xs text-[#D5ECE7]">Patients and reception follow queue tickets and room calls in real time.</dd>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3.5 py-3.5">
+                    <span class="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-[#B5DCD4]/35 bg-[#093E3A]/70 text-[#B5DCD4]">
+                        <x-icon name="clipboard" class="h-4 w-4" />
+                    </span>
+                    <div>
+                        <dt class="text-sm font-medium text-white">Structured consultations &amp; e-prescriptions</dt>
+                        <dd class="mt-0.5 text-xs text-[#D5ECE7]">Allergies, vitals, diagnoses, and prescriptions stay connected to each visit.</dd>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3.5 py-3.5">
+                    <span class="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-[#B5DCD4]/35 bg-[#093E3A]/70 text-[#B5DCD4]">
+                        <x-icon name="clock" class="h-4 w-4" />
+                    </span>
+                    <div>
+                        <dt class="text-sm font-medium text-white">Clinic hours: Mon–Sat, 08:00–17:00</dt>
+                        <dd class="mt-0.5 text-xs text-[#D5ECE7]">Online booking opens per physician schedule; walk-ins accommodated daily.</dd>
+                    </div>
+                </div>
+            </dl>
         </div>
 
-        <div class="relative flex flex-wrap items-center justify-between gap-3 border-t border-teal-200/60 pt-4 [@media(min-height:900px)]:pt-5">
-            <p class="text-xs leading-relaxed">
-                <span class="block font-medium text-dim">Camiguin Polytechnic State College</span>
-                <span class="text-meta">Outpatient Clinic · © {{ now()->year }}</span>
+        <div class="relative flex flex-wrap items-center justify-between gap-3 border-t border-[#B5DCD4]/25 pt-4 text-xs">
+            <p>
+                <span class="font-medium text-white">Camiguin Polytechnic State College</span>
+                <span class="text-[#D5ECE7]"> · Outpatient Clinic · © {{ now()->year }}</span>
             </p>
-            <span class="inline-flex items-center gap-1.5 rounded-full border border-teal-200/80 bg-white/90 px-3 py-1 text-[11px] font-medium text-live shadow-xs">
-                <span class="h-1.5 w-1.5 rounded-full bg-teal-500" aria-hidden="true"></span>
-                Online Booking Open
+            <span class="cs-num inline-flex items-center rounded-md border border-[#B5DCD4]/35 bg-[#093E3A]/70 px-2.5 py-1 font-mono text-[11px] font-medium text-[#E6F4F1]">
+                Mon–Sat · 08:00–17:00
             </span>
         </div>
-    </div>
+    </aside>
 
-    {{-- Form panel --}}
-    <div class="relative flex flex-1 items-center justify-center p-4 sm:p-8 lg:p-12">
-        {{-- Mobile only: soften the texture behind the logo block so both marks
-             and caption stay crisp above the card. --}}
-        <div class="pointer-events-none absolute inset-x-0 top-0 h-64 bg-[linear-gradient(to_bottom,var(--dp-color-ground)_0%,var(--dp-color-ground)_70%,transparent_100%)] lg:hidden"></div>
-
-        <div class="relative z-10 w-full max-w-md">
+    {{-- Coastal Mint form stage (#D5ECE7 / #E6F4F1) framing the crisp white auth card --}}
+    <main id="guest-main" class="relative flex min-w-0 w-full flex-1 items-center justify-center overflow-x-hidden bg-gradient-to-b from-[#E6F4F1] to-[#D5ECE7] p-4 sm:p-8 lg:p-12">
+        <div class="w-full max-w-md min-w-0">
             <div class="mb-6 flex flex-col items-center text-center lg:hidden">
-                <div class="flex items-center justify-center gap-4">
+                <div class="inline-flex items-center justify-center gap-4">
                     <img src="{{ $logoUrl }}"
                          alt="ClinicSync"
                          width="597" height="497"
-                         class="h-14 w-auto object-contain"
+                         class="h-12 w-auto object-contain"
                          fetchpriority="high" decoding="async">
-                    <span class="h-11 w-px shrink-0 bg-hairline-2" aria-hidden="true"></span>
+                    <span class="h-9 w-px shrink-0 bg-[#B5DCD4]" aria-hidden="true"></span>
                     <img src="{{ $sealUrl }}"
                          alt="Camiguin Polytechnic State College seal"
                          width="474" height="474"
-                         class="h-14 w-14 shrink-0 object-contain"
+                         class="h-12 w-12 shrink-0 object-contain"
                          decoding="async">
                 </div>
-                <p class="mt-3 font-guest-mono text-[11px] uppercase tracking-[0.14em] text-live">
-                    Camiguin Polytechnic State College · Outpatient Clinic
-                </p>
+                <span class="mt-3 inline-flex items-center rounded-full bg-[#0F766E] px-3 py-1 font-mono text-[11px] font-medium uppercase tracking-[0.1em] text-white">
+                    Outpatient Clinic · Mon–Sat 08:00–17:00
+                </span>
             </div>
 
-            {{-- Clean solid card lifted softly off the background for crisp legibility. --}}
-            <div class="rounded-panel border border-hairline border-t-2 border-t-teal-600 bg-panel p-6 shadow-[0_24px_60px_-20px_rgba(15,23,42,0.12)] sm:p-8">
+            <div class="rounded-xl border border-[#B5DCD4] bg-white p-6 shadow-[0_4px_12px_rgba(9,62,58,0.06),0_20px_40px_-14px_rgba(15,118,110,0.16)] sm:p-8">
                 @include('partials.flash')
                 @yield('content')
             </div>
         </div>
-    </div>
+    </main>
 </div>
 </body>
 </html>

@@ -3,7 +3,7 @@
 @section('title', 'User accounts')
 
 @section('content')
-    <x-page-header title="User accounts" description="Create staff and patient accounts, filter by role, and manage account status.">
+    <x-page-header title="User accounts" description="Create staff and patient accounts, filter by role, and manage access.">
         <x-slot:actions>
             <button type="button" class="btn btn-primary w-full lg:w-auto" data-dialog-open="create-user-dialog">
                 <x-icon name="plus" class="h-4 w-4" />
@@ -14,12 +14,12 @@
 
     <div id="create-user-dialog" data-dialog role="dialog" aria-modal="true" aria-labelledby="create-user-title"
          class="fixed inset-0 z-[60] hidden items-center justify-center p-4">
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" data-dialog-close></div>
-        <div class="relative max-h-[90dvh] w-full max-w-xl overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-xl">
-            <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
-                <h2 id="create-user-title" class="text-base font-semibold text-slate-900">Create account</h2>
+        <div class="absolute inset-0 bg-[#14201E]/50 backdrop-blur-xs" data-dialog-close></div>
+        <div class="relative max-h-[90dvh] w-full max-w-xl overflow-y-auto rounded-lg border border-[#DCE3E1] bg-white shadow-xl">
+            <div class="flex items-center justify-between border-b border-[#DCE3E1] px-5 py-4">
+                <h2 id="create-user-title" class="text-base font-semibold text-[#14201E]">Create account</h2>
                 <button type="button" data-dialog-close aria-label="Close"
-                        class="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600">
+                        class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md text-[#465854] transition hover:bg-[#F4F7F6] hover:text-[#14201E]">
                     <x-icon name="x" class="h-4 w-4" />
                 </button>
             </div>
@@ -51,7 +51,7 @@
                         <label for="create-phone" class="label">Phone</label>
                         <input id="create-phone" type="tel" name="phone" value="{{ old('phone') }}"
                                inputmode="numeric" autocomplete="tel"
-                               class="input @error('phone') input-invalid @enderror" placeholder="09XXXXXXXXX">
+                               class="input cs-num @error('phone') input-invalid @enderror" placeholder="09XXXXXXXXX">
                         @error('phone')
                             <p class="field-error">{{ $message }}</p>
                         @enderror
@@ -108,7 +108,7 @@
                         <label for="create-license" class="label">License number</label>
                         <input id="create-license" type="text" name="license_number"
                                value="{{ old('license_number') }}"
-                               class="input @error('license_number') input-invalid @enderror"
+                               class="input cs-num @error('license_number') input-invalid @enderror"
                                placeholder="e.g. MD-000123">
                         @error('license_number')
                             <p class="field-error">{{ $message }}</p>
@@ -116,7 +116,7 @@
                     </div>
                 </div>
 
-                <div class="flex justify-end gap-3 border-t border-slate-200 pt-4">
+                <div class="flex justify-end gap-3 border-t border-[#DCE3E1] pt-4">
                     <button type="button" class="btn btn-secondary" data-dialog-close>Cancel</button>
                     <button type="submit" class="btn btn-primary">
                         <x-icon name="user-plus" class="h-4 w-4" />
@@ -149,7 +149,7 @@
             <div class="flex-1 sm:max-w-xs">
                 <label for="q" class="label">Search</label>
                 <div class="relative">
-                    <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                    <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-[#465854]">
                         <x-icon name="magnifying-glass" class="h-4 w-4" />
                     </span>
                     <input id="q" type="search" name="q" value="{{ $search }}" class="input pl-9"
@@ -160,7 +160,7 @@
             <div class="sm:w-60">
                 <label for="role" class="label">Role</label>
                 <div class="relative">
-                    <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                    <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-[#465854]">
                         <x-icon name="funnel" class="h-4 w-4" />
                     </span>
                     <select id="role" name="role" class="input pl-9" data-auto-submit>
@@ -177,22 +177,25 @@
     </x-filter-bar>
 
     {{-- Accounts container --}}
-    <div class="card">
+    <section class="card mt-6">
         <div class="card-header flex flex-wrap items-center justify-between gap-2">
             <x-card-title>Accounts</x-card-title>
-            <span class="text-xs text-slate-500">{{ $users->total() }} total</span>
+            <span class="cs-num text-xs text-[#465854]">{{ $users->total() }} total</span>
         </div>
 
-        {{-- Mobile card view (below md) --}}
-        <div class="divide-y divide-slate-100 md:hidden">
+        {{-- Mobile card view --}}
+        <div class="divide-y divide-[#DCE3E1] md:hidden">
             @forelse ($users as $user)
-                <article class="p-4 space-y-3">
+                @php
+                    $roleName = $user->getRoleNames()->first();
+                @endphp
+                <article class="space-y-3 p-4">
                     <div class="flex items-start justify-between gap-2">
                         <div class="flex items-center gap-3">
                             <x-avatar :name="$user->name" size="sm" />
                             <div>
-                                <p class="font-medium text-slate-900">{{ $user->name }}</p>
-                                <p class="text-xs text-slate-500">{{ $user->email }}</p>
+                                <p class="font-medium text-[#14201E]">{{ $user->name }}</p>
+                                <p class="text-xs text-[#465854]">{{ $user->email }}</p>
                             </div>
                         </div>
                         <span class="badge badge-{{ $user->is_active ? 'enabled' : 'suspended' }}">
@@ -200,9 +203,8 @@
                         </span>
                     </div>
 
-                    <div class="flex items-center justify-between gap-2 text-xs text-slate-500 pt-1">
-                        @php($roleName = $user->getRoleNames()->first())
-                        <span>{{ $roleName ? \Illuminate\Support\Str::headline($roleName) : 'No role' }} · Joined {{ $user->created_at->isoFormat('MMM D, YYYY') }}</span>
+                    <div class="flex items-center justify-between gap-2 pt-1 text-xs text-[#465854]">
+                        <span class="cs-num">{{ $roleName ? \Illuminate\Support\Str::headline($roleName) : 'No role' }} · Joined {{ $user->created_at->isoFormat('MMM D, YYYY') }}</span>
 
                         @if ($user->id !== auth()->id())
                             <form method="POST" action="{{ route('admin.users.status', $user) }}">
@@ -219,7 +221,7 @@
                                 </button>
                             </form>
                         @else
-                            <span class="text-xs font-medium text-slate-400">You</span>
+                            <span class="text-xs font-medium text-[#465854]">You</span>
                         @endif
                     </div>
                 </article>
@@ -231,32 +233,35 @@
             @endforelse
         </div>
 
-        {{-- Desktop table view (md and up) --}}
+        {{-- Desktop table view --}}
         <div class="hidden overflow-x-auto md:block">
             <table class="min-w-full">
+                <caption class="sr-only">Clinic user accounts and access status</caption>
                 <thead>
                     <tr>
-                        <th class="table-head">Name</th>
-                        <th class="table-head">Role</th>
-                        <th class="table-head">Status</th>
-                        <th class="table-head">Created</th>
-                        <th class="table-head text-right">Actions</th>
+                        <th scope="col" class="table-head">Name</th>
+                        <th scope="col" class="table-head">Role</th>
+                        <th scope="col" class="table-head">Status</th>
+                        <th scope="col" class="table-head">Created</th>
+                        <th scope="col" class="table-head text-right">Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y divide-[#DCE3E1]">
                     @forelse ($users as $user)
+                        @php
+                            $roleName = $user->getRoleNames()->first();
+                        @endphp
                         <tr class="table-row">
                             <td class="table-cell">
                                 <div class="flex items-center gap-3">
                                     <x-avatar :name="$user->name" size="sm" />
                                     <div>
-                                        <p class="font-medium text-slate-900">{{ $user->name }}</p>
-                                        <p class="text-xs text-slate-500">{{ $user->email }}</p>
+                                        <p class="font-medium text-[#14201E]">{{ $user->name }}</p>
+                                        <p class="text-xs text-[#465854]">{{ $user->email }}</p>
                                     </div>
                                 </div>
                             </td>
-                            <td class="table-cell">
-                                @php($roleName = $user->getRoleNames()->first())
+                            <td class="table-cell text-[#14201E]">
                                 {{ $roleName ? \Illuminate\Support\Str::headline($roleName) : 'No role' }}
                             </td>
                             <td class="table-cell">
@@ -264,7 +269,7 @@
                                     {{ $user->is_active ? 'Active' : 'Suspended' }}
                                 </span>
                             </td>
-                            <td class="table-cell whitespace-nowrap">{{ $user->created_at->isoFormat('MMM D, YYYY') }}</td>
+                            <td class="table-cell cs-num whitespace-nowrap text-[#465854]">{{ $user->created_at->isoFormat('MMM D, YYYY') }}</td>
                             <td class="table-cell text-right">
                                 @if ($user->id !== auth()->id())
                                     <form method="POST" action="{{ route('admin.users.status', $user) }}" class="inline">
@@ -281,7 +286,7 @@
                                         </button>
                                     </form>
                                 @else
-                                    <span class="text-xs text-slate-400">You</span>
+                                    <span class="text-xs font-medium text-[#465854]">You</span>
                                 @endif
                             </td>
                         </tr>
@@ -296,7 +301,7 @@
                 </tbody>
             </table>
         </div>
-    </div>
+    </section>
 
     <div class="mt-4">
         {{ $users->links() }}

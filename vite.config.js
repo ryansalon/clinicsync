@@ -9,16 +9,11 @@ export default defineConfig({
             input: ['resources/css/app.css', 'resources/js/app.js'],
             refresh: true,
             fonts: [
-                bunny('Instrument Sans', {
+                bunny('Geist', {
                     weights: [400, 500, 600, 700],
                 }),
-                // Modern Dark design system: Geist for display/reading,
-                // Geist Mono for labels, dates, and numerical values.
-                bunny('Geist', {
-                    weights: [400, 500],
-                }),
                 bunny('Geist Mono', {
-                    weights: [400, 500],
+                    weights: [400, 500, 600],
                 }),
             ],
         }),

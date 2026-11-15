@@ -5,18 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     <title>ClinicSync</title>
+    {{ Vite::fonts(['geist', 'geist-mono']) }}
     @vite(['resources/css/app.css'])
 </head>
-<body class="flex min-h-screen items-center justify-center bg-slate-50 p-4 text-slate-800 antialiased">
-    <div class="w-full max-w-md text-center">
-        <span class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-teal-500 to-teal-700 text-white shadow-sm">
+<body class="flex min-h-screen items-center justify-center bg-[#F4F7F6] p-4 text-[#243330] antialiased">
+    <main class="w-full max-w-md rounded-xl border border-[#DCE3E1] bg-white p-8 text-center shadow-xs">
+        <span class="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-[#0F766E] text-white shadow-xs">
             <x-icon name="heart-pulse" class="h-7 w-7" />
         </span>
 
-        <h1 class="mt-5 text-2xl font-semibold tracking-tight text-slate-900">ClinicSync</h1>
-        <p class="mt-2 text-sm text-slate-500">
+        <h1 class="mt-5 text-2xl font-semibold tracking-tight text-[#14201E]">ClinicSync</h1>
+        <p class="mt-2 text-sm text-[#465854]">
             Your account does not have an assigned role yet. Please contact the clinic administrator
-            to gain access to the system.
+            at CPSC Outpatient Clinic to gain access to the system.
         </p>
 
         <div class="mt-8 flex justify-center">
@@ -28,6 +29,6 @@
                 </button>
             </form>
         </div>
-    </div>
+    </main>
 </body>
 </html>

@@ -3,172 +3,177 @@
 @section('title', 'Encounter log')
 
 @section('content')
-    <x-page-header title="Encounter log"
-                   description="Every consultation you have recorded, newest first.">
+    <x-page-header title="Encounter log" description="Consultations recorded under your clinical practice.">
+        <x-slot:actions>
+            <a class="btn btn-secondary" href="{{ route('physician.dashboard') }}">
+                <x-icon name="arrow-left" class="h-4 w-4" />
+                Back to dashboard
+            </a>
+        </x-slot:actions>
     </x-page-header>
 
     @php
-        $filterChips = [];
-        if ($search !== '') {
-            $filterChips[] = [
-                'label' => '“'.$search.'”',
-                'url' => route('physician.encounters.index'),
-            ];
-        }
+        $filterChips = $search !== ''
+            ? [['label' => "Search: {$search}", 'url' => route('physician.encounters.index')]]
+            : [];
     @endphp
 
     <x-filter-bar :action="route('physician.encounters.index')" submit-label="Search" :chips="$filterChips">
         <x-slot:fields>
-            <div class="flex-1">
+            <div class="flex-1 sm:max-w-md">
                 <label for="q" class="label">Search encounters</label>
                 <div class="relative">
-                    <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                    <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-[#465854]">
                         <x-icon name="magnifying-glass" class="h-4 w-4" />
                     </span>
-                    <input id="q" name="q" type="search" value="{{ $search }}" class="input pl-10"
-                           placeholder="Patient name, patient number, encounter # or diagnosis">
+                    <input id="q" type="search" name="q" value="{{ $search }}" class="input pl-9"
+                           placeholder="Patient name, patient #, encounter #, diagnosis">
                 </div>
             </div>
         </x-slot:fields>
     </x-filter-bar>
 
-    <div class="card">
-        <div class="card-header flex flex-wrap items-center justify-between gap-2">
-            <x-card-title>Recorded encounters</x-card-title>
-            <span class="text-xs text-slate-500">{{ $encounters->total() }} total</span>
+    <section class="card mt-6">
+        <div class="card-header flex items-center justify-between gap-2">
+            <x-card-title>Recorded consultations</x-card-title>
+            <span class="cs-num text-xs text-[#465854]">
+                {{ $encounters->total() }} {{ \Illuminate\Support\Str::plural('encounter', $encounters->total()) }}
+            </span>
         </div>
 
-        {{-- Mobile card view (below md) --}}
-        <div class="divide-y divide-slate-100 md:hidden">
-            @forelse ($encounters as $encounter)
-                <article class="p-4 space-y-2.5">
-                    <div class="flex items-center justify-between gap-2">
-                        <span class="font-mono text-xs font-semibold text-slate-900">{{ $encounter->encounter_number }}</span>
-                        <span class="badge badge-{{ $encounter->status }}">{{ \Illuminate\Support\Str::headline($encounter->status) }}</span>
-                    </div>
-
-                    <div class="flex items-start gap-3">
-                        <x-avatar :name="$encounter->patient->user->name" size="sm" />
-                        <div class="min-w-0 flex-1">
-                            <p class="font-medium text-slate-900">{{ $encounter->patient->user->name }}</p>
-                            <p class="text-xs text-slate-500">{{ $encounter->patient->patient_number }}</p>
-                            <p class="mt-1 text-xs text-slate-700 font-medium truncate" title="{{ $encounter->diagnosis }}">
-                                {{ $encounter->diagnosis }}
-                                @if ($encounter->diagnosis_code)
-                                    <span class="text-slate-400 font-normal">({{ $encounter->diagnosis_code }})</span>
-                                @endif
-                            </p>
-                            <p class="mt-0.5 text-xs text-slate-500">
-                                {{ $encounter->encountered_at->isoFormat('MMM D, YYYY · h:mm A') }}
-                                · {{ $encounter->prescriptions->count() }} Rx
-                            </p>
+        <div class="card-body p-0">
+            {{-- Mobile stacked cards --}}
+            <div class="divide-y divide-[#DCE3E1] md:hidden">
+                @forelse ($encounters as $encounter)
+                    <article class="space-y-2.5 p-4">
+                        <div class="flex items-start justify-between gap-2">
+                            <div class="min-w-0">
+                                <p class="cs-num font-mono text-xs font-semibold text-[#0F766E]">
+                                    {{ $encounter->encounter_number }}
+                                </p>
+                                <p class="mt-0.5 text-sm font-medium text-[#14201E]">
+                                    {{ $encounter->patient?->user?->name ?? 'Unknown patient' }}
+                                </p>
+                                <p class="cs-num text-xs text-[#465854]">
+                                    {{ $encounter->patient?->patient_number ?? '—' }} · {{ $encounter->encountered_at?->isoFormat('MMM D, YYYY') ?? '—' }}
+                                </p>
+                            </div>
+                            <span class="badge badge-{{ $encounter->status }} shrink-0">
+                                {{ \Illuminate\Support\Str::headline($encounter->status) }}
+                            </span>
                         </div>
-                    </div>
 
-                    <div class="pt-2 border-t border-slate-100 flex justify-end">
-                        <a href="{{ route('physician.encounters.show', $encounter) }}" class="btn btn-secondary btn-sm">
-                            <x-icon name="eye" class="h-4 w-4" />
-                            Open record
-                        </a>
-                    </div>
-                </article>
-            @empty
-                <div class="p-8">
-                    @if ($search !== '')
-                        <x-empty icon="magnifying-glass" title="No encounters found"
-                                 :description="'No encounters match “' . $search . '”. Try a different patient name, number or diagnosis.'" />
-                    @else
-                        <x-empty icon="clipboard" title="No encounters recorded yet"
-                                 description="Encounters you record during consultations will appear here." />
-                    @endif
-                </div>
-            @endforelse
-        </div>
+                        <p class="text-sm text-[#14201E]">
+                            {{ $encounter->diagnosis ?: 'Diagnosis pending' }}
+                            @if ($encounter->diagnosis_code)
+                                <span class="cs-num font-mono text-xs text-[#465854]">({{ $encounter->diagnosis_code }})</span>
+                            @endif
+                        </p>
 
-        {{-- Desktop table (md and up) --}}
-        <div class="hidden overflow-x-auto md:block">
-            <table class="w-full text-left">
-                <thead>
-                    <tr>
-                        <th class="table-head">Encounter #</th>
-                        <th class="table-head">Date</th>
-                        <th class="table-head">Patient</th>
-                        <th class="table-head">Diagnosis</th>
-                        <th class="table-head">Vitals</th>
-                        <th class="table-head">Prescriptions</th>
-                        <th class="table-head">Status</th>
-                        <th class="table-head text-right">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($encounters as $encounter)
-                        <tr class="table-row">
-                            <td class="table-cell whitespace-nowrap font-medium text-slate-900">
-                                {{ $encounter->encounter_number }}
-                            </td>
-                            <td class="table-cell whitespace-nowrap">
-                                {{ $encounter->encountered_at->isoFormat('dddd, MMM D, YYYY') }}
-                                <span class="block text-xs text-slate-500">{{ $encounter->encountered_at->isoFormat('h:mm A') }}</span>
-                            </td>
-                            <td class="table-cell">
-                                <div class="flex items-center gap-3">
-                                    <x-avatar :name="$encounter->patient->user->name" size="sm" />
-                                    <div class="min-w-0">
-                                        <p class="font-medium text-slate-900">{{ $encounter->patient->user->name }}</p>
-                                        <p class="text-xs text-slate-500">{{ $encounter->patient->patient_number }}</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="table-cell">
-                                <div class="max-w-[16rem] truncate" title="{{ $encounter->diagnosis }}">
-                                    {{ $encounter->diagnosis }}
-                                    @if ($encounter->diagnosis_code)
-                                        <span class="ml-1 text-xs font-medium text-slate-400">{{ $encounter->diagnosis_code }}</span>
-                                    @endif
-                                </div>
-                            </td>
-                            <td class="table-cell whitespace-nowrap">
-                                @if ($encounter->vitals !== null)
-                                    <span class="inline-flex items-center gap-1 text-xs font-medium text-emerald-600">
-                                        <x-icon name="check" class="h-4 w-4" />
-                                        Recorded
-                                    </span>
-                                @else
-                                    <span class="text-slate-400">—</span>
-                                @endif
-                            </td>
-                            <td class="table-cell">{{ $encounter->prescriptions->count() }}</td>
-                            <td class="table-cell">
-                                <span class="badge badge-{{ $encounter->status }}">{{ \Illuminate\Support\Str::headline($encounter->status) }}</span>
-                            </td>
-                            <td class="table-cell text-right">
-                                <a href="{{ route('physician.encounters.show', $encounter) }}" class="btn btn-secondary btn-sm">
-                                    <x-icon name="eye" class="h-4 w-4" />
-                                    Open
-                                </a>
-                            </td>
-                        </tr>
-                    @empty
+                        <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+                            <span class="cs-num text-xs text-[#465854]">
+                                {{ $encounter->vitals ? 'Vitals recorded' : 'No vitals' }} · {{ $encounter->prescriptions->count() }} Rx
+                            </span>
+                            <a class="btn btn-secondary btn-sm" href="{{ route('physician.encounters.show', $encounter) }}">
+                                <x-icon name="eye" class="h-4 w-4" />
+                                Open chart
+                            </a>
+                        </div>
+                    </article>
+                @empty
+                    <div class="p-6">
+                        <x-empty icon="clipboard" title="No encounters matched your query."
+                                 description="Completed or in-progress consultations will be listed here." />
+                    </div>
+                @endforelse
+            </div>
+
+            {{-- Desktop clinical ledger --}}
+            <div class="hidden overflow-x-auto md:block">
+                <table class="min-w-full">
+                    <caption class="sr-only">Recorded physician encounters</caption>
+                    <thead>
                         <tr>
-                            <td colspan="8" class="px-4 py-12">
-                                @if ($search !== '')
-                                    <x-empty icon="magnifying-glass" title="No encounters found"
-                                             :description="'No encounters match “' . $search . '”. Try a different patient name, number or diagnosis.'" />
-                                @else
-                                    <x-empty icon="clipboard" title="No encounters recorded yet"
-                                             description="Encounters you record during consultations will appear here." />
-                                @endif
-                            </td>
+                            <th scope="col" class="table-head">Encounter #</th>
+                            <th scope="col" class="table-head">Date</th>
+                            <th scope="col" class="table-head">Patient</th>
+                            <th scope="col" class="table-head">Diagnosis</th>
+                            <th scope="col" class="table-head">Vitals</th>
+                            <th scope="col" class="table-head">Prescriptions</th>
+                            <th scope="col" class="table-head">Status</th>
+                            <th scope="col" class="table-head text-right">Action</th>
                         </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody class="divide-y divide-[#DCE3E1]">
+                        @forelse ($encounters as $encounter)
+                            <tr class="table-row">
+                                <td class="table-cell cs-num font-mono text-xs font-semibold text-[#0F766E] whitespace-nowrap">
+                                    {{ $encounter->encounter_number }}
+                                </td>
+                                <td class="table-cell cs-num whitespace-nowrap text-[#465854]">
+                                    {{ $encounter->encountered_at?->isoFormat('MMM D, YYYY') ?? '—' }}
+                                </td>
+                                <td class="table-cell">
+                                    <div class="flex items-center gap-2.5">
+                                        @if ($encounter->patient?->user?->name)
+                                            <x-avatar :name="$encounter->patient->user->name" size="sm" />
+                                        @endif
+                                        <div class="min-w-0">
+                                            @if ($encounter->patient)
+                                                <a class="font-medium text-[#14201E] hover:text-[#0F766E] hover:underline"
+                                                   href="{{ route('physician.patients.show', $encounter->patient) }}">
+                                                    {{ $encounter->patient->user?->name ?? 'Unknown' }}
+                                                </a>
+                                            @else
+                                                <span class="font-medium text-[#14201E]">Unknown</span>
+                                            @endif
+                                            <p class="cs-num font-mono text-xs text-[#465854]">
+                                                {{ $encounter->patient?->patient_number ?? '—' }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="table-cell">
+                                    <span class="text-[#14201E]">{{ $encounter->diagnosis ?: 'Diagnosis pending' }}</span>
+                                    @if ($encounter->diagnosis_code)
+                                        <span class="cs-num ml-1 font-mono text-xs text-[#465854]">{{ $encounter->diagnosis_code }}</span>
+                                    @endif
+                                </td>
+                                <td class="table-cell whitespace-nowrap text-xs text-[#465854]">
+                                    {{ $encounter->vitals ? 'Recorded' : '—' }}
+                                </td>
+                                <td class="table-cell cs-num whitespace-nowrap text-[#14201E]">
+                                    {{ $encounter->prescriptions->count() }}
+                                </td>
+                                <td class="table-cell whitespace-nowrap">
+                                    <span class="badge badge-{{ $encounter->status }}">
+                                        {{ \Illuminate\Support\Str::headline($encounter->status) }}
+                                    </span>
+                                </td>
+                                <td class="table-cell whitespace-nowrap text-right">
+                                    <a class="btn btn-secondary btn-sm" href="{{ route('physician.encounters.show', $encounter) }}">
+                                        <x-icon name="eye" class="h-4 w-4" />
+                                        Open chart
+                                    </a>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td class="px-4 py-10" colspan="8">
+                                    <x-empty icon="clipboard" title="No encounters matched your query."
+                                             description="Completed or in-progress consultations will be listed here." />
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         @if ($encounters->hasPages())
-            <div class="border-t border-slate-200 px-5 py-4">
+            <div class="border-t border-[#DCE3E1] px-5 py-3.5">
                 {{ $encounters->links() }}
             </div>
         @endif
-    </div>
+    </section>
 @endsection

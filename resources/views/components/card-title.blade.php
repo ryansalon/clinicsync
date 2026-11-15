@@ -3,10 +3,10 @@
 ])
 
 <div>
-    <h3 {{ $attributes->merge(['class' => 'text-sm font-semibold tracking-tight text-slate-900']) }}>
+    <h2 {{ $attributes->merge(['class' => 'text-sm font-semibold tracking-tight text-[#14201E]']) }}>
         {{ $slot }}
-    </h3>
+    </h2>
     @if ($description)
-        <p class="mt-0.5 text-xs text-slate-500">{{ $description }}</p>
+        <p class="mt-0.5 text-xs text-[#465854]">{{ $description }}</p>
     @endif
 </div>

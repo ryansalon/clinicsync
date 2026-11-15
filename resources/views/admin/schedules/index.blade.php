@@ -15,7 +15,7 @@
 @endphp
 
 @section('content')
-    <x-page-header title="Physician schedules" description="Recurring weekly availability windows for every clinic physician.">
+    <x-page-header title="Physician schedules" description="Recurring weekly clinic hours for every outpatient physician · Mon–Sat, 08:00–17:00.">
         <x-slot:actions>
             <button type="button" class="btn btn-primary w-full lg:w-auto" data-dialog-open="create-schedule-dialog">
                 <x-icon name="plus" class="h-4 w-4" />
@@ -26,12 +26,12 @@
 
     <div id="create-schedule-dialog" data-dialog role="dialog" aria-modal="true" aria-labelledby="create-schedule-title"
          class="fixed inset-0 z-[60] hidden items-center justify-center p-4">
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" data-dialog-close></div>
-        <div class="relative max-h-[90dvh] w-full max-w-xl overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-xl">
-            <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
-                <h2 id="create-schedule-title" class="text-base font-semibold text-slate-900">Add physician schedule</h2>
+        <div class="absolute inset-0 bg-[#14201E]/50 backdrop-blur-xs" data-dialog-close></div>
+        <div class="relative max-h-[90dvh] w-full max-w-xl overflow-y-auto rounded-lg border border-[#DCE3E1] bg-white shadow-xl">
+            <div class="flex items-center justify-between border-b border-[#DCE3E1] px-5 py-4">
+                <h2 id="create-schedule-title" class="text-base font-semibold text-[#14201E]">Add physician schedule</h2>
                 <button type="button" data-dialog-close aria-label="Close"
-                        class="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600">
+                        class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md text-[#465854] transition hover:bg-[#F4F7F6] hover:text-[#14201E]">
                     <x-icon name="x" class="h-4 w-4" />
                 </button>
             </div>
@@ -70,7 +70,7 @@
                         <label for="schedule-start" class="label">Start time</label>
                         <input id="schedule-start" type="time" name="start_time"
                                value="{{ old('start_time') }}"
-                               class="input @error('start_time') input-invalid @enderror" required>
+                               class="input cs-num @error('start_time') input-invalid @enderror" required>
                         @error('start_time')
                             <p class="field-error">{{ $message }}</p>
                         @enderror
@@ -80,7 +80,7 @@
                         <label for="schedule-end" class="label">End time</label>
                         <input id="schedule-end" type="time" name="end_time"
                                value="{{ old('end_time') }}"
-                               class="input @error('end_time') input-invalid @enderror" required>
+                               class="input cs-num @error('end_time') input-invalid @enderror" required>
                         @error('end_time')
                             <p class="field-error">{{ $message }}</p>
                         @enderror
@@ -91,24 +91,24 @@
                     <div>
                         <label for="schedule-from" class="label">Effective from</label>
                         <input id="schedule-from" type="date" name="effective_from"
-                               value="{{ old('effective_from') }}" class="input">
+                               value="{{ old('effective_from') }}" class="input cs-num">
                     </div>
 
                     <div>
                         <label for="schedule-until" class="label">Effective until</label>
                         <input id="schedule-until" type="date" name="effective_until"
-                               value="{{ old('effective_until') }}" class="input">
+                               value="{{ old('effective_until') }}" class="input cs-num">
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2.5">
                     <input id="schedule-active" type="checkbox" name="is_active" value="1"
-                           class="h-4 w-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500"
+                           class="h-4 w-4 rounded border-[#DCE3E1] text-[#0F766E] focus:ring-[#0F766E]"
                            {{ old('is_active', 1) ? 'checked' : '' }}>
                     <label for="schedule-active" class="label mb-0">Active schedule</label>
                 </div>
 
-                <div class="flex justify-end gap-3 border-t border-slate-200 pt-4">
+                <div class="flex justify-end gap-3 border-t border-[#DCE3E1] pt-4">
                     <button type="button" class="btn btn-secondary" data-dialog-close>Cancel</button>
                     <button type="submit" class="btn btn-primary">
                         <x-icon name="plus" class="h-4 w-4" />
@@ -138,7 +138,7 @@
             <div class="flex-1">
                 <label for="filter-physician" class="label">Physician</label>
                 <div class="relative sm:max-w-md">
-                    <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                    <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-[#465854]">
                         <x-icon name="funnel" class="h-4 w-4" />
                     </span>
                     <select id="filter-physician" name="physician_id" class="input pl-9" data-auto-submit>
@@ -155,29 +155,29 @@
     </x-filter-bar>
 
     {{-- Schedules grouped by physician --}}
-    <div class="space-y-6">
+    <div class="mt-6 space-y-6">
         @forelse ($schedules->groupBy(fn ($s) => $s->physician->user->name) as $physicianName => $items)
-            <div class="card">
+            <section class="card">
                 <div class="card-header flex flex-wrap items-center justify-between gap-2">
                     <div class="flex items-center gap-3">
                         <x-avatar :name="$physicianName" />
                         <div>
-                            <h3 class="text-sm font-semibold tracking-tight text-slate-900">Dr. {{ $physicianName }}</h3>
-                            <p class="mt-0.5 text-xs text-slate-500">{{ $items->first()->physician->specialization }}</p>
+                            <h2 class="text-sm font-semibold tracking-tight text-[#14201E]">Dr. {{ $physicianName }}</h2>
+                            <p class="mt-0.5 text-xs text-[#465854]">{{ $items->first()->physician->specialization }}</p>
                         </div>
                     </div>
-                    <span class="chip">
-                        <x-icon name="calendar" class="h-3.5 w-3.5 text-slate-400" />
-                        {{ $items->count() }} window{{ $items->count() === 1 ? '' : 's' }}
+                    <span class="chip cs-num">
+                        <x-icon name="calendar" class="h-3.5 w-3.5 text-[#0F766E]" />
+                        {{ $items->count() }} {{ \Illuminate\Support\Str::plural('window', $items->count()) }}
                     </span>
                 </div>
 
-                {{-- Mobile stacked cards (below md) --}}
-                <div class="divide-y divide-slate-100 md:hidden">
+                {{-- Mobile stacked cards --}}
+                <div class="divide-y divide-[#DCE3E1] md:hidden">
                     @foreach ($items as $schedule)
-                        <article class="p-4 space-y-2">
+                        <article class="space-y-2 p-4">
                             <div class="flex items-center justify-between gap-2">
-                                <span class="font-semibold text-sm text-slate-900">
+                                <span class="text-sm font-semibold text-[#14201E]">
                                     {{ $days[$schedule->day_of_week] ?? '—' }}
                                 </span>
                                 <span class="badge badge-{{ $schedule->is_active ? 'enabled' : 'inactive' }}">
@@ -185,11 +185,11 @@
                                 </span>
                             </div>
 
-                            <p class="text-xs text-slate-600 font-medium">
+                            <p class="cs-num text-xs font-medium text-[#14201E]">
                                 {{ \Illuminate\Support\Carbon::parse($schedule->start_time)->isoFormat('h:mm A') }} – {{ \Illuminate\Support\Carbon::parse($schedule->end_time)->isoFormat('h:mm A') }}
                             </p>
 
-                            <p class="text-xs text-slate-500">
+                            <p class="cs-num text-xs text-[#465854]">
                                 @if ($schedule->effective_from && $schedule->effective_until)
                                     {{ $schedule->effective_from->isoFormat('MMM D, YYYY') }} – {{ $schedule->effective_until->isoFormat('MMM D, YYYY') }}
                                 @elseif ($schedule->effective_from)
@@ -201,7 +201,7 @@
                                 @endif
                             </p>
 
-                            <div class="flex items-center gap-2 pt-2 border-t border-slate-100">
+                            <div class="flex items-center gap-2 border-t border-[#DCE3E1] pt-2.5">
                                 <form method="POST" action="{{ route('admin.schedules.update', $schedule) }}" class="flex-1">
                                     @csrf
                                     @method('PUT')
@@ -230,28 +230,29 @@
                     @endforeach
                 </div>
 
-                {{-- Desktop table (md and up) --}}
+                {{-- Desktop table --}}
                 <div class="hidden overflow-x-auto md:block">
                     <table class="min-w-full">
+                        <caption class="sr-only">Availability schedule for Dr. {{ $physicianName }}</caption>
                         <thead>
                             <tr>
-                                <th class="table-head">Day</th>
-                                <th class="table-head">Window</th>
-                                <th class="table-head">Effective</th>
-                                <th class="table-head">Status</th>
-                                <th class="table-head text-right">Actions</th>
+                                <th scope="col" class="table-head">Day</th>
+                                <th scope="col" class="table-head">Window</th>
+                                <th scope="col" class="table-head">Effective</th>
+                                <th scope="col" class="table-head">Status</th>
+                                <th scope="col" class="table-head text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody class="divide-y divide-[#DCE3E1]">
                             @foreach ($items as $schedule)
                                 <tr class="table-row">
-                                    <td class="table-cell font-medium text-slate-900">
+                                    <td class="table-cell font-medium text-[#14201E]">
                                         {{ $days[$schedule->day_of_week] ?? '—' }}
                                     </td>
-                                    <td class="table-cell whitespace-nowrap">
+                                    <td class="table-cell cs-num whitespace-nowrap text-[#14201E]">
                                         {{ \Illuminate\Support\Carbon::parse($schedule->start_time)->isoFormat('h:mm A') }} – {{ \Illuminate\Support\Carbon::parse($schedule->end_time)->isoFormat('h:mm A') }}
                                     </td>
-                                    <td class="table-cell whitespace-nowrap">
+                                    <td class="table-cell cs-num whitespace-nowrap text-[#465854]">
                                         @if ($schedule->effective_from && $schedule->effective_until)
                                             {{ $schedule->effective_from->isoFormat('MMM D, YYYY') }} – {{ $schedule->effective_until->isoFormat('MMM D, YYYY') }}
                                         @elseif ($schedule->effective_from)
@@ -299,10 +300,10 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
+            </section>
         @empty
             <x-empty icon="calendar" title="No schedules yet"
-                     description="No availability windows have been created. Use “Add schedule” to publish a physician’s availability window." />
+                     description="Use “Add schedule” to publish a physician’s recurring clinic hours." />
         @endforelse
     </div>
 @endsection

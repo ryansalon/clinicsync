@@ -3,8 +3,8 @@
 @section('title', 'Forgot password')
 
 @section('content')
-    <h1 class="text-3xl font-normal tracking-tight text-bright">Forgot your password?</h1>
-    <p class="mt-2 text-sm leading-relaxed text-read">
+    <h1 class="text-2xl font-semibold tracking-tight text-[#14201E] sm:text-3xl">Forgot your password?</h1>
+    <p class="mt-2 text-sm leading-relaxed text-[#465854]">
         Enter the email address registered with the clinic and we'll send you a link to reset it.
     </p>
 

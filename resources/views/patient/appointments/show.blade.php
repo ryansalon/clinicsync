@@ -18,16 +18,16 @@
         </x-page-header>
 
         <div class="space-y-6">
-            {{-- Status timeline --}}
             @php
                 $isClosed = in_array($appointment->status, ['cancelled', 'no_show'], true);
+                $isActiveUpcoming = in_array($appointment->status, ['pending', 'confirmed'], true);
 
                 $steps = [
                     ['label' => 'Booked', 'time' => $appointment->created_at->isoFormat('MMM D · h:mm A'), 'done' => true],
                     [
                         'label' => 'Confirmed',
                         'time' => in_array($appointment->status, ['confirmed', 'completed'], true)
-                            ? 'Confirmed by the clinic'
+                            ? 'Confirmed by clinic'
                             : null,
                         'done' => in_array($appointment->status, ['confirmed', 'completed'], true),
                     ],
@@ -48,52 +48,48 @@
             @endphp
 
             @if ($isClosed)
-                <div class="alert alert-warning">
-                    <x-icon name="exclamation-triangle" class="mt-0.5 h-5 w-5 shrink-0" />
-                    <div>
-                        <p class="font-semibold">This appointment was {{ \Illuminate\Support\Str::headline($appointment->status) }}.</p>
-                        <p class="mt-0.5">
-                            @if ($appointment->status === 'no_show')
-                                The visit was marked as a no-show. You can book a new appointment anytime.
-                            @else
-                                The slot has been released. You can book a new appointment anytime.
-                            @endif
-                        </p>
-                    </div>
-                </div>
+                <x-alert type="warning" title="Appointment {{ \Illuminate\Support\Str::headline($appointment->status) }}">
+                    @if ($appointment->status === 'no_show')
+                        This visit was marked as a no-show. You may book another appointment anytime.
+                    @else
+                        This slot has been released. You may book another appointment anytime.
+                    @endif
+                </x-alert>
             @else
                 <section class="card">
                     <div class="card-body">
-                        <ol class="flex items-start">
+                        <ol class="flex items-start" aria-label="Appointment timeline">
                             @foreach ($steps as $index => $step)
-                                @php($isCurrent = $currentStep === $index)
+                                @php
+                                    $isCurrent = $currentStep === $index;
+                                @endphp
                                 <li class="relative flex-1 text-center">
                                     @if (! $loop->first)
-                                        <span class="absolute top-[15px] -left-1/2 z-0 h-0.5 w-full {{ $step['done'] ? 'bg-teal-500' : 'bg-slate-200' }}"></span>
+                                        <span class="absolute top-[15px] -left-1/2 z-0 h-0.5 w-full {{ $step['done'] ? 'bg-[#0F766E]' : 'bg-[#DCE3E1]' }}"></span>
                                     @endif
 
                                     <span class="relative z-10 mx-auto flex h-8 w-8 items-center justify-center rounded-full ring-4 ring-white
                                         @if ($step['done'])
-                                            bg-teal-600 text-white shadow-sm
+                                            bg-[#0F766E] text-white
                                         @elseif ($isCurrent)
-                                            border-2 border-teal-500 bg-white
+                                            border-2 border-[#0F766E] bg-[#E6F4F1] text-[#0F766E]
                                         @else
-                                            border border-slate-200 bg-slate-100 text-slate-500
+                                            border border-[#DCE3E1] bg-[#F4F7F6] text-[#465854]
                                         @endif">
                                         @if ($step['done'])
                                             <x-icon name="check" class="h-4 w-4" />
                                         @elseif ($isCurrent)
-                                            <span class="h-2 w-2 rounded-full bg-teal-500"></span>
+                                            <span class="h-2 w-2 rounded-full bg-[#0F766E]"></span>
                                         @else
-                                            <span class="text-[11px] font-semibold">{{ $index + 1 }}</span>
+                                            <span class="cs-num text-[11px] font-semibold">{{ $index + 1 }}</span>
                                         @endif
                                     </span>
 
-                                    <p class="mt-2 text-xs font-semibold {{ $step['done'] || $isCurrent ? 'text-slate-900' : 'text-slate-500' }}">
+                                    <p class="mt-2 text-xs font-semibold {{ $step['done'] || $isCurrent ? 'text-[#14201E]' : 'text-[#465854]' }}">
                                         {{ $step['label'] }}
                                     </p>
-                                    <p class="mt-0.5 text-[11px] text-slate-500">
-                                        {{ $step['time'] ?? ($isCurrent ? 'In progress…' : 'Pending') }}
+                                    <p class="cs-num mt-0.5 text-[11px] text-[#465854]">
+                                        {{ $step['time'] ?? ($isCurrent ? 'In progress' : 'Pending') }}
                                     </p>
                                 </li>
                             @endforeach
@@ -102,75 +98,68 @@
                 </section>
             @endif
 
-            {{-- Details --}}
+            {{-- Visit details --}}
             <section class="card">
                 <div class="card-header">
                     <x-card-title>Visit details</x-card-title>
                 </div>
-                <div class="card-body">
-                    <dl class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
-                        <div>
-                            <dt class="text-xs font-medium tracking-wide text-slate-500 uppercase">Physician</dt>
-                            <dd class="mt-1 flex items-center gap-3 text-sm text-slate-900">
+                <div class="card-body p-0">
+                    <dl class="grid grid-cols-1 divide-y divide-[#DCE3E1] sm:grid-cols-2 sm:divide-x">
+                        <div class="px-5 py-3.5">
+                            <dt class="text-[11px] font-semibold tracking-wider text-[#465854] uppercase">Physician</dt>
+                            <dd class="mt-1.5 flex items-center gap-2.5 text-sm font-medium text-[#14201E]">
                                 @if ($appointment->physician?->user?->name)
                                     <x-avatar :name="$appointment->physician->user->name" size="sm" />
                                 @endif
                                 <span>Dr. {{ $appointment->physician?->user?->name ?? 'To be assigned' }}</span>
                             </dd>
                         </div>
-                        <div>
-                            <dt class="text-xs font-medium tracking-wide text-slate-500 uppercase">Specialization</dt>
-                            <dd class="mt-1 text-sm text-slate-900">{{ $appointment->physician?->specialization ?? '—' }}</dd>
+                        <div class="px-5 py-3.5">
+                            <dt class="text-[11px] font-semibold tracking-wider text-[#465854] uppercase">Specialization</dt>
+                            <dd class="mt-1.5 text-sm text-[#14201E]">{{ $appointment->physician?->specialization ?? '—' }}</dd>
                         </div>
-                        <div>
-                            <dt class="text-xs font-medium tracking-wide text-slate-500 uppercase">Date</dt>
-                            <dd class="mt-1 text-sm text-slate-900">{{ $appointment->appointment_date->isoFormat('dddd, MMM D, YYYY') }}</dd>
+                        <div class="px-5 py-3.5">
+                            <dt class="text-[11px] font-semibold tracking-wider text-[#465854] uppercase">Date</dt>
+                            <dd class="cs-num mt-1.5 text-sm font-medium text-[#14201E]">{{ $appointment->appointment_date->isoFormat('dddd, MMM D, YYYY') }}</dd>
                         </div>
-                        <div>
-                            <dt class="text-xs font-medium tracking-wide text-slate-500 uppercase">Time</dt>
-                            <dd class="mt-1 text-sm text-slate-900">
+                        <div class="px-5 py-3.5">
+                            <dt class="text-[11px] font-semibold tracking-wider text-[#465854] uppercase">Time</dt>
+                            <dd class="cs-num mt-1.5 text-sm font-medium text-[#14201E]">
                                 {{ date('g:i A', strtotime($appointment->start_time)) }}
                                 @if ($appointment->end_time)
                                     – {{ date('g:i A', strtotime($appointment->end_time)) }}
                                 @endif
                             </dd>
                         </div>
-                        <div>
-                            <dt class="text-xs font-medium tracking-wide text-slate-500 uppercase">Queue number</dt>
-                            <dd class="mt-1 text-sm font-semibold text-slate-900">#{{ $appointment->queue_number }}</dd>
+                        <div class="px-5 py-3.5">
+                            <dt class="text-[11px] font-semibold tracking-wider text-[#465854] uppercase">Queue number</dt>
+                            <dd class="cs-num mt-1.5 font-mono text-sm font-semibold text-[#0F766E]">#{{ $appointment->queue_number }}</dd>
                         </div>
-                        <div>
-                            <dt class="text-xs font-medium tracking-wide text-slate-500 uppercase">Booked on</dt>
-                            <dd class="mt-1 text-sm text-slate-900">{{ $appointment->created_at->isoFormat('MMMM D, YYYY · h:mm A') }}</dd>
+                        <div class="px-5 py-3.5">
+                            <dt class="text-[11px] font-semibold tracking-wider text-[#465854] uppercase">Booked on</dt>
+                            <dd class="cs-num mt-1.5 text-sm text-[#465854]">{{ $appointment->created_at->isoFormat('MMM D, YYYY · h:mm A') }}</dd>
                         </div>
-                        <div class="sm:col-span-2">
-                            <dt class="text-xs font-medium tracking-wide text-slate-500 uppercase">Chief complaint</dt>
-                            <dd class="mt-1 text-sm text-slate-900">{{ $appointment->chief_complaint ?: '—' }}</dd>
+                        <div class="px-5 py-3.5 sm:col-span-2">
+                            <dt class="text-[11px] font-semibold tracking-wider text-[#465854] uppercase">Chief complaint</dt>
+                            <dd class="mt-1.5 text-sm text-[#14201E]">{{ $appointment->chief_complaint ?: '—' }}</dd>
                         </div>
-                        <div class="sm:col-span-2">
-                            <dt class="text-xs font-medium tracking-wide text-slate-500 uppercase">Reason</dt>
-                            <dd class="mt-1 text-sm text-slate-900">{{ $appointment->reason ?: '—' }}</dd>
-                        </div>
+                        @if ($appointment->reason)
+                            <div class="px-5 py-3.5 sm:col-span-2">
+                                <dt class="text-[11px] font-semibold tracking-wider text-[#465854] uppercase">Additional notes</dt>
+                                <dd class="mt-1.5 text-sm text-[#14201E]">{{ $appointment->reason }}</dd>
+                            </div>
+                        @endif
                     </dl>
                 </div>
             </section>
 
-            {{-- Queue information --}}
-            <section class="rounded-xl border border-teal-200 bg-teal-50 p-5 shadow-sm">
-                <div class="flex items-start gap-3">
-                    <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-teal-100 text-teal-700">
-                        <x-icon name="clock" class="h-5 w-5" />
-                    </span>
-                    <div class="min-w-0">
-                        <h3 class="text-sm font-semibold text-teal-900">Queue information</h3>
-                        <p class="mt-1 text-sm text-teal-800">
-                            Please arrive at the clinic <span class="font-semibold">15 minutes early</span> and wait for your queue number
-                            <span class="font-semibold">#{{ $appointment->queue_number }}</span> to be called. The queue display at the
-                            reception shows whose turn it is, and you will also be notified here once your status changes.
-                        </p>
-                    </div>
-                </div>
-            </section>
+            {{-- Arrival guidance only for upcoming/active appointments --}}
+            @if ($isActiveUpcoming)
+                <x-alert type="info" title="Queue & check-in instructions">
+                    Arrive <strong class="font-semibold">15 minutes before your slot</strong> and watch for queue number
+                    <strong class="cs-num font-mono font-semibold">#{{ $appointment->queue_number }}</strong>. Clinic hours: Mon–Sat, 08:00–17:00.
+                </x-alert>
+            @endif
 
             {{-- Consultation summary --}}
             @if ($appointment->encounter)
@@ -178,46 +167,52 @@
                     <div class="card-header">
                         <x-card-title>Consultation summary</x-card-title>
                     </div>
-                    <div class="card-body">
-                        <dl class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
-                            <div class="sm:col-span-2">
-                                <dt class="text-xs font-medium tracking-wide text-slate-500 uppercase">Diagnosis</dt>
-                                <dd class="mt-1 text-sm text-slate-900">
+                    <div class="card-body space-y-5">
+                        <dl class="space-y-3 text-sm">
+                            <div>
+                                <dt class="text-[11px] font-semibold tracking-wider text-[#465854] uppercase">Diagnosis</dt>
+                                <dd class="mt-1 text-[#14201E]">
                                     {{ $appointment->encounter->diagnosis ?: '—' }}
                                     @if ($appointment->encounter->diagnosis_code)
-                                        <span class="text-xs text-slate-500">(Code {{ $appointment->encounter->diagnosis_code }})</span>
+                                        <span class="cs-num font-mono text-xs text-[#465854]">({{ $appointment->encounter->diagnosis_code }})</span>
                                     @endif
                                 </dd>
                             </div>
-                            <div class="sm:col-span-2">
-                                <dt class="text-xs font-medium tracking-wide text-slate-500 uppercase">Assessment</dt>
-                                <dd class="mt-1 text-sm text-slate-900">{{ $appointment->encounter->assessment ?: '—' }}</dd>
-                            </div>
-                            <div class="sm:col-span-2">
-                                <dt class="text-xs font-medium tracking-wide text-slate-500 uppercase">Treatment plan</dt>
-                                <dd class="mt-1 text-sm text-slate-900">{{ $appointment->encounter->treatment_plan ?: '—' }}</dd>
-                            </div>
-                            <div class="sm:col-span-2">
-                                <dt class="text-xs font-medium tracking-wide text-slate-500 uppercase">Clinical notes</dt>
-                                <dd class="mt-1 text-sm text-slate-900">{{ $appointment->encounter->clinical_notes ?: '—' }}</dd>
-                            </div>
+                            @if ($appointment->encounter->assessment)
+                                <div>
+                                    <dt class="text-[11px] font-semibold tracking-wider text-[#465854] uppercase">Assessment</dt>
+                                    <dd class="mt-1 text-[#14201E]">{{ $appointment->encounter->assessment }}</dd>
+                                </div>
+                            @endif
+                            @if ($appointment->encounter->treatment_plan)
+                                <div>
+                                    <dt class="text-[11px] font-semibold tracking-wider text-[#465854] uppercase">Treatment plan</dt>
+                                    <dd class="mt-1 text-[#14201E]">{{ $appointment->encounter->treatment_plan }}</dd>
+                                </div>
+                            @endif
+                            @if ($appointment->encounter->clinical_notes)
+                                <div>
+                                    <dt class="text-[11px] font-semibold tracking-wider text-[#465854] uppercase">Clinical notes</dt>
+                                    <dd class="mt-1 text-[#14201E]">{{ $appointment->encounter->clinical_notes }}</dd>
+                                </div>
+                            @endif
                         </dl>
 
                         @if ($appointment->encounter->prescriptions?->isNotEmpty())
-                            <div class="mt-5">
+                            <div>
                                 <p class="section-title mb-2">Prescriptions</p>
-                                <ul class="divide-y divide-slate-100 rounded-lg border border-slate-200">
+                                <ul class="divide-y divide-[#DCE3E1] border-y border-[#DCE3E1]">
                                     @foreach ($appointment->encounter->prescriptions as $prescription)
-                                        <li class="px-3 py-2 text-sm">
-                                            <span class="font-medium text-slate-900">{{ $prescription->medication_name }}</span>
+                                        <li class="py-2.5 text-sm">
+                                            <span class="font-medium text-[#14201E]">{{ $prescription->medication_name }}</span>
                                             @if ($prescription->strength)
-                                                <span class="text-slate-600">{{ $prescription->strength }}</span>
+                                                <span class="text-[#465854]">{{ $prescription->strength }}</span>
                                             @endif
-                                            <span class="text-slate-500">
+                                            <span class="cs-num text-[#465854]">
                                                 — {{ $prescription->dosage }}, {{ $prescription->frequency }}, {{ $prescription->duration }}
                                             </span>
                                             @if ($prescription->instructions)
-                                                <p class="mt-0.5 text-xs text-slate-500">{{ $prescription->instructions }}</p>
+                                                <p class="mt-0.5 text-xs text-[#465854]">{{ $prescription->instructions }}</p>
                                             @endif
                                         </li>
                                     @endforeach
@@ -229,7 +224,7 @@
             @endif
 
             {{-- Actions --}}
-            <div class="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-5">
+            <div class="flex flex-wrap items-center justify-between gap-3 border-t border-[#DCE3E1] pt-5">
                 <a class="btn btn-secondary" href="{{ route('patient.appointments.index') }}">
                     <x-icon name="arrow-left" class="h-4 w-4" />
                     Back to my appointments

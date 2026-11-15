@@ -11,7 +11,7 @@
     @endphp
 
     <x-page-header title="Profile settings"
-                   description="Manage your personal details and account security." />
+                   description="Personal details, contact information, and password security." />
 
     <div class="grid gap-6 lg:grid-cols-2">
         {{-- Profile details --}}
@@ -20,8 +20,8 @@
             @method('PATCH')
 
             <div class="card-header">
-                <h2 class="text-sm font-semibold text-slate-900">Profile</h2>
-                <p class="mt-0.5 text-xs text-slate-500">Your name, contact number and photo.</p>
+                <x-card-title>Profile</x-card-title>
+                <p class="mt-0.5 text-xs text-[#465854]">Display name, mobile number, and portrait photo.</p>
             </div>
 
             <div class="card-body space-y-5">
@@ -29,7 +29,7 @@
                     @if ($photoPath)
                         <img src="{{ route('profile.photo') }}" alt="{{ $user->name }}"
                              width="64" height="64" loading="lazy"
-                             class="h-16 w-16 shrink-0 rounded-full object-cover ring-2 ring-slate-200">
+                             class="h-16 w-16 shrink-0 rounded-full object-cover ring-1 ring-[#DCE3E1]">
                     @else
                         <x-avatar :name="$user->name" size="lg" />
                     @endif
@@ -38,8 +38,8 @@
                         <div class="min-w-0 flex-1">
                             <label for="photo" class="label">Profile photo</label>
                             <input id="photo" type="file" name="photo" accept="image/png,image/jpeg,image/webp"
-                                   class="block w-full cursor-pointer text-sm text-slate-600 file:mr-3 file:cursor-pointer file:rounded-lg file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-slate-700 transition hover:file:bg-slate-200">
-                            <p class="helper">JPG, PNG or WebP · up to 2 MB.</p>
+                                   class="block w-full cursor-pointer text-sm text-[#465854] file:mr-3 file:min-h-11 file:cursor-pointer file:rounded-md file:border file:border-[#DCE3E1] file:bg-[#F4F7F6] file:px-3.5 file:py-2 file:text-xs file:font-semibold file:text-[#14201E] transition hover:file:bg-[#E6F4F1]">
+                            <p class="helper">JPG, PNG, or WebP · max 2 MB.</p>
                             @error('photo')
                                 <p class="field-error">{{ $message }}</p>
                             @enderror
@@ -59,26 +59,28 @@
                 <div>
                     <label for="phone" class="label">Mobile number</label>
                     <input id="phone" type="tel" name="phone" value="{{ old('phone', $user->phone) }}" inputmode="numeric" autocomplete="tel"
-                           class="input @error('phone') input-invalid @enderror" placeholder="09XXXXXXXXX">
+                           class="input cs-num @error('phone') input-invalid @enderror" placeholder="09XXXXXXXXX">
                     @error('phone')
                         <p class="field-error">{{ $message }}</p>
                     @enderror
                 </div>
 
-                <div class="rounded-lg border border-slate-200 bg-slate-50/70 p-4">
-                    <div class="flex flex-wrap items-center justify-between gap-2 text-sm">
-                        <span class="text-slate-500">Login email</span>
-                        <span class="font-medium text-slate-900">{{ $user->email }}</span>
+                <dl class="divide-y divide-[#DCE3E1] rounded-md border border-[#DCE3E1] bg-[#F4F7F6]/70">
+                    <div class="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 text-sm">
+                        <dt class="text-[#465854]">Login email</dt>
+                        <dd class="font-medium text-[#14201E]">{{ $user->email }}</dd>
                     </div>
-                    <div class="mt-2 flex flex-wrap items-center justify-between gap-2 text-sm">
-                        <span class="text-slate-500">Role</span>
-                        <span class="badge bg-teal-100 text-teal-800">{{ $roleLabel }}</span>
+                    <div class="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 text-sm">
+                        <dt class="text-[#465854]">Role</dt>
+                        <dd>
+                            <span class="badge bg-[#E6F4F1] text-[#0F766E]">{{ $roleLabel }}</span>
+                        </dd>
                     </div>
-                    <p class="helper">Contact the clinic administrator to change your login email or role.</p>
-                </div>
+                </dl>
+                <p class="helper -mt-3">Contact the clinic administrator to update your login email or role.</p>
             </div>
 
-            <div class="border-t border-slate-200 px-5 py-4">
+            <div class="border-t border-[#DCE3E1] px-5 py-4">
                 <button type="submit" class="btn btn-primary">
                     <x-icon name="check" class="h-4 w-4" />
                     Save changes
@@ -92,8 +94,8 @@
             @method('PATCH')
 
             <div class="card-header">
-                <h3 class="text-sm font-semibold text-slate-900">Change password</h3>
-                <p class="mt-0.5 text-xs text-slate-500">Use at least 8 characters with a mix of letters and numbers.</p>
+                <x-card-title>Change password</x-card-title>
+                <p class="mt-0.5 text-xs text-[#465854]">Use at least 8 characters with letters and numbers.</p>
             </div>
 
             <div class="card-body space-y-5">
@@ -131,13 +133,12 @@
                     </div>
                 </div>
 
-                <div class="alert alert-info">
-                    <x-icon name="information-circle" class="mt-0.5 h-5 w-5 shrink-0" />
-                    <p>You'll stay signed in on this device after changing your password.</p>
-                </div>
+                <x-alert type="info">
+                    You will remain signed in on this device after updating your password.
+                </x-alert>
             </div>
 
-            <div class="border-t border-slate-200 px-5 py-4">
+            <div class="border-t border-[#DCE3E1] px-5 py-4">
                 <button type="submit" class="btn btn-secondary">
                     <x-icon name="lock" class="h-4 w-4" />
                     Update password

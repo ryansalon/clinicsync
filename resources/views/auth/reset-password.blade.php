@@ -3,8 +3,8 @@
 @section('title', 'Reset password')
 
 @section('content')
-    <h1 class="text-3xl font-normal tracking-tight text-bright">Choose a new password</h1>
-    <p class="mt-2 text-sm leading-relaxed text-read">Pick a strong password you haven't used before.</p>
+    <h1 class="text-2xl font-semibold tracking-tight text-[#14201E] sm:text-3xl">Choose a new password</h1>
+    <p class="mt-2 text-sm leading-relaxed text-[#465854]">Pick a strong password you haven't used before.</p>
 
     <form method="POST" action="{{ route('password.store') }}" class="mt-8 space-y-5">
         @csrf

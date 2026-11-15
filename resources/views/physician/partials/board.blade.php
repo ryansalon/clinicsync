@@ -1,35 +1,82 @@
-{{-- Caseload at a glance --}}
-<div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
-    <x-stat label="Waiting now" :value="$waiting->count()" icon="clock" tone="amber" />
-    <x-stat label="Completed today" :value="$completedToday" icon="check-circle" tone="emerald" />
-    <x-stat label="Encounters recorded" :value="$encounterCount" icon="clipboard" tone="indigo" />
-    <x-stat label="Total in queue today" :value="$queue->count()" icon="users" tone="teal" />
+{{-- Caseload hairline ledger strip --}}
+<div class="ledger-strip lg:grid-cols-4">
+    <div class="ledger-cell">
+        <div class="flex items-start justify-between gap-2">
+            <p class="stat-label">Waiting now</p>
+            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-amber-200 bg-amber-50 text-amber-800">
+                <x-icon name="clock" class="h-4 w-4" />
+            </span>
+        </div>
+        <div>
+            <p class="text-2xl font-semibold tracking-tight text-amber-900 cs-num">{{ $waiting->count() }}</p>
+            <p class="mt-0.5 text-xs text-[#465854]">Ready for consultation</p>
+        </div>
+    </div>
+    <div class="ledger-cell">
+        <div class="flex items-start justify-between gap-2">
+            <p class="stat-label">Completed today</p>
+            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-emerald-200 bg-emerald-50 text-emerald-800">
+                <x-icon name="check-circle" class="h-4 w-4" />
+            </span>
+        </div>
+        <div>
+            <p class="text-2xl font-semibold tracking-tight text-emerald-800 cs-num">{{ $completedToday }}</p>
+            <p class="mt-0.5 text-xs text-[#465854]">Consultations finished</p>
+        </div>
+    </div>
+    <a href="{{ route('physician.encounters.index') }}" class="ledger-cell group hover:bg-[#F4F7F6]">
+        <div class="flex items-start justify-between gap-2">
+            <p class="stat-label">Encounters recorded</p>
+            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-[#B5DCD4] bg-[#E6F4F1] text-[#0F766E]">
+                <x-icon name="clipboard" class="h-4 w-4" />
+            </span>
+        </div>
+        <div class="flex items-end justify-between gap-2">
+            <div>
+                <p class="text-2xl font-semibold tracking-tight text-[#0F766E] cs-num">{{ $encounterCount }}</p>
+                <p class="mt-0.5 text-xs text-[#465854]">Signed chart notes</p>
+            </div>
+            <span class="text-xs font-medium text-[#0F766E] opacity-0 transition group-hover:opacity-100">Log &rarr;</span>
+        </div>
+    </a>
+    <div class="ledger-cell">
+        <div class="flex items-start justify-between gap-2">
+            <p class="stat-label">Total in queue today</p>
+            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-[#DCE3E1] bg-[#EFF4F2] text-[#465854]">
+                <x-icon name="list" class="h-4 w-4" />
+            </span>
+        </div>
+        <div>
+            <p class="text-2xl font-semibold tracking-tight text-[#14201E] cs-num">{{ $queue->count() }}</p>
+            <p class="mt-0.5 text-xs text-[#465854]">Scheduled + walk-ins</p>
+        </div>
+    </div>
 </div>
 
 {{-- Next patient up spotlight --}}
 @if ($nextPatient)
-    <section class="mt-6 rounded-2xl border border-teal-200/90 bg-gradient-to-br from-teal-50/90 via-white to-white p-5 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_20px_-10px_rgba(13,148,136,0.16)]">
+    <section class="mt-5 rounded-lg border border-[#0F766E]/35 bg-[#E6F4F1] p-5 shadow-[0_1px_3px_rgba(15,118,110,0.08)]">
         <div class="flex flex-wrap items-center justify-between gap-4">
             <div class="flex min-w-0 items-center gap-4">
-                <div class="flex h-14 min-w-14 shrink-0 flex-col items-center justify-center rounded-2xl bg-teal-600 px-3 text-white shadow-sm">
-                    <span class="text-[10px] font-semibold tracking-wider text-teal-100 uppercase">Next</span>
-                    <span class="font-mono text-lg leading-tight font-bold">#{{ $nextPatient->queue_number }}</span>
+                <div class="flex h-14 min-w-14 shrink-0 flex-col items-center justify-center rounded-xl bg-[#0F766E] px-3 text-white">
+                    <span class="font-mono text-[10px] font-semibold tracking-wider text-[#E6F4F1] uppercase">Next</span>
+                    <span class="font-mono text-lg leading-tight font-bold cs-num">#{{ $nextPatient->queue_number }}</span>
                 </div>
                 <div class="min-w-0">
                     <div class="flex flex-wrap items-center gap-2">
-                        <p class="text-xs font-semibold tracking-wider text-teal-700 uppercase">Next patient up</p>
+                        <p class="text-xs font-semibold tracking-wider text-[#0F766E] uppercase">Next patient up</p>
                         @if ($nextPatient->patient->activeAllergies->isNotEmpty())
-                            <span class="inline-flex items-center gap-1 rounded-full bg-rose-100 px-2.5 py-0.5 text-[11px] font-semibold text-rose-800">
+                            <span class="inline-flex items-center gap-1 rounded-full border border-rose-300 bg-rose-100 px-2.5 py-0.5 text-[11px] font-semibold text-rose-900">
                                 <x-icon name="exclamation-triangle" class="h-3 w-3" />
-                                {{ $nextPatient->patient->activeAllergies->count() }} active {{ \Illuminate\Support\Str::plural('allergy', $nextPatient->patient->activeAllergies->count()) }}
+                                Allergies: {{ $nextPatient->patient->activeAllergies->pluck('allergen')->take(3)->implode(', ') }}
                             </span>
                         @endif
                     </div>
-                    <p class="mt-0.5 text-lg font-semibold text-slate-900">
+                    <p class="mt-0.5 text-lg font-semibold text-[#14201E]">
                         {{ $nextPatient->patient->user->name }}
-                        <span class="font-mono text-xs font-normal text-slate-500">· {{ $nextPatient->patient->patient_number }}</span>
+                        <span class="font-mono text-xs font-normal text-[#465854]">· {{ $nextPatient->patient->patient_number }}</span>
                     </p>
-                    <p class="mt-0.5 text-sm text-slate-600">
+                    <p class="mt-0.5 text-sm text-[#243330] cs-num">
                         {{ \Illuminate\Support\Carbon::parse($nextPatient->start_time)->isoFormat('h:mm A') }}
                         @if ($nextPatient->chief_complaint)
                             · {{ $nextPatient->chief_complaint }}
@@ -46,6 +93,6 @@
 @endif
 
 {{-- Today's queue table --}}
-<div class="mt-6">
+<div class="mt-5">
     @include('physician.partials.queue-table')
 </div>
