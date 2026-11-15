@@ -12,7 +12,6 @@ use App\Services\SequenceGenerator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
@@ -30,7 +29,7 @@ class RegisteredUserController extends Controller
      */
     public function store(RegisterRequest $request): RedirectResponse
     {
-        $user = DB::transaction(function () use ($request) {
+        $user = SequenceGenerator::retryTransaction(function () use ($request) {
             $user = User::create([
                 'name' => $request->string('name'),
                 'email' => $request->string('email'),

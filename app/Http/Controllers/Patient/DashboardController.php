@@ -48,6 +48,14 @@ class DashboardController extends Controller
             'latestEncounter' => $patient === null
                 ? null
                 : $patient->encounters()->with('physician.user')->latest('encountered_at')->first(),
+            'recentPrescriptions' => $patient === null
+                ? collect()
+                : $patient->prescriptions()->with('physician.user')->latest('issued_at')->limit(3)->get(),
+            'needsProfileCompletion' => $patient !== null && (
+                blank($patient->blood_type)
+                || blank($patient->emergency_contact_name)
+                || blank($patient->emergency_contact_phone)
+            ),
         ]);
     }
 
@@ -58,12 +66,16 @@ class DashboardController extends Controller
      */
     private function queueStatusFor($patient): ?array
     {
-        $appointment = Appointment::query()
+        $todayAppointments = Appointment::query()
             ->forPatient($patient->id)
             ->forDate(now()->toDateString())
             ->with('physician.user')
             ->orderByDesc('queue_number')
-            ->first();
+            ->get();
+
+        $appointment = $todayAppointments->first(
+            fn (Appointment $item) => in_array($item->status, [Appointment::STATUS_PENDING, Appointment::STATUS_CONFIRMED], true),
+        ) ?? $todayAppointments->firstWhere('status', Appointment::STATUS_COMPLETED);
 
         if ($appointment === null) {
             return null;
@@ -128,11 +140,13 @@ class DashboardController extends Controller
             'encounters' => $patient->encounters()
                 ->with(['physician.user', 'vitals', 'prescriptions'])
                 ->latest('encountered_at')
-                ->get(),
+                ->paginate(10, ['*'], 'encounters_page')
+                ->withQueryString(),
             'prescriptions' => $patient->prescriptions()
                 ->with('physician.user')
                 ->latest('issued_at')
-                ->get(),
+                ->paginate(10, ['*'], 'rx_page')
+                ->withQueryString(),
         ]);
     }
 }

@@ -3,7 +3,11 @@
 @section('title', 'Sign in')
 
 @section('content')
-    <h1 class="text-3xl font-normal tracking-tight text-bright">Welcome back</h1>
+    <p class="inline-flex items-center gap-2 font-guest-mono text-[11px] uppercase tracking-[0.16em] text-live">
+        <span class="h-1.5 w-1.5 rounded-full bg-live" aria-hidden="true"></span>
+        Patient &amp; Staff Portal
+    </p>
+    <h1 class="mt-2 text-3xl font-normal tracking-tight text-bright">Welcome back</h1>
     <p class="mt-2 text-sm leading-relaxed text-read">Sign in with the email address registered with the clinic.</p>
 
     <form method="POST" action="{{ route('login') }}" class="mt-8 space-y-5">
@@ -67,5 +71,8 @@
         <a href="{{ route('register') }}" class="font-medium text-bright hover:text-brand-strong">
             Register as a patient
         </a>
+    </p>
+    <p class="mt-2 text-center text-xs text-meta">
+        Physicians and clinic staff sign in with clinic-issued credentials.
     </p>
 @endsection

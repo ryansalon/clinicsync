@@ -53,6 +53,7 @@ class Appointment extends Model
         'called_at',
         'started_at',
         'finished_at',
+        'reminder_sent_at',
     ];
 
     protected function casts(): array
@@ -63,6 +64,7 @@ class Appointment extends Model
             'called_at' => 'datetime',
             'started_at' => 'datetime',
             'finished_at' => 'datetime',
+            'reminder_sent_at' => 'datetime',
         ];
     }
 

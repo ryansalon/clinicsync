@@ -5,114 +5,127 @@
 @section('content')
     <x-page-header title="User accounts" description="Create staff and patient accounts, filter by role, and manage account status.">
         <x-slot:actions>
-            <details data-popover class="card w-full shrink-0 overflow-hidden lg:w-auto">
-                <summary class="btn btn-primary w-full cursor-pointer list-none lg:w-auto">
-                    <x-icon name="plus" class="h-4 w-4" />
-                    Add user
-                </summary>
-                <form method="POST" action="{{ route('admin.users.store') }}" class="card-body border-t border-slate-200 space-y-4 lg:w-[30rem]">
-                    @csrf
+            <button type="button" class="btn btn-primary w-full lg:w-auto" data-dialog-open="create-user-dialog">
+                <x-icon name="plus" class="h-4 w-4" />
+                Add user
+            </button>
+        </x-slot:actions>
+    </x-page-header>
 
-                    <div class="grid gap-4 sm:grid-cols-2">
-                        <div>
-                            <label for="create-name" class="label">Full name</label>
-                            <input id="create-name" type="text" name="name" value="{{ old('name') }}"
-                                   autocomplete="name"
-                                   class="input @error('name') input-invalid @enderror" placeholder="Juan Dela Cruz" required>
-                            @error('name')
-                                <p class="field-error">{{ $message }}</p>
-                            @enderror
+    <div id="create-user-dialog" data-dialog role="dialog" aria-modal="true" aria-labelledby="create-user-title"
+         class="fixed inset-0 z-[60] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" data-dialog-close></div>
+        <div class="relative max-h-[90dvh] w-full max-w-xl overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-xl">
+            <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+                <h2 id="create-user-title" class="text-base font-semibold text-slate-900">Create account</h2>
+                <button type="button" data-dialog-close aria-label="Close"
+                        class="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600">
+                    <x-icon name="x" class="h-4 w-4" />
+                </button>
+            </div>
+            <form method="POST" action="{{ route('admin.users.store') }}" class="card-body space-y-4">
+                @csrf
+
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <div>
+                        <label for="create-name" class="label">Full name</label>
+                        <input id="create-name" type="text" name="name" value="{{ old('name') }}"
+                               autocomplete="name"
+                               class="input @error('name') input-invalid @enderror" placeholder="Juan Dela Cruz" required>
+                        @error('name')
+                            <p class="field-error">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label for="create-email" class="label">Email address</label>
+                        <input id="create-email" type="email" name="email" value="{{ old('email') }}"
+                               autocomplete="email"
+                               class="input @error('email') input-invalid @enderror" placeholder="name@clinic.ph" required>
+                        @error('email')
+                            <p class="field-error">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label for="create-phone" class="label">Phone</label>
+                        <input id="create-phone" type="tel" name="phone" value="{{ old('phone') }}"
+                               inputmode="numeric" autocomplete="tel"
+                               class="input @error('phone') input-invalid @enderror" placeholder="09XXXXXXXXX">
+                        @error('phone')
+                            <p class="field-error">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label for="create-role" class="label">Role</label>
+                        <select id="create-role" name="role" data-role-picker class="input @error('role') input-invalid @enderror" required>
+                            @foreach ($roles as $r)
+                                <option value="{{ $r->value }}" {{ old('role') === $r->value ? 'selected' : '' }}>
+                                    {{ $r->label() }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('role')
+                            <p class="field-error">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label for="create-password" class="label">Password</label>
+                        <div class="relative">
+                            <input id="create-password" type="password" name="password"
+                                   class="input pr-16 @error('password') input-invalid @enderror"
+                                   placeholder="••••••••" required autocomplete="new-password">
+                            <x-password-toggle for="#create-password" />
                         </div>
+                        @error('password')
+                            <p class="field-error">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                        <div>
-                            <label for="create-email" class="label">Email address</label>
-                            <input id="create-email" type="email" name="email" value="{{ old('email') }}"
-                                   autocomplete="email"
-                                   class="input @error('email') input-invalid @enderror" placeholder="name@clinic.ph" required>
-                            @error('email')
-                                <p class="field-error">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div>
-                            <label for="create-phone" class="label">Phone</label>
-                            <input id="create-phone" type="tel" name="phone" value="{{ old('phone') }}"
-                                   inputmode="numeric" autocomplete="tel"
-                                   class="input @error('phone') input-invalid @enderror" placeholder="09XXXXXXXXX">
-                            @error('phone')
-                                <p class="field-error">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div>
-                            <label for="create-role" class="label">Role</label>
-                            <select id="create-role" name="role" class="input @error('role') input-invalid @enderror" required>
-                                @foreach ($roles as $r)
-                                    <option value="{{ $r->value }}" {{ old('role') === $r->value ? 'selected' : '' }}>
-                                        {{ $r->label() }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('role')
-                                <p class="field-error">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div>
-                            <label for="create-password" class="label">Password</label>
-                            <div class="relative">
-                                <input id="create-password" type="password" name="password"
-                                       class="input pr-16 @error('password') input-invalid @enderror"
-                                       placeholder="••••••••" required autocomplete="new-password">
-                                <x-password-toggle for="#create-password" />
-                            </div>
-                            @error('password')
-                                <p class="field-error">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div>
-                            <label for="create-password-confirmation" class="label">Confirm password</label>
-                            <div class="relative">
-                                <input id="create-password-confirmation" type="password" name="password_confirmation"
-                                       class="input pr-16" placeholder="••••••••" required autocomplete="new-password">
-                                <x-password-toggle for="#create-password-confirmation" />
-                            </div>
-                        </div>
-
-                        <div>
-                            <label for="create-specialization" class="label">Specialization</label>
-                            <input id="create-specialization" type="text" name="specialization"
-                                   value="{{ old('specialization') }}"
-                                   class="input @error('specialization') input-invalid @enderror"
-                                   placeholder="e.g. Family Medicine">
-                            @error('specialization')
-                                <p class="field-error">{{ $message }}</p>
-                            @enderror
-                            <p class="helper">Required only when the role is Physician.</p>
-                        </div>
-
-                        <div>
-                            <label for="create-license" class="label">License number</label>
-                            <input id="create-license" type="text" name="license_number"
-                                   value="{{ old('license_number') }}"
-                                   class="input @error('license_number') input-invalid @enderror"
-                                   placeholder="e.g. MD-000123">
-                            @error('license_number')
-                                <p class="field-error">{{ $message }}</p>
-                            @enderror
-                            <p class="helper">Required only when the role is Physician.</p>
+                    <div>
+                        <label for="create-password-confirmation" class="label">Confirm password</label>
+                        <div class="relative">
+                            <input id="create-password-confirmation" type="password" name="password_confirmation"
+                                   class="input pr-16" placeholder="••••••••" required autocomplete="new-password">
+                            <x-password-toggle for="#create-password-confirmation" />
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-full sm:w-auto">
+                    <div data-role-only="physician">
+                        <label for="create-specialization" class="label">Specialization</label>
+                        <input id="create-specialization" type="text" name="specialization"
+                               value="{{ old('specialization') }}"
+                               class="input @error('specialization') input-invalid @enderror"
+                               placeholder="e.g. Family Medicine">
+                        @error('specialization')
+                            <p class="field-error">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div data-role-only="physician">
+                        <label for="create-license" class="label">License number</label>
+                        <input id="create-license" type="text" name="license_number"
+                               value="{{ old('license_number') }}"
+                               class="input @error('license_number') input-invalid @enderror"
+                               placeholder="e.g. MD-000123">
+                        @error('license_number')
+                            <p class="field-error">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-3 border-t border-slate-200 pt-4">
+                    <button type="button" class="btn btn-secondary" data-dialog-close>Cancel</button>
+                    <button type="submit" class="btn btn-primary">
                         <x-icon name="user-plus" class="h-4 w-4" />
                         Create account
                     </button>
-                </form>
-            </details>
-        </x-slot:actions>
-    </x-page-header>
+                </div>
+            </form>
+        </div>
+    </div>
 
     {{-- Toolbar: search + role filter --}}
     @php

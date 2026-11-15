@@ -23,6 +23,12 @@ class EnsureUserIsActive
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'This account has been suspended. Please contact the administrator.',
+                ], 403);
+            }
+
             return redirect()->route('login')->withErrors([
                 'email' => 'This account has been suspended. Please contact the administrator.',
             ]);

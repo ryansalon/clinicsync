@@ -2,6 +2,10 @@
 
 namespace App\Services;
 
+use Closure;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\DB;
+
 class SequenceGenerator
 {
     /**
@@ -22,5 +26,32 @@ class SequenceGenerator
         }
 
         return $prefix.str_pad((string) $sequence, 6, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * Run a sequence-allocating transaction and retry on unique-constraint collisions
+     * (e.g. concurrent first-of-day rows under Read Committed isolation).
+     *
+     * @template TReturn
+     *
+     * @param  Closure(): TReturn  $callback
+     * @return TReturn
+     */
+    public static function retryTransaction(Closure $callback, int $attempts = 3): mixed
+    {
+        for ($attempt = 1; $attempt <= $attempts; $attempt++) {
+            try {
+                return DB::transaction($callback);
+            } catch (QueryException $exception) {
+                $isUniqueCollision = in_array((string) ($exception->errorInfo[0] ?? $exception->getCode()), ['23000', '23505'], true)
+                    || str_contains(strtolower($exception->getMessage()), 'unique');
+
+                if (! $isUniqueCollision || $attempt === $attempts) {
+                    throw $exception;
+                }
+            }
+        }
+
+        return null;
     }
 }

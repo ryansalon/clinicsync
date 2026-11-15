@@ -4,22 +4,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     <title>@yield('title', 'ClinicSync') · ClinicSync</title>
     {{ Vite::fonts(['geist', 'geist-mono']) }}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="min-h-screen bg-slate-50 text-slate-800 antialiased app-dark">
-    {{-- Apply the stored theme before first paint so light-mode users
-         never see a dark flash (default stays dark). --}}
-    <script>
-        try {
-            if (localStorage.getItem('clinicsync-theme') === 'light') {
-                document.body.classList.remove('app-dark');
-            }
-        } catch (error) {
-            /* Storage unavailable — keep the default dark theme. */
-        }
-    </script>
+<body class="min-h-screen bg-[#f3f6f9] text-slate-800 antialiased">
 
     @php
         /** Shell data ($currentUser, $currentUserPhoto, $currentRoleLabel, $recentNotifications,
@@ -44,15 +34,17 @@
     <div id="app-shell" class="flex h-dvh overflow-hidden">
         {{-- Sidebar --}}
         <aside id="app-sidebar"
-               class="fixed inset-y-0 left-0 z-50 hidden w-72 flex-col border-r border-slate-200 bg-white md:static md:flex md:w-64 md:shrink-0">
+               class="fixed inset-y-0 left-0 z-50 hidden w-72 flex-col border-r border-slate-200/85 bg-white md:static md:flex md:w-64 md:shrink-0">
             {{-- Brand --}}
-            <div class="flex h-16 shrink-0 items-center gap-3 border-b border-slate-200 px-5">
-                <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-teal-500 to-teal-700 text-white shadow-sm">
-                    <x-icon name="heart-pulse" class="h-5 w-5" />
-                </span>
+            <div class="flex h-16 shrink-0 items-center gap-3 border-b border-slate-200/80 px-5">
+                <img src="{{ asset('images/cpsc-logo2.png') }}"
+                     alt="CPSC"
+                     width="474" height="474"
+                     class="h-9 w-9 shrink-0 object-contain"
+                     decoding="async">
                 <div class="min-w-0 leading-tight">
                     <p class="truncate text-sm font-bold tracking-tight text-slate-900">ClinicSync</p>
-                    <p class="truncate text-[11px] text-slate-500">Polytechnic State College Clinic</p>
+                    <p class="truncate text-[11px] font-medium text-slate-500">CPSC Outpatient Clinic</p>
                 </div>
                 <button type="button" class="ml-auto rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 md:hidden"
                         data-sidebar-close aria-label="Close menu">
@@ -116,6 +108,10 @@
 
                 @role('administrator')
                     <p class="nav-group-label">Administration</p>
+                    <a href="{{ route('admin.dashboard') }}"
+                       class="nav-link {{ $navActive('admin.dashboard') }}">
+                        <x-icon name="home" /> <span>System overview</span>
+                    </a>
                     <a href="{{ route('admin.users.index') }}"
                        class="nav-link {{ $navActive('admin.users.*') }}">
                         <x-icon name="users" /> <span>User accounts</span>
@@ -128,10 +124,10 @@
             </nav>
 
             {{-- Signed-in user --}}
-            <div class="shrink-0 border-t border-slate-200 p-3">
-                <div class="flex items-center gap-2">
+            <div class="shrink-0 border-t border-slate-200/80 p-3">
+                <div class="flex items-center gap-1 rounded-xl border border-slate-200/80 bg-slate-50/85 p-1">
                     <a href="{{ route('profile.edit') }}" title="Profile settings"
-                       class="group flex min-w-0 flex-1 items-center gap-3 rounded-lg p-2 transition hover:bg-slate-100">
+                       class="group flex min-w-0 flex-1 items-center gap-2.5 rounded-lg p-1.5 transition hover:bg-white">
                         <x-avatar :name="$currentUser->name" :photo="$currentUserPhoto" />
                         <div class="min-w-0 flex-1 leading-tight">
                             <p class="truncate text-sm font-semibold text-slate-900">{{ $currentUser->name }}</p>
@@ -286,13 +282,9 @@
                     </div>
                 </div>
 
-                {{-- Theme: light / dark (choice stored in localStorage) --}}
-                <button type="button" data-theme-toggle
-                        aria-label="Switch to light mode" title="Switch to light mode"
-                        class="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/60">
-                    <x-icon name="sun" class="theme-icon theme-icon-sun" />
-                    <x-icon name="moon" class="theme-icon theme-icon-moon" />
-                </button>
+                <span class="chip hidden sm:inline-flex border-teal-200/70 bg-teal-50/70 text-teal-800">
+                    {{ $currentRoleLabel }}
+                </span>
 
                 <span class="chip hidden lg:inline-flex">
                     <x-icon name="calendar" class="h-4 w-4 text-slate-400" />
@@ -302,8 +294,10 @@
 
             {{-- Page content --}}
             <main id="main-content" class="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6 lg:p-8">
-                @include('partials.flash')
-                @yield('content')
+                <div class="mx-auto w-full max-w-7xl">
+                    @include('partials.flash')
+                    @yield('content')
+                </div>
             </main>
         </div>
     </div>

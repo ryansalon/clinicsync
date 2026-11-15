@@ -51,7 +51,7 @@ class AppointmentController extends Controller
      */
     public function create(Request $request): View
     {
-        $physicians = Physician::query()->with('user')->orderBy('id')->get();
+        $physicians = Physician::cachedRoster();
 
         $requestedDate = $request->query('date');
         $selectedDate = is_string($requestedDate) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $requestedDate) === 1

@@ -7,12 +7,58 @@ use App\Models\Physician;
 use App\Models\PhysicianSchedule;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\ValidationException;
 
 class PhysicianAvailability
 {
     /** How far ahead a date may be booked; mirrors the +90 days validation rule. */
     public const BOOKING_HORIZON_DAYS = 90;
+
+    private const CALENDAR_VERSION_KEY = 'availability:calendar:version';
+
+    public static function flushCalendarCache(): void
+    {
+        Cache::forever(self::CALENDAR_VERSION_KEY, ((int) Cache::get(self::CALENDAR_VERSION_KEY, 1)) + 1);
+    }
+
+    /**
+     * Check whether a proposed recurring window overlaps another schedule for the
+     * same physician, weekday and overlapping effective date range.
+     */
+    public function hasOverlappingSchedule(
+        int $physicianId,
+        int $dayOfWeek,
+        string $startTime,
+        string $endTime,
+        ?string $effectiveFrom = null,
+        ?string $effectiveUntil = null,
+        ?int $ignoreId = null,
+    ): bool {
+        $start = strlen($startTime) === 5 ? $startTime.':00' : $startTime;
+        $end = strlen($endTime) === 5 ? $endTime.':00' : $endTime;
+
+        return PhysicianSchedule::query()
+            ->where('physician_id', $physicianId)
+            ->where('day_of_week', $dayOfWeek)
+            ->when($ignoreId !== null, fn ($query) => $query->where('id', '!=', $ignoreId))
+            ->get()
+            ->contains(function (PhysicianSchedule $existing) use ($start, $end, $effectiveFrom, $effectiveUntil): bool {
+                $existingStart = strlen($existing->start_time) === 5 ? $existing->start_time.':00' : $existing->start_time;
+                $existingEnd = strlen($existing->end_time) === 5 ? $existing->end_time.':00' : $existing->end_time;
+
+                if (! $this->timesOverlap($existingStart, $existingEnd, $start, $end)) {
+                    return false;
+                }
+
+                $fromA = $effectiveFrom ?? '0000-01-01';
+                $untilA = $effectiveUntil ?? '9999-12-31';
+                $fromB = $existing->effective_from?->toDateString() ?? '0000-01-01';
+                $untilB = $existing->effective_until?->toDateString() ?? '9999-12-31';
+
+                return $fromA <= $untilB && $untilA >= $fromB;
+            });
+    }
 
     /**
      * Bookable slots for a physician on a single date, capped by the daily
@@ -170,59 +216,70 @@ class PhysicianAvailability
      */
     public function calendarMonth(string $month): array
     {
-        $monthStart = Carbon::parse($month.'-01')->startOfMonth();
-        $monthEnd = $monthStart->copy()->endOfMonth();
-        $today = Carbon::today();
-        $horizon = $today->copy()->addDays(self::BOOKING_HORIZON_DAYS);
+        $compute = function () use ($month): array {
+            $monthStart = Carbon::parse($month.'-01')->startOfMonth();
+            $monthEnd = $monthStart->copy()->endOfMonth();
+            $today = Carbon::today();
+            $horizon = $today->copy()->addDays(self::BOOKING_HORIZON_DAYS);
 
-        $physicians = Physician::query()
-            ->with(['user', 'schedules' => fn ($query) => $query->active()->orderBy('day_of_week')->orderBy('start_time')])
-            ->orderBy('id')
-            ->get();
+            $physicians = Physician::query()
+                ->with(['user', 'schedules' => fn ($query) => $query->active()->orderBy('day_of_week')->orderBy('start_time')])
+                ->orderBy('id')
+                ->get();
 
-        $computeStart = $monthStart->lt($today) ? $today : $monthStart;
-        $computeEnd = $monthEnd->gt($horizon) ? $horizon : $monthEnd;
+            $computeStart = $monthStart->lt($today) ? $today : $monthStart;
+            $computeEnd = $monthEnd->gt($horizon) ? $horizon : $monthEnd;
 
-        $booked = $computeStart->lte($computeEnd)
-            ? $this->bookedInRange(
-                $physicians->pluck('id')->all(),
-                $computeStart->toDateString(),
-                $computeEnd->toDateString(),
-            )->groupBy(fn (Appointment $appointment) => $appointment->physician_id.'|'.$appointment->appointment_date->toDateString())
-            : collect();
+            $booked = $computeStart->lte($computeEnd)
+                ? $this->bookedInRange(
+                    $physicians->pluck('id')->all(),
+                    $computeStart->toDateString(),
+                    $computeEnd->toDateString(),
+                )->groupBy(fn (Appointment $appointment) => $appointment->physician_id.'|'.$appointment->appointment_date->toDateString())
+                : collect();
 
-        $dates = [];
+            $dates = [];
 
-        for ($day = $monthStart->copy(); $day->lte($monthEnd); $day->addDay()) {
-            $dateString = $day->toDateString();
+            for ($day = $monthStart->copy(); $day->lte($monthEnd); $day->addDay()) {
+                $dateString = $day->toDateString();
 
-            if ($day->lt($today)) {
-                $dates[$dateString] = ['state' => 'past', 'physicians' => []];
+                if ($day->lt($today)) {
+                    $dates[$dateString] = ['state' => 'past', 'physicians' => []];
 
-                continue;
+                    continue;
+                }
+
+                if ($day->gt($horizon)) {
+                    $dates[$dateString] = ['state' => 'closed', 'physicians' => []];
+
+                    continue;
+                }
+
+                $dates[$dateString] = $this->dateState($physicians, $dateString, $day->isToday(), $booked);
             }
 
-            if ($day->gt($horizon)) {
-                $dates[$dateString] = ['state' => 'closed', 'physicians' => []];
+            return [
+                'month' => $month,
+                'today' => $today->toDateString(),
+                'horizon' => $horizon->toDateString(),
+                'physicians' => $physicians->map(fn (Physician $physician) => [
+                    'id' => $physician->id,
+                    'name' => $physician->user?->name ?? 'Physician',
+                    'specialization' => $physician->specialization,
+                    'daily_patient_limit' => (int) $physician->daily_patient_limit,
+                ])->values()->all(),
+                'dates' => $dates,
+            ];
+        };
 
-                continue;
-            }
-
-            $dates[$dateString] = $this->dateState($physicians, $dateString, $day->isToday(), $booked);
+        if (Carbon::hasTestNow()) {
+            return $compute();
         }
 
-        return [
-            'month' => $month,
-            'today' => $today->toDateString(),
-            'horizon' => $horizon->toDateString(),
-            'physicians' => $physicians->map(fn (Physician $physician) => [
-                'id' => $physician->id,
-                'name' => $physician->user?->name ?? 'Physician',
-                'specialization' => $physician->specialization,
-                'daily_patient_limit' => (int) $physician->daily_patient_limit,
-            ])->values()->all(),
-            'dates' => $dates,
-        ];
+        $version = (int) Cache::get(self::CALENDAR_VERSION_KEY, 1);
+        $key = "availability:calendar:{$version}:".Carbon::today()->toDateString().":{$month}";
+
+        return Cache::remember($key, now()->addSeconds(60), $compute);
     }
 
     /**

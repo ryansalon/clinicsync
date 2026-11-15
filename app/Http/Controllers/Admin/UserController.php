@@ -54,7 +54,7 @@ class UserController extends Controller
         $data = $request->validated();
         $role = Role::from($data['role']);
 
-        $user = DB::transaction(function () use ($data, $role) {
+        $user = SequenceGenerator::retryTransaction(function () use ($data, $role) {
             $user = User::create([
                 'name' => $data['name'],
                 'email' => $data['email'],
@@ -104,6 +104,12 @@ class UserController extends Controller
         }
 
         $user->update(['is_active' => ! $user->is_active]);
+
+        if (! $user->is_active && config('session.driver') === 'database') {
+            DB::table(config('session.table', 'sessions'))
+                ->where('user_id', $user->id)
+                ->delete();
+        }
 
         AuditLogger::log($request->user(), $user->is_active ? 'user.activated' : 'user.suspended', $user);
 

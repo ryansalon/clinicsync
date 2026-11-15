@@ -331,66 +331,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     /* ------------------------------------------------------------------ */
-    /* Light / dark theme toggle                                            */
-    /* ------------------------------------------------------------------ */
-    const THEME_STORAGE_KEY = 'clinicsync-theme';
-
-    // Guest (auth) pages and the authenticated shell each carry their own
-    // dark scope class; light mode on guest pages swaps to `guest-light`.
-    const isGuestShell = document.body.dataset.shell === 'guest';
-    const DARK_CLASS = isGuestShell ? 'guest-dark' : 'app-dark';
-    const LIGHT_CLASS = isGuestShell ? 'guest-light' : null;
-
-    const isDarkTheme = () => document.body.classList.contains(DARK_CLASS);
-
-    const applyTheme = (dark) => {
-        if (LIGHT_CLASS) {
-            document.body.classList.toggle(DARK_CLASS, dark);
-            document.body.classList.toggle(LIGHT_CLASS, !dark);
-        } else {
-            document.body.classList.toggle(DARK_CLASS, dark);
-        }
-    };
-
-    /** Keep the toggle's accessible name describing the action it will do. */
-    const syncThemeToggleLabels = () => {
-        const label = isDarkTheme() ? 'Switch to light mode' : 'Switch to dark mode';
-
-        document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
-            button.setAttribute('aria-label', label);
-            button.setAttribute('title', label);
-        });
-    };
-
-    syncThemeToggleLabels();
-
-    document.addEventListener('click', (event) => {
-        if (!event.target.closest('[data-theme-toggle]')) {
-            return;
-        }
-
-        applyTheme(!isDarkTheme());
-
-        try {
-            localStorage.setItem(THEME_STORAGE_KEY, isDarkTheme() ? 'dark' : 'light');
-        } catch (error) {
-            // Storage unavailable — the theme still applies to this page.
-        }
-
-        syncThemeToggleLabels();
-    });
-
-    // Follow the choice made in another open tab.
-    window.addEventListener('storage', (event) => {
-        if (event.key !== THEME_STORAGE_KEY || (event.newValue !== 'dark' && event.newValue !== 'light')) {
-            return;
-        }
-
-        applyTheme(event.newValue === 'dark');
-        syncThemeToggleLabels();
-    });
-
-    /* ------------------------------------------------------------------ */
     /* Popover details panels (create forms in headers)                     */
     /* ------------------------------------------------------------------ */
     document.querySelectorAll('details[data-popover]').forEach((details) => {
@@ -432,6 +372,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (openPopover) {
             openPopover.open = false;
             openPopover.querySelector('summary')?.focus();
+
+            return;
+        }
+
+        const openDialog = document.querySelector('[data-dialog]:not(.hidden)');
+        if (openDialog) {
+            openDialog.dispatchEvent(new CustomEvent('dialog:close'));
 
             return;
         }
@@ -503,6 +450,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
                 });
 
+                if (response.status === 401 || response.status === 419) {
+                    stop();
+                    if (!container.querySelector('[data-poll-expired]')) {
+                        const note = document.createElement('div');
+                        note.setAttribute('data-poll-expired', 'true');
+                        note.setAttribute('role', 'status');
+                        note.className = 'mb-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800';
+                        note.textContent = 'Live updates paused — your session may have expired. Refresh or sign in to resume.';
+                        container.prepend(note);
+                    }
+
+                    return;
+                }
+
                 if (!response.ok) {
                     return;
                 }
@@ -516,6 +477,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 lastHtml = html;
                 container.innerHTML = html;
+                container.dispatchEvent(new CustomEvent('clinicsync:polled', { bubbles: true }));
             } catch (error) {
                 // Transient network failure — the next tick will retry.
             } finally {
@@ -729,5 +691,127 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             // WebGL unavailable — the page keeps its flat background.
         }
+    });
+
+    /* ------------------------------------------------------------------ */
+    /* Accessible slide-over / modal dialogs                              */
+    /* ------------------------------------------------------------------ */
+    document.querySelectorAll('[data-dialog]').forEach((dialog) => {
+        let opener = null;
+
+        const open = (trigger) => {
+            opener = trigger || document.activeElement;
+            dialog.classList.remove('hidden');
+            dialog.classList.add('flex');
+            const firstInput = dialog.querySelector('input:not([type="hidden"]), select, textarea, button');
+            firstInput?.focus();
+        };
+
+        const close = () => {
+            dialog.classList.add('hidden');
+            dialog.classList.remove('flex');
+            opener?.focus?.();
+            opener = null;
+        };
+
+        dialog.addEventListener('dialog:close', close);
+        dialog.querySelectorAll('[data-dialog-close]').forEach((btn) => btn.addEventListener('click', close));
+
+        document.querySelectorAll(`[data-dialog-open="${dialog.id}"]`).forEach((btn) => {
+            btn.addEventListener('click', () => open(btn));
+        });
+
+        if (dialog.querySelector('.input-invalid, .field-error')) {
+            open(null);
+        }
+    });
+
+    /* ------------------------------------------------------------------ */
+    /* Conditional role inputs (hide physician fields for other roles)    */
+    /* ------------------------------------------------------------------ */
+    document.querySelectorAll('[data-role-picker]').forEach((select) => {
+        const scope = select.closest('form') || document;
+        const sync = () => {
+            scope.querySelectorAll('[data-role-only]').forEach((block) => {
+                const match = block.dataset.roleOnly === select.value;
+                block.hidden = !match;
+                block.querySelectorAll('input, select, textarea').forEach((el) => {
+                    el.disabled = !match;
+                });
+            });
+        };
+
+        select.addEventListener('change', sync);
+        sync();
+    });
+
+    /* ------------------------------------------------------------------ */
+    /* Dirty-form guard for clinical notes                                */
+    /* ------------------------------------------------------------------ */
+    document.querySelectorAll('form[data-dirty-guard]').forEach((form) => {
+        let dirty = false;
+
+        form.addEventListener('input', () => {
+            dirty = true;
+        });
+
+        form.addEventListener('change', () => {
+            dirty = true;
+        });
+
+        form.addEventListener('submit', () => {
+            dirty = false;
+        });
+
+        window.addEventListener('beforeunload', (event) => {
+            if (!dirty) {
+                return;
+            }
+
+            event.preventDefault();
+            event.returnValue = '';
+        });
+    });
+
+    /* ------------------------------------------------------------------ */
+    /* Client-side queue status tabs and quick search (reception desk)    */
+    /* ------------------------------------------------------------------ */
+    document.querySelectorAll('[data-queue-filter-root]').forEach((root) => {
+        const searchInput = root.querySelector('[data-queue-search]');
+        const tabButtons = root.querySelectorAll('[data-queue-tab]');
+        let activeStatus = 'all';
+
+        const apply = () => {
+            const query = (searchInput?.value || '').trim().toLowerCase();
+
+            tabButtons.forEach((button) => {
+                const selected = button.dataset.queueTab === activeStatus;
+                button.setAttribute('aria-pressed', String(selected));
+                button.classList.toggle('btn-primary', selected);
+                button.classList.toggle('btn-secondary', !selected);
+            });
+
+            root.querySelectorAll('[data-queue-row]').forEach((row) => {
+                const status = row.dataset.status || '';
+                const haystack = (row.dataset.search || '').toLowerCase();
+                const statusMatch =
+                    activeStatus === 'all'
+                    || (activeStatus === 'waiting' ? status === 'pending' || status === 'confirmed' : status === activeStatus);
+                const queryMatch = query === '' || haystack.includes(query);
+
+                row.hidden = !(statusMatch && queryMatch);
+            });
+        };
+
+        tabButtons.forEach((button) => {
+            button.addEventListener('click', () => {
+                activeStatus = button.dataset.queueTab || 'all';
+                apply();
+            });
+        });
+
+        searchInput?.addEventListener('input', apply);
+        root.addEventListener('clinicsync:polled', apply);
+        apply();
     });
 });

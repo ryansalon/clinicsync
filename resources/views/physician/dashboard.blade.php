@@ -17,17 +17,9 @@
         </x-slot:actions>
     </x-page-header>
 
-    {{-- Caseload at a glance --}}
-    <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <x-stat label="Waiting now" :value="$waiting->count()" icon="clock" tone="amber" />
-        <x-stat label="Completed today" :value="$completedToday" icon="check-circle" tone="emerald" />
-        <x-stat label="Encounters recorded" :value="$encounterCount" icon="clipboard" tone="indigo" />
-        <x-stat label="Total in queue today" :value="$queue->count()" icon="users" tone="teal" />
-    </div>
-
-    {{-- Consultation queue with live polling --}}
-    <div id="live-physician-queue" class="mt-6" data-poll data-poll-url="{{ route('physician.dashboard') }}" data-poll-interval="30000">
-        @include('physician.partials.queue-table')
+    {{-- Live caseload stats, next patient spotlight, and today's queue --}}
+    <div id="live-physician-queue" data-poll data-poll-url="{{ route('physician.dashboard') }}" data-poll-interval="30000">
+        @include('physician.partials.board')
     </div>
 
     {{-- Upcoming appointments --}}

@@ -18,25 +18,34 @@ class SendAppointmentReminders extends Command
     public function handle(): int
     {
         $date = $this->option('date') ?: now()->addDay()->toDateString();
+        $count = 0;
 
-        $appointments = Appointment::query()
+        Appointment::query()
             ->with(['patient.user', 'physician.user'])
             ->forDate($date)
             ->active()
-            ->get();
+            ->whereNull('reminder_sent_at')
+            ->chunkById(100, function ($appointments) use (&$count): void {
+                $queuedIds = [];
 
-        $count = 0;
+                foreach ($appointments as $appointment) {
+                    $user = $appointment->patient->user;
 
-        foreach ($appointments as $appointment) {
-            $user = $appointment->patient->user;
+                    if ($user === null || ! $user->is_active) {
+                        continue;
+                    }
 
-            if ($user === null || ! $user->is_active) {
-                continue;
-            }
+                    $user->notify(new AppointmentReminderNotification($appointment));
+                    $queuedIds[] = $appointment->id;
+                    $count++;
+                }
 
-            $user->notify(new AppointmentReminderNotification($appointment));
-            $count++;
-        }
+                if ($queuedIds !== []) {
+                    Appointment::query()
+                        ->whereIn('id', $queuedIds)
+                        ->update(['reminder_sent_at' => now()]);
+                }
+            });
 
         $this->info("Queued {$count} reminder(s) for {$date}.");
 

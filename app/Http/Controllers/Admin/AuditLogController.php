@@ -26,11 +26,21 @@ class AuditLogController extends Controller
             ->paginate(25)
             ->withQueryString();
 
+        $actorIds = AuditLog::query()
+            ->whereNotNull('user_id')
+            ->distinct()
+            ->limit(200)
+            ->pluck('user_id');
+
         return view('admin.audit-logs.index', [
             'logs' => $logs,
             'action' => $action,
             'userId' => $userId,
-            'users' => User::query()->orderBy('name')->get(['id', 'name']),
+            'users' => User::query()
+                ->whereIn('id', $actorIds)
+                ->when($userId !== null && $userId !== '', fn ($query) => $query->orWhere('id', (int) $userId))
+                ->orderBy('name')
+                ->get(['id', 'name']),
         ]);
     }
 }

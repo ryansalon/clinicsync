@@ -4,10 +4,16 @@
             <h3 class="text-sm font-semibold tracking-tight text-slate-900">Consultation queue</h3>
             <p class="mt-0.5 text-xs text-slate-500">{{ now()->isoFormat('dddd, MMM D, YYYY') }}</p>
         </div>
-        <span class="chip">
-            <x-icon name="users" class="h-4 w-4 text-slate-400" />
-            {{ $queue->count() }} in queue
-        </span>
+        <div class="flex items-center gap-2">
+            <span class="chip text-emerald-700">
+                <span class="h-2 w-2 rounded-full bg-emerald-500" aria-hidden="true"></span>
+                Live updates
+            </span>
+            <span class="chip">
+                <x-icon name="users" class="h-4 w-4 text-slate-400" />
+                {{ $queue->count() }} in queue
+            </span>
+        </div>
     </div>
 
     {{-- Mobile stacked cards (below md) --}}
@@ -22,7 +28,14 @@
                 <div class="flex items-start gap-3">
                     <x-avatar :name="$appointment->patient->user->name" size="sm" />
                     <div class="min-w-0 flex-1">
-                        <p class="font-medium text-slate-900">{{ $appointment->patient->user->name }}</p>
+                        <div class="flex flex-wrap items-center gap-1.5">
+                            <p class="font-medium text-slate-900">{{ $appointment->patient->user->name }}</p>
+                            @if ($appointment->patient->activeAllergies->isNotEmpty())
+                                <span class="rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-semibold text-rose-800">
+                                    Allergies ({{ $appointment->patient->activeAllergies->count() }})
+                                </span>
+                            @endif
+                        </div>
                         <p class="text-xs text-slate-500">{{ $appointment->patient->patient_number }}</p>
                         <p class="mt-1 text-xs text-slate-600">
                             {{ \Illuminate\Support\Carbon::parse($appointment->start_time)->isoFormat('h:mm A') }} – {{ \Illuminate\Support\Carbon::parse($appointment->end_time)->isoFormat('h:mm A') }}
@@ -42,10 +55,17 @@
                             <x-icon name="arrow-right" class="h-4 w-4" />
                         </a>
                     @elseif ($appointment->status === 'completed')
-                        <span class="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 py-1">
-                            <x-icon name="check-circle" class="h-4 w-4" />
-                            Done
-                        </span>
+                        @if ($appointment->encounter)
+                            <a href="{{ route('physician.encounters.show', $appointment->encounter) }}" class="btn btn-secondary btn-sm w-full">
+                                <x-icon name="document" class="h-4 w-4" />
+                                View encounter
+                            </a>
+                        @else
+                            <span class="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 py-1">
+                                <x-icon name="check-circle" class="h-4 w-4" />
+                                Done
+                            </span>
+                        @endif
                     @else
                         <span class="text-xs text-slate-400">—</span>
                     @endif
@@ -76,13 +96,22 @@
                 @forelse ($queue as $appointment)
                     <tr class="table-row">
                         <td class="table-cell">
-                            <span class="text-base font-semibold text-slate-900">#{{ $appointment->queue_number }}</span>
+                            <span class="inline-flex h-8 min-w-8 items-center justify-center rounded-lg bg-teal-50 px-2.5 font-mono text-sm font-bold text-teal-800 ring-1 ring-teal-200/70">
+                                #{{ $appointment->queue_number }}
+                            </span>
                         </td>
                         <td class="table-cell">
                             <div class="flex items-center gap-3">
                                 <x-avatar :name="$appointment->patient->user->name" size="sm" />
                                 <div class="min-w-0">
-                                    <p class="font-medium text-slate-900">{{ $appointment->patient->user->name }}</p>
+                                    <div class="flex flex-wrap items-center gap-1.5">
+                                        <p class="font-medium text-slate-900">{{ $appointment->patient->user->name }}</p>
+                                        @if ($appointment->patient->activeAllergies->isNotEmpty())
+                                            <span class="rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-semibold text-rose-800">
+                                                Allergies ({{ $appointment->patient->activeAllergies->count() }})
+                                            </span>
+                                        @endif
+                                    </div>
                                     <p class="text-xs text-slate-500">{{ $appointment->patient->patient_number }}</p>
                                 </div>
                             </div>
@@ -103,10 +132,17 @@
                                     <x-icon name="arrow-right" class="h-4 w-4" />
                                 </a>
                             @elseif ($appointment->status === 'completed')
-                                <span class="inline-flex items-center gap-1 text-xs font-medium text-emerald-600">
-                                    <x-icon name="check-circle" class="h-4 w-4" />
-                                    Done
-                                </span>
+                                @if ($appointment->encounter)
+                                    <a href="{{ route('physician.encounters.show', $appointment->encounter) }}" class="btn btn-secondary btn-sm">
+                                        <x-icon name="document" class="h-4 w-4" />
+                                        View encounter
+                                    </a>
+                                @else
+                                    <span class="inline-flex items-center gap-1 text-xs font-medium text-emerald-600">
+                                        <x-icon name="check-circle" class="h-4 w-4" />
+                                        Done
+                                    </span>
+                                @endif
                             @else
                                 <span class="text-slate-400">—</span>
                             @endif

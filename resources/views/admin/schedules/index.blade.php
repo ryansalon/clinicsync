@@ -17,92 +17,107 @@
 @section('content')
     <x-page-header title="Physician schedules" description="Recurring weekly availability windows for every clinic physician.">
         <x-slot:actions>
-            <details data-popover class="card w-full shrink-0 overflow-hidden lg:w-auto">
-                <summary class="btn btn-primary w-full cursor-pointer list-none lg:w-auto">
-                    <x-icon name="plus" class="h-4 w-4" />
-                    Add schedule
-                </summary>
-                <form method="POST" action="{{ route('admin.schedules.store') }}" class="card-body border-t border-slate-200 space-y-4 lg:w-[30rem]">
-                    @csrf
+            <button type="button" class="btn btn-primary w-full lg:w-auto" data-dialog-open="create-schedule-dialog">
+                <x-icon name="plus" class="h-4 w-4" />
+                Add schedule
+            </button>
+        </x-slot:actions>
+    </x-page-header>
 
+    <div id="create-schedule-dialog" data-dialog role="dialog" aria-modal="true" aria-labelledby="create-schedule-title"
+         class="fixed inset-0 z-[60] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" data-dialog-close></div>
+        <div class="relative max-h-[90dvh] w-full max-w-xl overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-xl">
+            <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+                <h2 id="create-schedule-title" class="text-base font-semibold text-slate-900">Add physician schedule</h2>
+                <button type="button" data-dialog-close aria-label="Close"
+                        class="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600">
+                    <x-icon name="x" class="h-4 w-4" />
+                </button>
+            </div>
+            <form method="POST" action="{{ route('admin.schedules.store') }}" class="card-body space-y-4">
+                @csrf
+
+                <div>
+                    <label for="schedule-physician" class="label">Physician</label>
+                    <select id="schedule-physician" name="physician_id"
+                            class="input @error('physician_id') input-invalid @enderror" required>
+                        <option value="" disabled {{ old('physician_id') ? '' : 'selected' }}>Select a physician</option>
+                        @foreach ($physicians as $physician)
+                            <option value="{{ $physician->id }}" {{ old('physician_id') == $physician->id ? 'selected' : '' }}>
+                                Dr. {{ $physician->user->name }} — {{ $physician->specialization }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('physician_id')
+                        <p class="field-error">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="grid gap-4 sm:grid-cols-3">
                     <div>
-                        <label for="schedule-physician" class="label">Physician</label>
-                        <select id="schedule-physician" name="physician_id"
-                                class="input @error('physician_id') input-invalid @enderror" required>
-                            <option value="" disabled {{ old('physician_id') ? '' : 'selected' }}>Select a physician</option>
-                            @foreach ($physicians as $physician)
-                                <option value="{{ $physician->id }}" {{ old('physician_id') == $physician->id ? 'selected' : '' }}>
-                                    Dr. {{ $physician->user->name }} — {{ $physician->specialization }}
+                        <label for="schedule-day" class="label">Day of week</label>
+                        <select id="schedule-day" name="day_of_week" class="input" required>
+                            @foreach ($days as $dayValue => $dayLabel)
+                                <option value="{{ $dayValue }}" {{ (int) old('day_of_week', 1) === $dayValue ? 'selected' : '' }}>
+                                    {{ $dayLabel }}
                                 </option>
                             @endforeach
                         </select>
-                        @error('physician_id')
+                    </div>
+
+                    <div>
+                        <label for="schedule-start" class="label">Start time</label>
+                        <input id="schedule-start" type="time" name="start_time"
+                               value="{{ old('start_time') }}"
+                               class="input @error('start_time') input-invalid @enderror" required>
+                        @error('start_time')
                             <p class="field-error">{{ $message }}</p>
                         @enderror
                     </div>
 
-                    <div class="grid gap-4 sm:grid-cols-3">
-                        <div>
-                            <label for="schedule-day" class="label">Day of week</label>
-                            <select id="schedule-day" name="day_of_week" class="input" required>
-                                @foreach ($days as $dayValue => $dayLabel)
-                                    <option value="{{ $dayValue }}" {{ (int) old('day_of_week', 1) === $dayValue ? 'selected' : '' }}>
-                                        {{ $dayLabel }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+                    <div>
+                        <label for="schedule-end" class="label">End time</label>
+                        <input id="schedule-end" type="time" name="end_time"
+                               value="{{ old('end_time') }}"
+                               class="input @error('end_time') input-invalid @enderror" required>
+                        @error('end_time')
+                            <p class="field-error">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
 
-                        <div>
-                            <label for="schedule-start" class="label">Start time</label>
-                            <input id="schedule-start" type="time" name="start_time"
-                                   value="{{ old('start_time') }}"
-                                   class="input @error('start_time') input-invalid @enderror" required>
-                            @error('start_time')
-                                <p class="field-error">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div>
-                            <label for="schedule-end" class="label">End time</label>
-                            <input id="schedule-end" type="time" name="end_time"
-                                   value="{{ old('end_time') }}"
-                                   class="input @error('end_time') input-invalid @enderror" required>
-                            @error('end_time')
-                                <p class="field-error">{{ $message }}</p>
-                            @enderror
-                        </div>
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <div>
+                        <label for="schedule-from" class="label">Effective from</label>
+                        <input id="schedule-from" type="date" name="effective_from"
+                               value="{{ old('effective_from') }}" class="input">
                     </div>
 
-                    <div class="grid gap-4 sm:grid-cols-2">
-                        <div>
-                            <label for="schedule-from" class="label">Effective from</label>
-                            <input id="schedule-from" type="date" name="effective_from"
-                                   value="{{ old('effective_from') }}" class="input">
-                        </div>
-
-                        <div>
-                            <label for="schedule-until" class="label">Effective until</label>
-                            <input id="schedule-until" type="date" name="effective_until"
-                                   value="{{ old('effective_until') }}" class="input">
-                        </div>
+                    <div>
+                        <label for="schedule-until" class="label">Effective until</label>
+                        <input id="schedule-until" type="date" name="effective_until"
+                               value="{{ old('effective_until') }}" class="input">
                     </div>
+                </div>
 
-                    <div class="flex items-center gap-2">
-                        <input id="schedule-active" type="checkbox" name="is_active" value="1"
-                               class="h-4 w-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500"
-                               {{ old('is_active', 1) ? 'checked' : '' }}>
-                        <label for="schedule-active" class="label mb-0">Active schedule</label>
-                    </div>
+                <div class="flex items-center gap-2">
+                    <input id="schedule-active" type="checkbox" name="is_active" value="1"
+                           class="h-4 w-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500"
+                           {{ old('is_active', 1) ? 'checked' : '' }}>
+                    <label for="schedule-active" class="label mb-0">Active schedule</label>
+                </div>
 
-                    <button type="submit" class="btn btn-primary w-full sm:w-auto">
+                <div class="flex justify-end gap-3 border-t border-slate-200 pt-4">
+                    <button type="button" class="btn btn-secondary" data-dialog-close>Cancel</button>
+                    <button type="submit" class="btn btn-primary">
                         <x-icon name="plus" class="h-4 w-4" />
                         Save schedule
                     </button>
-                </form>
-            </details>
-        </x-slot:actions>
-    </x-page-header>
+                </div>
+            </form>
+        </div>
+    </div>
 
     {{-- Filter bar --}}
     @php

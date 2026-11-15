@@ -10,16 +10,19 @@ Artisan::command('inspire', function () {
 
 Schedule::command('appointments:send-reminders')
     ->dailyAt('18:00')
-    ->withoutOverlapping();
+    ->withoutOverlapping()
+    ->onOneServer();
 
 /*
- * Queued notifications (confirmations, reschedules, reminders) need a worker.
- * Draining the queue every minute keeps notifications flowing without a
- * long-running process, as long as the scheduler itself is ticking.
+ * Queued notifications fall back to a once-per-minute drain when no dedicated
+ * worker process (or Laravel Cloud Managed Queue) is running. Set
+ * QUEUE_CRON_FALLBACK=false when running dedicated workers.
  */
 Schedule::command('queue:work', [
     '--stop-when-empty' => true,
     '--max-time' => 55,
 ])
     ->everyMinute()
-    ->withoutOverlapping();
+    ->withoutOverlapping()
+    ->onOneServer()
+    ->when(fn () => (bool) env('QUEUE_CRON_FALLBACK', true));

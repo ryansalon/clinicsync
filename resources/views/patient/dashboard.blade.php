@@ -5,13 +5,23 @@
 @section('content')
     <x-page-header title="Patient dashboard" description="A quick overview of your upcoming visits and medical records.">
         @if ($patient)
-            <p class="mt-1 text-xs text-slate-500">
-                Record #{{ $patient->patient_number }}
-                · {{ $patient->date_of_birth?->isoFormat('MMMM D, YYYY') ?? '—' }}
-                · {{ $patient->sex ? \Illuminate\Support\Str::headline($patient->sex) : '—' }}
-                · {{ $patient->blood_type ?: 'No blood type on file' }}
-                · {{ $patient->address ?: 'No address on file' }}
-            </p>
+            <div class="mt-2.5 flex flex-wrap items-center gap-1.5">
+                <span class="inline-flex items-center rounded-md border border-teal-200/80 bg-teal-50/80 px-2.5 py-0.5 font-mono text-xs font-semibold text-teal-800">
+                    Record #{{ $patient->patient_number }}
+                </span>
+                <span class="inline-flex items-center rounded-md border border-slate-200/90 bg-white px-2.5 py-0.5 text-xs text-slate-600">
+                    {{ $patient->date_of_birth?->isoFormat('MMMM D, YYYY') ?? '—' }}
+                </span>
+                <span class="inline-flex items-center rounded-md border border-slate-200/90 bg-white px-2.5 py-0.5 text-xs text-slate-600">
+                    {{ $patient->sex ? \Illuminate\Support\Str::headline($patient->sex) : '—' }}
+                </span>
+                <span class="inline-flex items-center rounded-md border border-slate-200/90 bg-white px-2.5 py-0.5 text-xs text-slate-600">
+                    {{ $patient->blood_type ?: 'No blood type on file' }}
+                </span>
+                <span class="inline-flex items-center rounded-md border border-slate-200/90 bg-white px-2.5 py-0.5 text-xs text-slate-600">
+                    {{ $patient->address ?: 'No address on file' }}
+                </span>
+            </div>
         @endif
 
         <x-slot:actions>
@@ -41,6 +51,43 @@
         <div id="live-queue-status" data-poll data-poll-url="{{ route('patient.dashboard') }}" data-poll-interval="30000">
             @include('patient.partials.queue-status')
         </div>
+
+        @if ($needsProfileCompletion)
+            <div class="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-200/80 bg-amber-50/80 px-4 py-3 text-sm text-amber-900">
+                <div class="flex items-center gap-2.5">
+                    <x-icon name="exclamation-triangle" class="h-4 w-4 shrink-0 text-amber-600" />
+                    <span>Complete your blood type and emergency contact details for safer clinic triage.</span>
+                </div>
+                <a href="{{ route('profile.edit') }}" class="btn btn-secondary btn-sm">Update profile</a>
+            </div>
+        @endif
+
+        @if ($activeAllergies->isNotEmpty())
+            <section class="mb-6 rounded-2xl border border-rose-200 bg-rose-50/90 p-5 shadow-sm">
+                <div class="flex items-start gap-3">
+                    <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-rose-100 text-rose-700">
+                        <x-icon name="exclamation-triangle" class="h-5 w-5" />
+                    </span>
+                    <div class="min-w-0 flex-1">
+                        <h3 class="text-sm font-semibold text-rose-900">Active allergies on file</h3>
+                        <p class="mt-0.5 text-xs text-rose-700">Please confirm these allergies with the physician and clinic staff during your visit.</p>
+                        <div class="mt-3 grid gap-2 sm:grid-cols-2">
+                            @foreach ($activeAllergies as $allergy)
+                                <div class="rounded-lg border border-rose-200 bg-white px-3 py-2">
+                                    <div class="flex flex-wrap items-center justify-between gap-2">
+                                        <span class="text-sm font-medium text-slate-900">{{ $allergy->allergen }}</span>
+                                        <span class="badge badge-{{ $allergy->severity }}">
+                                            {{ \Illuminate\Support\Str::headline($allergy->severity) }}
+                                        </span>
+                                    </div>
+                                    <p class="mt-0.5 text-xs text-slate-600">{{ $allergy->reaction }}</p>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </section>
+        @endif
 
         {{-- Summary tiles --}}
         <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -141,10 +188,17 @@
                                             <span class="badge badge-{{ $appointment->status }}">{{ \Illuminate\Support\Str::headline($appointment->status) }}</span>
                                         </td>
                                         <td class="table-cell text-right">
-                                            <a class="btn btn-secondary btn-sm" href="{{ route('patient.appointments.show', $appointment) }}">
-                                                <x-icon name="eye" class="h-4 w-4" />
-                                                View
-                                            </a>
+                                            <div class="inline-flex items-center gap-1.5">
+                                                @if ($appointment->isCancellable())
+                                                    <a class="btn btn-secondary btn-sm" href="{{ route('patient.appointments.reschedule', $appointment) }}">
+                                                        Reschedule
+                                                    </a>
+                                                @endif
+                                                <a class="btn btn-secondary btn-sm" href="{{ route('patient.appointments.show', $appointment) }}">
+                                                    <x-icon name="eye" class="h-4 w-4" />
+                                                    View
+                                                </a>
+                                            </div>
                                         </td>
                                     </tr>
                                 @empty
@@ -168,43 +222,69 @@
                 </div>
             </section>
 
-            {{-- Latest consultation --}}
-            <section class="card">
-                <div class="card-header">
-                    <h3 class="text-sm font-semibold tracking-tight text-slate-900">Latest consultation</h3>
-                </div>
-                <div class="card-body">
-                    @if ($latestEncounter)
-                        <p class="text-sm font-semibold text-slate-900">
-                            {{ $latestEncounter->diagnosis ?: 'Diagnosis not yet recorded' }}
-                        </p>
-                        @if ($latestEncounter->diagnosis_code)
-                            <p class="mt-0.5 text-xs text-slate-500">Code {{ $latestEncounter->diagnosis_code }}</p>
-                        @endif
-                        <p class="mt-3 text-sm text-slate-600">{{ $latestEncounter->encountered_at->isoFormat('dddd, MMM D, YYYY') }}</p>
-                        <div class="mt-1 flex items-center gap-2.5">
-                            @if ($latestEncounter->physician?->user?->name)
-                                <x-avatar :name="$latestEncounter->physician->user->name" size="sm" />
+            {{-- Latest consultation + recent prescriptions --}}
+            <div class="space-y-6">
+                <section class="card">
+                    <div class="card-header">
+                        <h3 class="text-sm font-semibold tracking-tight text-slate-900">Latest consultation</h3>
+                    </div>
+                    <div class="card-body">
+                        @if ($latestEncounter)
+                            <p class="text-sm font-semibold text-slate-900">
+                                {{ $latestEncounter->diagnosis ?: 'Diagnosis not yet recorded' }}
+                            </p>
+                            @if ($latestEncounter->diagnosis_code)
+                                <p class="mt-0.5 text-xs text-slate-500">Code {{ $latestEncounter->diagnosis_code }}</p>
                             @endif
-                            <p class="text-sm text-slate-600">Dr. {{ $latestEncounter->physician?->user?->name ?? '—' }}</p>
-                        </div>
-                        <p class="mt-0.5 text-xs text-slate-500">Encounter {{ $latestEncounter->encounter_number }}</p>
+                            <p class="mt-3 text-sm text-slate-600">{{ $latestEncounter->encountered_at->isoFormat('dddd, MMM D, YYYY') }}</p>
+                            <div class="mt-1 flex items-center gap-2.5">
+                                @if ($latestEncounter->physician?->user?->name)
+                                    <x-avatar :name="$latestEncounter->physician->user->name" size="sm" />
+                                @endif
+                                <p class="text-sm text-slate-600">Dr. {{ $latestEncounter->physician?->user?->name ?? '—' }}</p>
+                            </div>
+                            <p class="mt-0.5 text-xs text-slate-500">Encounter {{ $latestEncounter->encounter_number }}</p>
 
-                        <div class="mt-4 flex items-center justify-between gap-3">
-                            <span class="badge badge-{{ $latestEncounter->status }}">
-                                {{ \Illuminate\Support\Str::headline($latestEncounter->status) }}
-                            </span>
-                            <a href="{{ route('patient.records') }}" class="inline-flex items-center gap-1 text-sm font-medium text-teal-600 transition hover:text-teal-700">
-                                View records
-                                <x-icon name="arrow-right" class="h-4 w-4" />
-                            </a>
-                        </div>
-                    @else
-                        <x-empty icon="clipboard" title="No consultations yet."
-                                 description="Your consultation history will appear here after your first visit." />
-                    @endif
-                </div>
-            </section>
+                            <div class="mt-4 flex items-center justify-between gap-3">
+                                <span class="badge badge-{{ $latestEncounter->status }}">
+                                    {{ \Illuminate\Support\Str::headline($latestEncounter->status) }}
+                                </span>
+                                <a href="{{ route('patient.records') }}" class="inline-flex items-center gap-1 text-sm font-medium text-teal-600 transition hover:text-teal-700">
+                                    View records
+                                    <x-icon name="arrow-right" class="h-4 w-4" />
+                                </a>
+                            </div>
+                        @else
+                            <x-empty icon="clipboard" title="No consultations yet."
+                                     description="Your consultation history will appear here after your first visit." />
+                        @endif
+                    </div>
+                </section>
+
+                <section class="card">
+                    <div class="card-header flex items-center justify-between gap-2">
+                        <h3 class="text-sm font-semibold tracking-tight text-slate-900">Recent prescriptions</h3>
+                        <a href="{{ route('patient.records') }}" class="text-xs font-semibold text-teal-600 hover:text-teal-700">All records</a>
+                    </div>
+                    <div class="card-body">
+                        @forelse ($recentPrescriptions as $rx)
+                            <div class="border-b border-slate-100 py-2.5 first:pt-0 last:border-0 last:pb-0">
+                                <div class="flex items-center justify-between gap-2">
+                                    <p class="text-sm font-semibold text-slate-900">{{ $rx->medication_name }}</p>
+                                    <span class="font-mono text-[11px] text-slate-500">{{ $rx->strength }}</span>
+                                </div>
+                                <p class="mt-0.5 text-xs text-slate-600">{{ $rx->instructions ?: 'Follow physician directions.' }}</p>
+                                <p class="mt-1 text-[11px] text-slate-400">
+                                    {{ $rx->issued_at?->isoFormat('MMM D, YYYY') ?? '—' }}
+                                    · Dr. {{ $rx->physician?->user?->name ?? '—' }}
+                                </p>
+                            </div>
+                        @empty
+                            <p class="text-xs text-slate-500">No prescriptions issued yet.</p>
+                        @endforelse
+                    </div>
+                </section>
+            </div>
         </div>
 
         {{-- Physician availability calendar --}}
@@ -220,34 +300,6 @@
                     :book-url="route('patient.appointments.create')" />
             </div>
         </section>
-
-        {{-- Active allergies --}}
-        @if ($activeAllergies->isNotEmpty())
-            <section class="mt-6 rounded-xl border border-rose-200 bg-rose-50 p-5 shadow-sm">
-                <div class="flex items-start gap-3">
-                    <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-rose-100 text-rose-700">
-                        <x-icon name="exclamation-triangle" class="h-5 w-5" />
-                    </span>
-                    <div class="min-w-0 flex-1">
-                        <h3 class="text-sm font-semibold text-rose-900">Active allergies</h3>
-                        <p class="mt-0.5 text-xs text-rose-700">Please inform the physician and clinic staff of these allergies during your visit.</p>
-                        <ul class="mt-3 space-y-2">
-                            @foreach ($activeAllergies as $allergy)
-                                <li class="rounded-lg border border-rose-200 bg-white px-3 py-2">
-                                    <div class="flex flex-wrap items-center justify-between gap-2">
-                                        <span class="text-sm font-medium text-slate-900">{{ $allergy->allergen }}</span>
-                                        <span class="badge badge-{{ $allergy->severity }}">
-                                            {{ \Illuminate\Support\Str::headline($allergy->severity) }}
-                                        </span>
-                                    </div>
-                                    <p class="mt-0.5 text-sm text-slate-600">{{ $allergy->reaction }}</p>
-                                </li>
-                            @endforeach
-                        </ul>
-                    </div>
-                </div>
-            </section>
-        @endif
     @else
         <x-empty icon="user" title="Patient profile not linked"
                  description="Your account is not yet linked to a patient record. Please visit the clinic reception to complete your registration." />

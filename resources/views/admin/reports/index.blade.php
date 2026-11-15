@@ -5,7 +5,7 @@
 @section('content')
     <x-page-header title="Daily census" description="Appointments, consultations and workload for the selected clinic day.">
         <x-slot:actions>
-            <form method="GET" action="{{ route('admin.reports.index') }}" class="flex flex-wrap items-end gap-3">
+            <form method="GET" action="{{ route('admin.reports.index') }}" class="no-print flex flex-wrap items-end gap-3">
                 <div>
                     <label for="report-date" class="label">Date</label>
                     <input id="report-date" type="date" name="date" value="{{ $date }}" class="input">
@@ -16,7 +16,12 @@
                 </button>
             </form>
 
-            <button type="button" class="btn btn-secondary" onclick="window.print()">
+            <a href="{{ route('admin.reports.export', ['date' => $date]) }}" class="btn btn-secondary no-print">
+                <x-icon name="arrow-right" class="h-4 w-4" />
+                Export CSV
+            </a>
+
+            <button type="button" class="btn btn-secondary no-print" onclick="window.print()">
                 <x-icon name="document" class="h-4 w-4" />
                 Print
             </button>

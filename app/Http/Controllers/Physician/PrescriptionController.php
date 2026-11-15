@@ -9,7 +9,6 @@ use App\Models\Prescription;
 use App\Services\AuditLogger;
 use App\Services\SequenceGenerator;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 class PrescriptionController extends Controller
@@ -21,7 +20,7 @@ class PrescriptionController extends Controller
     {
         Gate::authorize('update', $encounter);
 
-        $prescription = DB::transaction(function () use ($request, $encounter) {
+        $prescription = SequenceGenerator::retryTransaction(function () use ($request, $encounter) {
             return $encounter->prescriptions()->create([
                 'patient_id' => $encounter->patient_id,
                 'physician_id' => $encounter->physician_id,

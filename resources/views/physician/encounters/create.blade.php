@@ -10,6 +10,19 @@
         </x-slot:actions>
     </x-page-header>
 
+    @if ($allergies->isNotEmpty())
+        <x-alert type="error" class="mb-6" title="Active allergies on file ({{ $allergies->count() }})">
+            <ul class="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs">
+                @foreach ($allergies as $allergy)
+                    <li>
+                        <span class="font-semibold">{{ $allergy->allergen }}</span>
+                        ({{ \Illuminate\Support\Str::headline($allergy->severity) }}@if ($allergy->reaction) — {{ $allergy->reaction }}@endif)
+                    </li>
+                @endforeach
+            </ul>
+        </x-alert>
+    @endif
+
     <div class="grid gap-6 lg:grid-cols-3">
         {{-- Left column: patient record at a glance --}}
         <div class="space-y-6 lg:col-span-2">
@@ -165,7 +178,7 @@
                     <x-card-title description="Record the diagnosis, plan and vitals for this visit.">Consultation form</x-card-title>
                 </div>
 
-                <form method="POST" action="{{ route('physician.encounters.store', $appointment) }}">
+                <form method="POST" action="{{ route('physician.encounters.store', $appointment) }}" data-dirty-guard>
                     @csrf
 
                     <div class="card-body space-y-5">
@@ -378,7 +391,7 @@
                         </label>
                     </div>
 
-                    <div class="flex items-center justify-end gap-3 border-t border-slate-200 px-5 py-4">
+                    <div class="sticky bottom-0 z-10 flex items-center justify-end gap-3 rounded-b-xl border-t border-slate-200 bg-white/95 px-5 py-4 backdrop-blur">
                         <a href="{{ route('physician.dashboard') }}" class="btn btn-secondary">
                             <x-icon name="x" class="h-4 w-4" />
                             Cancel

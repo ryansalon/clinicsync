@@ -13,6 +13,7 @@ use App\Services\AuditLogger;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
@@ -56,9 +57,13 @@ class QueueController extends Controller
     /**
      * Unified daily queue: online bookings and physical walk-ins together.
      */
-    public function index(Request $request): View
+    public function index(Request $request): View|JsonResponse
     {
-        $date = (string) $request->query('date', now()->toDateString());
+        $rawDate = $request->query('date');
+        $date = is_string($rawDate) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $rawDate) === 1
+            ? rescue(fn () => Carbon::createFromFormat('Y-m-d', $rawDate)->toDateString(), now()->toDateString(), false)
+            : now()->toDateString();
+
         $physicianId = $request->query('physician_id');
 
         $query = Appointment::query()
@@ -71,19 +76,51 @@ class QueueController extends Controller
         }
 
         $queue = $query->get();
+        $physicians = Physician::cachedRoster();
 
-        return view('admin.queue.index', [
+        $bookedCounts = Appointment::query()
+            ->forDate($date)
+            ->active()
+            ->selectRaw('physician_id, count(*) as booked')
+            ->groupBy('physician_id')
+            ->pluck('booked', 'physician_id');
+
+        $physicianCapacity = $physicians->map(function (Physician $physician) use ($bookedCounts) {
+            $booked = (int) ($bookedCounts[$physician->id] ?? 0);
+            $limit = (int) ($physician->daily_patient_limit ?? 0);
+
+            return [
+                'physician' => $physician,
+                'booked' => $booked,
+                'limit' => $limit,
+                'remaining' => max(0, $limit - $booked),
+            ];
+        });
+
+        $viewData = [
             'date' => $date,
             'physicianId' => $physicianId === '' ? null : $physicianId,
             'queue' => $queue,
-            'physicians' => Physician::cachedRoster(),
+            'physicians' => $physicians,
+            'physicianCapacity' => $physicianCapacity,
+            'currentlyCalled' => $queue->where('status', Appointment::STATUS_CONFIRMED)
+                ->filter(fn (Appointment $item) => $item->called_at !== null)
+                ->values(),
             'pending' => $queue->where('status', Appointment::STATUS_PENDING)->count(),
             'confirmed' => $queue->where('status', Appointment::STATUS_CONFIRMED)->count(),
             'completed' => $queue->where('status', Appointment::STATUS_COMPLETED)->count(),
             'noShow' => $queue->where('status', Appointment::STATUS_NO_SHOW)->count(),
             'waiting' => $queue->whereIn('status', [Appointment::STATUS_PENDING, Appointment::STATUS_CONFIRMED]),
             'walkIns' => $queue->where('source', 'walk_in')->count(),
-        ]);
+        ];
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'html' => view('admin.queue.partials.board', $viewData)->render(),
+            ]);
+        }
+
+        return view('admin.queue.index', $viewData);
     }
 
     /**

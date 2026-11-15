@@ -11,12 +11,29 @@
     <x-page-header title="Encounter details"
                    description="{{ $encounter->encounter_number }} · {{ $encounter->encountered_at->isoFormat('dddd, MMM D, YYYY') }} · {{ $encounter->encountered_at->format('g:i A') }}">
         <x-slot:actions>
-            <a href="{{ route('physician.encounters.index') }}" class="btn btn-secondary">
+            <button type="button" class="btn btn-secondary no-print" onclick="window.print()">
+                <x-icon name="document" class="h-4 w-4" />
+                Print
+            </button>
+            <a href="{{ route('physician.encounters.index') }}" class="btn btn-secondary no-print">
                 <x-icon name="arrow-left" class="h-4 w-4" />
                 Back to encounter log
             </a>
         </x-slot:actions>
     </x-page-header>
+
+    @if ($encounter->patient->activeAllergies->isNotEmpty())
+        <x-alert type="error" class="mb-6" title="Active allergies on file ({{ $encounter->patient->activeAllergies->count() }})">
+            <ul class="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs">
+                @foreach ($encounter->patient->activeAllergies as $allergy)
+                    <li>
+                        <span class="font-semibold">{{ $allergy->allergen }}</span>
+                        ({{ \Illuminate\Support\Str::headline($allergy->severity) }}@if ($allergy->reaction) — {{ $allergy->reaction }}@endif)
+                    </li>
+                @endforeach
+            </ul>
+        </x-alert>
+    @endif
 
     {{-- Header summary --}}
     <div class="card">
@@ -249,7 +266,7 @@
     </div>
 
     {{-- Forms --}}
-    <div class="mt-6 grid gap-6 lg:grid-cols-2">
+    <div class="no-print mt-6 grid gap-6 lg:grid-cols-2">
         {{-- Issue prescription --}}
         <div class="card self-start">
             <div class="card-header">
@@ -257,7 +274,7 @@
                 <p class="mt-0.5 text-xs text-slate-500">Attach a new medication to this encounter.</p>
             </div>
 
-            <form method="POST" action="{{ route('physician.prescriptions.store', $encounter) }}">
+            <form method="POST" action="{{ route('physician.prescriptions.store', $encounter) }}" data-dirty-guard>
                 @csrf
 
                 <div class="card-body space-y-4">
@@ -377,7 +394,7 @@
                 <p class="mt-0.5 text-xs text-slate-500">Amend the diagnosis, plan or clinical notes.</p>
             </div>
 
-            <form method="POST" action="{{ route('physician.encounters.update', $encounter) }}">
+            <form method="POST" action="{{ route('physician.encounters.update', $encounter) }}" data-dirty-guard>
                 @csrf
                 @method('PUT')
 

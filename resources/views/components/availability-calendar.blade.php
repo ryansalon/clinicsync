@@ -60,7 +60,7 @@
             var DAY_AVAILABLE = 'bg-teal-50 text-teal-700 hover:bg-teal-100';
             var DAY_FULL = 'bg-rose-50 text-rose-600 hover:bg-rose-100';
             var DAY_NONE = 'bg-slate-50 text-slate-400 hover:bg-slate-100';
-            var DAY_SELECTED = 'bg-teal-600 text-white shadow-sm';
+            var DAY_SELECTED = 'btn-primary shadow-sm';
             var DAY_TODAY = 'border border-teal-500';
             var PANEL_IDLE = 'rounded-lg border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-center';
             var PANEL_LIST = 'rounded-lg border border-slate-200 bg-slate-50 p-3';

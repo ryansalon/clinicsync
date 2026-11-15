@@ -21,11 +21,11 @@
         </a>
         <a href="#consultations" class="chip hover:border-teal-400 hover:text-teal-800 shrink-0">
             <x-icon name="clipboard-check" class="h-3.5 w-3.5 text-slate-400" />
-            Consultations ({{ $encounters->count() }})
+            Consultations ({{ $encounters->total() }})
         </a>
         <a href="#prescriptions" class="chip hover:border-teal-400 hover:text-teal-800 shrink-0">
             <x-icon name="document" class="h-3.5 w-3.5 text-slate-400" />
-            Prescriptions ({{ $prescriptions->count() }})
+            Prescriptions ({{ $prescriptions->total() }})
         </a>
     </nav>
 
@@ -33,8 +33,8 @@
     <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <x-stat label="Medical history" value="{{ $histories->count() }}" icon="clipboard" tone="sky" />
         <x-stat label="Allergies" value="{{ $allergies->count() }}" icon="exclamation-triangle" tone="rose" />
-        <x-stat label="Consultations" value="{{ $encounters->count() }}" icon="clipboard-check" tone="teal" />
-        <x-stat label="Prescriptions" value="{{ $prescriptions->count() }}" icon="document" tone="violet" />
+        <x-stat label="Consultations" value="{{ $encounters->total() }}" icon="clipboard-check" tone="teal" />
+        <x-stat label="Prescriptions" value="{{ $prescriptions->total() }}" icon="document" tone="violet" />
     </div>
 
     {{-- Patient demographics --}}
@@ -242,7 +242,7 @@
     <section id="consultations" class="card mt-6 scroll-mt-16">
         <div class="card-header flex items-center justify-between gap-2">
             <x-card-title>Consultation history</x-card-title>
-            <span class="text-xs text-slate-500">{{ $encounters->count() }} encounter{{ $encounters->count() === 1 ? '' : 's' }}</span>
+            <span class="text-xs text-slate-500">{{ $encounters->total() }} encounter{{ $encounters->total() === 1 ? '' : 's' }}</span>
         </div>
         <div class="card-body space-y-4">
             @forelse ($encounters as $encounter)
@@ -349,6 +349,9 @@
                 <x-empty icon="clipboard" title="No consultations recorded yet."
                          description="Notes, vitals and prescriptions from your clinic visits will appear here." />
             @endforelse
+            @if ($encounters->hasPages())
+                <div class="pt-2">{{ $encounters->links() }}</div>
+            @endif
         </div>
     </section>
 
@@ -356,7 +359,7 @@
     <section id="prescriptions" class="card mt-6 scroll-mt-16">
         <div class="card-header flex items-center justify-between gap-2">
             <x-card-title>E-prescriptions</x-card-title>
-            <span class="text-xs text-slate-500">{{ $prescriptions->count() }} issued</span>
+            <span class="text-xs text-slate-500">{{ $prescriptions->total() }} issued</span>
         </div>
         <div class="card-body p-0">
             {{-- Mobile card view (below md) --}}
@@ -453,5 +456,8 @@
                 </table>
             </div>
         </div>
+        @if ($prescriptions->hasPages())
+            <div class="border-t border-slate-200 px-5 py-4">{{ $prescriptions->links() }}</div>
+        @endif
     </section>
 @endsection

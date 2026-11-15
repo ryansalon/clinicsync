@@ -34,9 +34,10 @@ class ProfileController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:250'],
             'phone' => ['nullable', 'string', 'max:30'],
-            'photo' => ['nullable', 'image', 'max:2048'],
+            'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ], [
             'photo.image' => 'The photo must be a JPG, PNG or WebP image.',
+            'photo.mimes' => 'The photo must be a JPG, PNG or WebP image.',
             'photo.max' => 'The photo may not be larger than 2 MB.',
         ]);
 
@@ -70,9 +71,13 @@ class ProfileController extends Controller
 
         $path = $user->patient?->photo_path ?? $user->physician?->photo_path;
 
-        abort_unless($path !== null && Storage::disk('local')->exists($path), 404);
+        $disk = Storage::disk();
 
-        return Storage::disk('local')->response($path);
+        abort_unless($path !== null && $disk->exists($path), 404);
+
+        return $disk->response($path, null, [
+            'Cache-Control' => 'private, max-age=3600',
+        ]);
     }
 
     /**
@@ -113,11 +118,38 @@ class ProfileController extends Controller
             return;
         }
 
+        $disk = Storage::disk();
+
         if ($profile->photo_path !== null) {
-            Storage::disk('local')->delete($profile->photo_path);
+            $disk->delete($profile->photo_path);
         }
 
-        $profile->photo_path = $request->file('photo')->store('photos', 'local');
+        $file = $request->file('photo');
+        $raw = @file_get_contents($file->getRealPath());
+
+        // Re-encode raster images through GD when available to strip EXIF metadata.
+        if ($raw !== false && function_exists('imagecreatefromstring')) {
+            $image = @imagecreatefromstring($raw);
+
+            if ($image !== false) {
+                ob_start();
+                imagejpeg($image, null, 88);
+                $encoded = ob_get_clean();
+                imagedestroy($image);
+
+                if (is_string($encoded) && $encoded !== '') {
+                    $path = 'photos/'.$file->hashName();
+                    $path = preg_replace('/\.[^.]+$/', '.jpg', $path) ?? $path.'.jpg';
+                    $disk->put($path, $encoded);
+                    $profile->photo_path = $path;
+                    $profile->save();
+
+                    return;
+                }
+            }
+        }
+
+        $profile->photo_path = $file->store('photos');
         $profile->save();
     }
 }

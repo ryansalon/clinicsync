@@ -13,6 +13,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ReportController extends Controller
 {
@@ -21,7 +22,7 @@ class ReportController extends Controller
      */
     public function index(Request $request): View
     {
-        $date = (string) $request->query('date', now()->toDateString());
+        $date = $this->resolveDate($request->query('date'));
 
         /** The census only changes when appointments or encounters are written, so a
             short-lived cache absorbs repeat loads and date flipping. */
@@ -32,6 +33,55 @@ class ReportController extends Controller
         );
 
         return view('admin.reports.index', $stats + ['date' => $date]);
+    }
+
+    /**
+     * Stream the selected day's appointments as a spreadsheet-safe CSV file.
+     */
+    public function export(Request $request): StreamedResponse
+    {
+        $date = $this->resolveDate($request->query('date'));
+        $stats = $this->dailyCensus($date);
+
+        return response()->streamDownload(function () use ($stats): void {
+            $handle = fopen('php://output', 'w');
+
+            if ($handle === false) {
+                return;
+            }
+
+            fwrite($handle, "\xEF\xBB\xBF");
+            fputcsv($handle, ['Queue #', 'Patient', 'Patient ID', 'Physician', 'Time', 'Source', 'Status', 'Chief Complaint']);
+
+            foreach ($stats['appointments'] as $appointment) {
+                fputcsv($handle, [
+                    $appointment->queue_number,
+                    $this->csvSafe($appointment->patient?->user?->name ?? 'Unknown'),
+                    $this->csvSafe($appointment->patient?->patient_number ?? ''),
+                    $this->csvSafe('Dr. '.($appointment->physician?->user?->name ?? 'Unknown')),
+                    $appointment->start_time,
+                    $appointment->source,
+                    $appointment->status,
+                    $this->csvSafe($appointment->chief_complaint),
+                ]);
+            }
+
+            fclose($handle);
+        }, "clinicsync-census-{$date}.csv", ['Content-Type' => 'text/csv; charset=UTF-8']);
+    }
+
+    private function resolveDate(mixed $rawDate): string
+    {
+        return is_string($rawDate) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $rawDate) === 1
+            ? rescue(fn () => Carbon::createFromFormat('Y-m-d', $rawDate)->toDateString(), now()->toDateString(), false)
+            : now()->toDateString();
+    }
+
+    private function csvSafe(?string $value): string
+    {
+        $string = (string) ($value ?? '');
+
+        return preg_match('/^[=+\-@\t\r]/', $string) === 1 ? "'".$string : $string;
     }
 
     /**

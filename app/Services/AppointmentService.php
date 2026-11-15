@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Appointment;
 use App\Models\Patient;
 use App\Models\Physician;
+use App\Notifications\AppointmentCancelledNotification;
 use App\Notifications\AppointmentConfirmedNotification;
 use App\Notifications\AppointmentRescheduledNotification;
 use Illuminate\Support\Facades\DB;
@@ -20,7 +21,7 @@ class AppointmentService
      */
     public function book(Patient $patient, Physician $physician, array $data): Appointment
     {
-        return DB::transaction(function () use ($patient, $physician, $data) {
+        $appointment = SequenceGenerator::retryTransaction(function () use ($patient, $physician, $data) {
             // Validation ran before the transaction; re-check the daily limit
             // here so a concurrent booking can never slip past it.
             $this->availability->guardCapacity($physician, $data['appointment_date']);
@@ -53,6 +54,10 @@ class AppointmentService
 
             return $appointment;
         });
+
+        PhysicianAvailability::flushCalendarCache();
+
+        return $appointment;
     }
 
     public function cancel(Appointment $appointment, int $cancelledBy): void
@@ -62,7 +67,14 @@ class AppointmentService
                 'status' => Appointment::STATUS_CANCELLED,
                 'handled_by' => $cancelledBy,
             ]);
+
+            DB::afterCommit(function () use ($appointment): void {
+                $appointment->load(['patient.user', 'physician.user']);
+                $appointment->patient?->user?->notify(new AppointmentCancelledNotification($appointment));
+            });
         });
+
+        PhysicianAvailability::flushCalendarCache();
     }
 
     /**
@@ -72,7 +84,7 @@ class AppointmentService
      */
     public function reschedule(Appointment $appointment, array $data, int $handledBy): Appointment
     {
-        return DB::transaction(function () use ($appointment, $data, $handledBy) {
+        $refreshed = SequenceGenerator::retryTransaction(function () use ($appointment, $data, $handledBy) {
             $physician = isset($data['physician_id'])
                 ? Physician::findOrFail($data['physician_id'])
                 : $appointment->physician;
@@ -103,6 +115,10 @@ class AppointmentService
 
             return $refreshed;
         });
+
+        PhysicianAvailability::flushCalendarCache();
+
+        return $refreshed;
     }
 
     /**

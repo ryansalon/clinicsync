@@ -28,8 +28,7 @@ class NotificationController extends Controller
     {
         $request->user()
             ->unreadNotifications()
-            ->get()
-            ->each->markAsRead();
+            ->update(['read_at' => now()]);
 
         return back()->with('status', 'All notifications marked as read.');
     }

@@ -105,6 +105,11 @@
                         @enderror
                     </div>
 
+                    <div id="booking-summary" class="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-600" hidden>
+                        <p class="font-semibold text-slate-900">Booking summary</p>
+                        <p id="booking-summary-text" class="mt-0.5"></p>
+                    </div>
+
                     <div class="flex flex-wrap items-center gap-3 border-t border-slate-200 pt-5">
                         <button type="submit" class="btn btn-primary">
                             <x-icon name="calendar" class="h-4 w-4" />
@@ -144,8 +149,25 @@
             var NO_SLOTS_MESSAGE = 'No open slots on this date. Please try another date.';
             var LOADING_MESSAGE = 'Loading available slots…';
             var AVAILABLE_CLASS = 'rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm font-medium text-slate-700 shadow-xs transition hover:border-teal-400 hover:bg-teal-50 hover:text-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500';
-            var SELECTED_CLASS = 'rounded-lg border border-teal-600 bg-teal-600 px-3 py-2.5 text-sm font-semibold text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500';
+            var SELECTED_CLASS = 'btn btn-primary w-full justify-center py-2.5';
             var DISABLED_CLASS = 'rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-medium text-slate-400 cursor-not-allowed';
+            var summaryBox = document.getElementById('booking-summary');
+            var summaryText = document.getElementById('booking-summary-text');
+
+            function updateSummary() {
+                if (!summaryBox || !summaryText) return;
+                var docLabel = physicianSelect.selectedIndex > 0 ? physicianSelect.options[physicianSelect.selectedIndex].text.trim() : '';
+                var chosenDate = dateInput.value;
+                var selectedBtn = slotContainer.querySelector('button[aria-pressed="true"]');
+                var timeLabel = selectedBtn ? selectedBtn.textContent.trim() : '';
+
+                if (docLabel && chosenDate && timeLabel) {
+                    summaryText.textContent = docLabel + ' · ' + chosenDate + ' at ' + timeLabel;
+                    summaryBox.hidden = false;
+                } else {
+                    summaryBox.hidden = true;
+                }
+            }
 
             function setError(message) {
                 if (!errorBox) return;
@@ -203,6 +225,7 @@
                 button.className = SELECTED_CLASS;
                 button.setAttribute('aria-pressed', 'true');
                 setError('');
+                updateSummary();
             }
 
             function renderSlots(payload) {
@@ -265,8 +288,11 @@
                 if (!physicianId || !date) {
                     setError('');
                     showMessage(IDLE_MESSAGE);
+                    updateSummary();
                     return;
                 }
+
+                updateSummary();
 
                 setError('');
                 showMessage(LOADING_MESSAGE);

@@ -74,7 +74,11 @@ return [
         ],
 
         'sms' => [
-            'driver' => 'daily',
+            'driver' => env('SMS_LOG_CHANNEL', 'daily') === 'stderr' ? 'monolog' : 'daily',
+            'handler' => StreamHandler::class,
+            'handler_with' => [
+                'stream' => 'php://stderr',
+            ],
             'path' => storage_path('logs/sms.log'),
             'level' => 'info',
             'max_files' => 30,

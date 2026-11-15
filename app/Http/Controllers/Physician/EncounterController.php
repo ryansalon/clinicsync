@@ -51,9 +51,15 @@ class EncounterController extends Controller
     /**
      * Open a consultation for a queued appointment, with the patient's EMR in view.
      */
-    public function create(Request $request, Appointment $appointment): View
+    public function create(Request $request, Appointment $appointment): View|RedirectResponse
     {
         Gate::authorize('update', $appointment);
+
+        if ($appointment->encounter !== null) {
+            return redirect()
+                ->route('physician.encounters.show', $appointment->encounter)
+                ->with('status', 'An encounter already exists for this appointment.');
+        }
 
         $appointment->load(['patient.user', 'physician.user']);
 
@@ -79,16 +85,25 @@ class EncounterController extends Controller
 
         $user = $request->user();
 
-        $encounter = DB::transaction(function () use ($request, $appointment, $user) {
+        $encounter = SequenceGenerator::retryTransaction(function () use ($request, $appointment, $user) {
+            $lockedAppointment = Appointment::query()
+                ->whereKey($appointment->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($existing = $lockedAppointment->encounter()->first()) {
+                return $existing;
+            }
+
             $completed = $request->boolean('mark_completed');
 
             $encounter = Encounter::create([
-                'patient_id' => $appointment->patient_id,
-                'physician_id' => $appointment->physician_id,
-                'appointment_id' => $appointment->id,
+                'patient_id' => $lockedAppointment->patient_id,
+                'physician_id' => $lockedAppointment->physician_id,
+                'appointment_id' => $lockedAppointment->id,
                 'encounter_number' => $this->nextEncounterNumber(),
                 'encountered_at' => now(),
-                'chief_complaint' => $request->input('chief_complaint') ?? $appointment->chief_complaint,
+                'chief_complaint' => $request->input('chief_complaint') ?? $lockedAppointment->chief_complaint,
                 'diagnosis' => $request->input('diagnosis'),
                 'diagnosis_code' => $request->input('diagnosis_code'),
                 'assessment' => $request->input('assessment'),
@@ -100,14 +115,14 @@ class EncounterController extends Controller
             $this->syncVitals($encounter, $request);
 
             if ($completed) {
-                $appointment->update([
+                $lockedAppointment->update([
                     'status' => Appointment::STATUS_COMPLETED,
-                    'started_at' => $appointment->started_at ?? now(),
+                    'started_at' => $lockedAppointment->started_at ?? now(),
                     'finished_at' => now(),
                     'handled_by' => $user->id,
                 ]);
-            } elseif ($appointment->status === Appointment::STATUS_CONFIRMED) {
-                $appointment->update([
+            } elseif ($lockedAppointment->status === Appointment::STATUS_CONFIRMED) {
+                $lockedAppointment->update([
                     'started_at' => now(),
                     'handled_by' => $user->id,
                 ]);
@@ -133,6 +148,7 @@ class EncounterController extends Controller
         return view('physician.encounters.show', [
             'encounter' => $encounter->load([
                 'patient.user',
+                'patient.activeAllergies',
                 'physician.user',
                 'vitals',
                 'prescriptions',

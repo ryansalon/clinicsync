@@ -8,6 +8,7 @@ use App\Models\Appointment;
 use App\Models\Physician;
 use App\Models\PhysicianSchedule;
 use App\Services\AuditLogger;
+use App\Services\PhysicianAvailability;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -46,6 +47,7 @@ class AvailabilityController extends Controller
             'is_active' => $request->boolean('is_active'),
         ]);
 
+        PhysicianAvailability::flushCalendarCache();
         AuditLogger::log($request->user(), 'schedule.created', $schedule, null, $schedule->toArray());
 
         return redirect()
@@ -68,6 +70,7 @@ class AvailabilityController extends Controller
             'is_active' => $request->boolean('is_active', $schedule->is_active),
         ]);
 
+        PhysicianAvailability::flushCalendarCache();
         AuditLogger::log($request->user(), 'schedule.updated', $schedule, $before, $schedule->fresh()->toArray());
 
         return redirect()
@@ -86,6 +89,7 @@ class AvailabilityController extends Controller
 
         $schedule->delete();
 
+        PhysicianAvailability::flushCalendarCache();
         AuditLogger::log($request->user(), 'schedule.deleted', $schedule);
 
         return redirect()
@@ -108,6 +112,7 @@ class AvailabilityController extends Controller
 
         $physician->update($validated);
 
+        PhysicianAvailability::flushCalendarCache();
         AuditLogger::log($request->user(), 'physician.limit_updated', $physician, $before, $validated);
 
         return redirect()

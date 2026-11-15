@@ -60,59 +60,74 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-                <label for="civil_status" class="label">Civil status</label>
-                <select id="civil_status" name="civil_status" class="input @error('civil_status') input-invalid @enderror">
-                    <option value="">Select…</option>
-                    @foreach (['single' => 'Single', 'married' => 'Married', 'widowed' => 'Widowed', 'separated' => 'Separated'] as $value => $label)
-                        <option value="{{ $value }}" @selected(old('civil_status') === $value)>{{ $label }}</option>
-                    @endforeach
-                </select>
-                @error('civil_status')
-                    <p class="field-error">{{ $message }}</p>
-                @enderror
-            </div>
-            <div>
-                <label for="blood_type" class="label">Blood type</label>
-                <input id="blood_type" type="text" name="blood_type" value="{{ old('blood_type') }}"
-                       class="input @error('blood_type') input-invalid @enderror" placeholder="O+">
-                @error('blood_type')
-                    <p class="field-error">{{ $message }}</p>
-                @enderror
-            </div>
-        </div>
+        @php
+            $hasOptionalInput = $errors->hasAny(['civil_status', 'blood_type', 'address', 'emergency_contact_name', 'emergency_contact_phone', 'emergency_contact_relationship'])
+                || old('civil_status') || old('blood_type') || old('address')
+                || old('emergency_contact_name') || old('emergency_contact_phone') || old('emergency_contact_relationship');
+        @endphp
 
-        <div>
-            <label for="address" class="label">Address</label>
-            <input id="address" type="text" name="address" value="{{ old('address') }}"
-                   class="input @error('address') input-invalid @enderror">
-            @error('address')
-                <p class="field-error">{{ $message }}</p>
-            @enderror
-        </div>
+        <details class="rounded-panel border border-hairline bg-ground/60 p-4" @if ($hasOptionalInput) open @endif>
+            <summary class="flex cursor-pointer list-none items-center justify-between text-xs font-semibold uppercase tracking-[0.12em] text-meta hover:text-bright">
+                <span>Optional demographics &amp; emergency contact</span>
+                <span class="text-[11px] font-normal normal-case text-meta">Can be added later</span>
+            </summary>
 
-        <fieldset class="rounded-panel border border-hairline bg-ground p-4">
-            <legend class="px-1 font-guest-mono text-[11px] font-normal uppercase tracking-[0.14em] text-meta">Emergency contact</legend>
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div class="mt-4 space-y-4">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div>
+                        <label for="civil_status" class="label">Civil status</label>
+                        <select id="civil_status" name="civil_status" class="input @error('civil_status') input-invalid @enderror">
+                            <option value="">Select…</option>
+                            @foreach (['single' => 'Single', 'married' => 'Married', 'widowed' => 'Widowed', 'separated' => 'Separated'] as $value => $label)
+                                <option value="{{ $value }}" @selected(old('civil_status') === $value)>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                        @error('civil_status')
+                            <p class="field-error">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label for="blood_type" class="label">Blood type</label>
+                        <input id="blood_type" type="text" name="blood_type" value="{{ old('blood_type') }}"
+                               class="input @error('blood_type') input-invalid @enderror" placeholder="O+">
+                        @error('blood_type')
+                            <p class="field-error">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
                 <div>
-                    <label for="emergency_contact_name" class="label">Contact name</label>
-                    <input id="emergency_contact_name" type="text" name="emergency_contact_name"
-                           value="{{ old('emergency_contact_name') }}" class="input">
+                    <label for="address" class="label">Address</label>
+                    <input id="address" type="text" name="address" value="{{ old('address') }}"
+                           class="input @error('address') input-invalid @enderror">
+                    @error('address')
+                        <p class="field-error">{{ $message }}</p>
+                    @enderror
                 </div>
-                <div>
-                    <label for="emergency_contact_phone" class="label">Contact number</label>
-                    <input id="emergency_contact_phone" type="tel" name="emergency_contact_phone"
-                           value="{{ old('emergency_contact_phone') }}" inputmode="numeric" autocomplete="tel"
-                           class="input" placeholder="09XXXXXXXXX">
-                </div>
-                <div class="sm:col-span-2">
-                    <label for="emergency_contact_relationship" class="label">Relationship</label>
-                    <input id="emergency_contact_relationship" type="text" name="emergency_contact_relationship"
-                           value="{{ old('emergency_contact_relationship') }}" class="input" placeholder="Spouse, Parent…">
-                </div>
+
+                <fieldset class="rounded-panel border border-hairline bg-ground p-4">
+                    <legend class="px-1 font-guest-mono text-[11px] font-normal uppercase tracking-[0.14em] text-meta">Emergency contact</legend>
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div>
+                            <label for="emergency_contact_name" class="label">Contact name</label>
+                            <input id="emergency_contact_name" type="text" name="emergency_contact_name"
+                                   value="{{ old('emergency_contact_name') }}" class="input">
+                        </div>
+                        <div>
+                            <label for="emergency_contact_phone" class="label">Contact number</label>
+                            <input id="emergency_contact_phone" type="tel" name="emergency_contact_phone"
+                                   value="{{ old('emergency_contact_phone') }}" inputmode="numeric" autocomplete="tel"
+                                   class="input" placeholder="09XXXXXXXXX">
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label for="emergency_contact_relationship" class="label">Relationship</label>
+                            <input id="emergency_contact_relationship" type="text" name="emergency_contact_relationship"
+                                   value="{{ old('emergency_contact_relationship') }}" class="input" placeholder="Spouse, Parent…">
+                        </div>
+                    </div>
+                </fieldset>
             </div>
-        </fieldset>
+        </details>
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>

@@ -185,6 +185,7 @@ export function mountRibbonField(host, props = {}) {
     const time = gl.getUniformLocation(program, 'time');
     const pointerUniform = gl.getUniformLocation(program, 'pointer');
 
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let mouseX = 0.72;
     let mouseY = 0.42;
     let targetX = 0.72;
@@ -207,6 +208,12 @@ export function mountRibbonField(host, props = {}) {
         canvas.height = Math.max(1, Math.floor(bounds.height * ratio));
         gl.viewport(0, 0, canvas.width, canvas.height);
         gl.uniform2f(resolution, canvas.width, canvas.height);
+
+        if (reducedMotion) {
+            gl.uniform1f(time, 0);
+            gl.uniform2f(pointerUniform, mouseX, mouseY);
+            gl.drawArrays(gl.TRIANGLES, 0, 6);
+        }
     };
 
     const render = (now) => {
@@ -215,32 +222,40 @@ export function mountRibbonField(host, props = {}) {
         gl.uniform1f(time, (now - startedAt) * 0.001 * options.speed);
         gl.uniform2f(pointerUniform, mouseX, mouseY);
         gl.drawArrays(gl.TRIANGLES, 0, 6);
-        frame = visible && !document.hidden ? requestAnimationFrame(render) : 0;
+        frame = !reducedMotion && visible && !document.hidden ? requestAnimationFrame(render) : 0;
+    };
+
+    const syncPlayback = () => {
+        if (reducedMotion) {
+            return;
+        }
+
+        if (visible && !document.hidden && !frame) {
+            frame = requestAnimationFrame(render);
+        } else if ((!visible || document.hidden) && frame) {
+            cancelAnimationFrame(frame);
+            frame = 0;
+        }
     };
 
     const resizeObserver = new ResizeObserver(resize);
     const intersection = new IntersectionObserver(([entry]) => {
         visible = entry?.isIntersecting ?? true;
-
-        if (visible && !frame) {
-            frame = requestAnimationFrame(render);
-        }
-
-        if (!visible && frame) {
-            cancelAnimationFrame(frame);
-            frame = 0;
-        }
+        syncPlayback();
     });
 
     resizeObserver.observe(host);
     intersection.observe(host);
+    document.addEventListener('visibilitychange', syncPlayback);
 
-    // The background sits behind the page content, so track the pointer on the
-    // window and map it into the host's bounds — same maths as the original
-    // host-level listener, just able to receive events across the whole page.
-    window.addEventListener('pointermove', pointer, { passive: true });
+    if (!reducedMotion) {
+        window.addEventListener('pointermove', pointer, { passive: true });
+    }
+
     resize();
-    frame = requestAnimationFrame(render);
+    if (!reducedMotion) {
+        frame = requestAnimationFrame(render);
+    }
 
     return () => {
         if (frame) {
@@ -249,6 +264,7 @@ export function mountRibbonField(host, props = {}) {
 
         resizeObserver.disconnect();
         intersection.disconnect();
+        document.removeEventListener('visibilitychange', syncPlayback);
         window.removeEventListener('pointermove', pointer);
         gl.deleteBuffer(buffer);
         gl.deleteShader(vertex);
