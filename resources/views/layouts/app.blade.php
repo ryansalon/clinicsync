@@ -98,7 +98,7 @@
                 @hasanyrole('administrator|receptionist')
                     <p class="nav-group-label">Front desk</p>
                     <a href="{{ route('admin.queue.index') }}"
-                       class="nav-link {{ $navActive('admin.queue.index', 'admin.queue.store', 'admin.queue.update', 'admin.queue.call', 'admin.queue.destroy', 'admin.queue.patient-search') }}">
+                       class="nav-link {{ $navActive('admin.queue.index', 'admin.queue.store', 'admin.queue.update', 'admin.queue.call', 'admin.queue.destroy') }}">
                         <x-icon name="list" /> <span>Daily queue</span>
                     </a>
                     <a href="{{ route('admin.schedules.index') }}"

@@ -75,7 +75,9 @@ class PhysicianAvailabilityTest extends TestCase
 
         $this->actingAs($receptionist)
             ->post(route('admin.queue.store'), [
-                'patient_id' => $patient->patient->id,
+                'patient_name' => 'Walk-In Overflow Patient',
+                'date_of_birth' => '1999-02-14',
+                'sex' => 'female',
                 'physician_id' => $physician->id,
                 'appointment_date' => $today,
                 'start_time' => '09:30',

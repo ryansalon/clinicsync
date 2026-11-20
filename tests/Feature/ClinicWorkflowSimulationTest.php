@@ -141,23 +141,27 @@ class ClinicWorkflowSimulationTest extends TestCase
         $this->assertSame($receptionist->id, $mariaAppointment->handled_by);
         $this->assertTrue(AuditLog::where('action', 'appointment.called')->exists());
 
-        // John walks in without an appointment.
+        // A walk-in patient arrives without an online booking.
         $this->post(route('admin.queue.store'), [
-            'patient_id' => $john->patient->id,
+            'patient_name' => 'Carlos Mendoza',
+            'date_of_birth' => '1991-06-21',
+            'sex' => 'male',
             'physician_id' => $physician->id,
             'appointment_date' => now()->toDateString(),
             'start_time' => '09:30',
             'chief_complaint' => 'Migraine since yesterday',
         ])
             ->assertSessionHasNoErrors()
-            ->assertSessionHas('status', 'Walk-in added to queue as #2.');
+            ->assertSessionHas('status', 'Walk-in registered (PT-000003) and added to queue as #2.');
 
-        $johnWalkIn = Appointment::where('patient_id', $john->patient->id)
+        $carlos = User::where('name', 'Carlos Mendoza')->firstOrFail();
+        $carlosWalkIn = Appointment::where('patient_id', $carlos->patient->id)
             ->whereDate('appointment_date', now()->toDateString())
             ->firstOrFail();
 
-        $this->assertSame(2, $johnWalkIn->queue_number);
-        $this->assertSame(Appointment::STATUS_CONFIRMED, $johnWalkIn->status);
+        $this->assertSame('PT-000003', $carlos->patient->patient_number);
+        $this->assertSame(2, $carlosWalkIn->queue_number);
+        $this->assertSame(Appointment::STATUS_CONFIRMED, $carlosWalkIn->status);
         $this->assertTrue(AuditLog::where('action', 'appointment.walk_in_registered')->exists());
 
         // John calls to move his follow-up to a later slot.
@@ -331,7 +335,7 @@ class ClinicWorkflowSimulationTest extends TestCase
         $this->assertSame(3, Appointment::count());
         $this->assertSame(1, Encounter::count());
         $this->assertSame(1, Prescription::count());
-        $this->assertSame(5, User::count());
+        $this->assertSame(6, User::count());
 
         foreach ([
             'user.registered',

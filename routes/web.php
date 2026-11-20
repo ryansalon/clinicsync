@@ -132,9 +132,6 @@ Route::middleware('auth')->group(function () {
     */
     Route::middleware('role:administrator|receptionist')->prefix('admin')->name('admin.')->group(function () {
         Route::get('queue', [QueueController::class, 'index'])->name('queue.index');
-        Route::get('queue/patient-search', [QueueController::class, 'searchPatients'])
-            ->middleware('throttle:60,1')
-            ->name('queue.patient-search');
         Route::post('queue/walk-ins', [QueueController::class, 'store'])->name('queue.store');
         Route::patch('queue/{appointment}', [QueueController::class, 'update'])->name('queue.update');
         Route::patch('queue/{appointment}/call', [QueueController::class, 'call'])->name('queue.call');

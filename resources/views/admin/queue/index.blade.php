@@ -4,14 +4,6 @@
 
 @section('content')
     @php
-        $restoredPatientLabel = '';
-        if (old('patient_id')) {
-            $restoredPatient = \App\Models\Patient::with('user')->find(old('patient_id'));
-            if ($restoredPatient) {
-                $restoredPatientLabel = ($restoredPatient->user?->name ?? 'Unknown').' ('.$restoredPatient->patient_number.')';
-            }
-        }
-
         $filterChips = [];
         if ($physicianId) {
             $matchedPhysician = $physicians->firstWhere('id', (int) $physicianId);
@@ -63,28 +55,77 @@
             <form method="POST" action="{{ route('admin.queue.store') }}" class="card-body space-y-4">
                 @csrf
 
-                <div data-combobox="{{ route('admin.queue.patient-search') }}" class="relative">
-                    <label for="walkin-patient-search" class="label">Patient</label>
-                    <input type="hidden" name="patient_id" id="walkin-patient-id" data-combobox-value
-                           value="{{ old('patient_id') }}" required>
-                    <div class="relative">
-                        <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-meta">
-                            <x-icon name="magnifying-glass" class="h-4 w-4" />
+                {{-- Walk-in patient details (Patient ID auto-generated on submit) --}}
+                <div class="space-y-4 rounded-md border border-hairline bg-canvas/70 p-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-hairline pb-2.5 text-xs">
+                        <span class="section-title">Walk-in patient details</span>
+                        <span class="chip border-brand-border bg-brand-tint font-mono text-[11px] text-brand cs-num">
+                            ID auto-generated · {{ $nextPatientNumber }}
                         </span>
-                        <input id="walkin-patient-search" type="search" data-combobox-input
-                               value="{{ $restoredPatientLabel }}"
-                               class="input pl-9 @error('patient_id') input-invalid @enderror"
-                               placeholder="Search patient name or ID…"
-                               autocomplete="off" role="combobox" aria-expanded="false"
-                               aria-autocomplete="list" aria-controls="walkin-patient-listbox">
                     </div>
-                    <ul id="walkin-patient-listbox" data-combobox-listbox role="listbox" hidden
-                        class="dropdown-panel left-0 right-0 max-h-60 overflow-y-auto"></ul>
-                    <p data-combobox-status aria-live="polite" class="sr-only"></p>
-                    @error('patient_id')
-                        <p class="field-error">{{ $message }}</p>
-                    @enderror
-                    <p class="helper">Search existing clinic patients by full name or ID (e.g. PT-0001).</p>
+
+                    <div>
+                        <label for="walkin-patient-name" class="label">Full name <span class="text-danger">*</span></label>
+                        <input id="walkin-patient-name" type="text" name="patient_name"
+                               value="{{ old('patient_name') }}"
+                               class="input @error('patient_name') input-invalid @enderror"
+                               placeholder="e.g. Juan Dela Cruz"
+                               autocomplete="name" required>
+                        @error('patient_name')
+                            <p class="field-error">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <div>
+                            <label for="walkin-dob" class="label">Date of birth <span class="text-danger">*</span></label>
+                            <input id="walkin-dob" type="date" name="date_of_birth"
+                                   value="{{ old('date_of_birth') }}"
+                                   max="{{ now()->toDateString() }}"
+                                   class="input cs-num @error('date_of_birth') input-invalid @enderror" required>
+                            @error('date_of_birth')
+                                <p class="field-error">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label for="walkin-sex" class="label">Sex <span class="text-danger">*</span></label>
+                            <select id="walkin-sex" name="sex"
+                                    class="input @error('sex') input-invalid @enderror" required>
+                                <option value="">Select…</option>
+                                @foreach (['male' => 'Male', 'female' => 'Female', 'other' => 'Other'] as $sexValue => $sexLabel)
+                                    <option value="{{ $sexValue }}" @selected(old('sex') === $sexValue)>{{ $sexLabel }}</option>
+                                @endforeach
+                            </select>
+                            @error('sex')
+                                <p class="field-error">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <div>
+                            <label for="walkin-phone" class="label">Mobile number <span class="font-normal text-meta">(optional)</span></label>
+                            <input id="walkin-phone" type="tel" name="phone"
+                                   value="{{ old('phone') }}"
+                                   inputmode="numeric" autocomplete="tel"
+                                   class="input cs-num @error('phone') input-invalid @enderror"
+                                   placeholder="09XXXXXXXXX">
+                            @error('phone')
+                                <p class="field-error">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label for="walkin-email" class="label">Email <span class="font-normal text-meta">(optional)</span></label>
+                            <input id="walkin-email" type="email" name="email"
+                                   value="{{ old('email') }}"
+                                   autocomplete="email"
+                                   class="input @error('email') input-invalid @enderror"
+                                   placeholder="Auto-assigned if blank">
+                            @error('email')
+                                <p class="field-error">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
                 </div>
 
                 <div>
