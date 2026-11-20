@@ -201,6 +201,12 @@
                         </div>
                     </div>
                     <button type="submit" class="btn btn-secondary btn-sm">Apply</button>
+                    @if ($date !== now()->toDateString())
+                        <a href="{{ route('admin.queue.index', array_filter(['physician_id' => $physicianId])) }}"
+                           class="btn btn-ghost btn-sm text-brand">
+                            Today
+                        </a>
+                    @endif
                 </form>
 
                 <div class="flex flex-wrap items-center gap-2.5">
@@ -211,12 +217,16 @@
                         <button type="button" data-queue-tab="completed" aria-pressed="false" class="tab-btn">Completed</button>
                         <button type="button" data-queue-tab="no_show" aria-pressed="false" class="tab-btn">No show</button>
                     </div>
-                    <div class="relative w-full sm:w-60">
+                    <div class="relative w-full sm:w-64">
                         <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-2.5 text-meta">
                             <x-icon name="magnifying-glass" class="h-3.5 w-3.5" />
                         </span>
-                        <input type="search" data-queue-search class="input min-h-9 py-1.5 pl-8 text-xs"
+                        <input type="search" data-queue-search class="input min-h-9 py-1.5 pr-9 pl-8 text-xs"
                                placeholder="Patient, PT-ID, or #queue…" aria-label="Filter queue rows">
+                        <kbd aria-hidden="true"
+                             class="pointer-events-none absolute inset-y-0 right-2 my-auto hidden h-5 items-center rounded border border-hairline bg-surface-subtle px-1.5 font-mono text-[10px] font-semibold text-meta sm:inline-flex">
+                            /
+                        </kbd>
                     </div>
                 </div>
             </div>
