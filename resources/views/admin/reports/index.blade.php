@@ -3,6 +3,11 @@
 @section('title', 'Daily census')
 
 @section('content')
+    <div class="print-only mb-5 border-b border-hairline pb-3">
+        <p class="font-mono text-[10px] font-semibold tracking-wider text-meta uppercase">Camiguin Polytechnic State College · Outpatient Clinic</p>
+        <p class="mt-0.5 text-base font-bold text-bright">Daily Census Report — {{ \Illuminate\Support\Carbon::parse($date)->isoFormat('dddd, MMM D, YYYY') }}</p>
+    </div>
+
     <x-page-header title="Daily census" description="Appointments, consultations and workload for the selected clinic day.">
         <x-slot:actions>
             <form method="GET" action="{{ route('admin.reports.index') }}" class="no-print flex flex-wrap items-end gap-2.5">
@@ -14,6 +19,11 @@
                     <x-icon name="check" class="h-4 w-4" />
                     Apply
                 </button>
+                @if ($date !== now()->toDateString())
+                    <a href="{{ route('admin.reports.index') }}" class="btn btn-ghost text-brand">
+                        Today
+                    </a>
+                @endif
             </form>
 
             <a href="{{ route('admin.reports.export', ['date' => $date]) }}" class="btn btn-secondary no-print">
