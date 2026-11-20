@@ -199,7 +199,15 @@
     }
 
     .ledger-cell {
-        @apply flex flex-col justify-between gap-2 px-4 py-3.5 transition-colors duration-150;
+        @apply flex flex-col justify-between gap-2 px-4 py-3.5 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand;
+    }
+
+    details > summary {
+        @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-surface;
+    }
+
+    .print-only {
+        display: none;
     }
 
     .section-title {
@@ -578,6 +586,10 @@
  * across pages as high-contrast black ink on white paper.
  */
 @media print {
+    .print-only {
+        display: block !important;
+    }
+
     #app-sidebar,
     [data-sidebar-backdrop],
     header,
