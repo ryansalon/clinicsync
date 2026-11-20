@@ -40,6 +40,7 @@
         <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-brand"></span> Available</span>
         <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-danger-solid"></span> Full</span>
         <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-hairline-2"></span> No availability</span>
+        <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full border border-brand bg-surface"></span> Today</span>
     </div>
 
     <div data-cal-panel class="rounded-md border border-dashed border-hairline-2 bg-surface-subtle/60 px-4 py-6 text-center text-sm text-meta">
@@ -139,6 +140,7 @@
                 function load() {
                     prevBtn.disabled = true;
                     nextBtn.disabled = true;
+                    root.setAttribute('aria-busy', 'true');
 
                     fetch(url + '?month=' + monthKey(), { headers: { 'Accept': 'application/json' } })
                         .then(function (response) {
@@ -165,9 +167,11 @@
 
                             render();
                             renderPanel();
+                            root.setAttribute('aria-busy', 'false');
                         })
                         .catch(function () {
                             setPanel('We could not load physician availability. Please try again.');
+                            root.setAttribute('aria-busy', 'false');
                         });
                 }
 
