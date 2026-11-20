@@ -68,7 +68,7 @@
                                 </span>
                             @else
                                 <a href="{{ $url }}"
-                                   class="cs-num inline-flex h-9 min-w-9 items-center justify-center rounded-md border border-hairline bg-surface px-2.5 font-mono text-xs font-medium text-bright transition hover:border-brand/50 hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+                                   class="cs-num inline-flex h-9 min-w-9 items-center justify-center rounded-md border border-hairline bg-surface px-2.5 font-mono text-xs font-medium text-bright transition-[transform,background-color,border-color,box-shadow] duration-150 ease-out hover:-translate-y-0.5 hover:border-brand/50 hover:bg-surface-subtle hover:shadow-[0_3px_8px_-3px_rgba(24,32,29,0.12)] active:translate-y-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
                                    aria-label="Go to page {{ $page }}">
                                     {{ $page }}
                                 </a>

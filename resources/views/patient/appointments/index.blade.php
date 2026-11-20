@@ -18,12 +18,12 @@
             <x-icon name="funnel" class="h-4 w-4" />
         </span>
         <a href="{{ route('patient.appointments.index') }}"
-           class="inline-flex min-h-11 items-center gap-1.5 rounded-full border px-4 py-2 text-xs font-semibold transition {{ $currentStatus === null ? 'border-brand bg-brand text-white' : 'border-hairline bg-surface text-meta hover:border-brand/50 hover:text-bright' }}">
+           class="inline-flex min-h-11 items-center gap-1.5 rounded-full border px-4 py-2 text-xs font-semibold transition-[transform,background-color,border-color,color,box-shadow] duration-150 ease-out hover:-translate-y-0.5 active:translate-y-0 {{ $currentStatus === null ? 'border-brand bg-brand text-white hover:shadow-[0_4px_10px_-3px_rgba(30,73,118,0.32)]' : 'border-hairline bg-surface text-meta hover:border-brand/50 hover:text-bright hover:shadow-[0_3px_8px_-3px_rgba(24,32,29,0.1)]' }}">
             All
         </a>
         @foreach (['pending', 'confirmed', 'completed', 'cancelled', 'no_show'] as $status)
             <a href="{{ route('patient.appointments.index', ['status' => $status]) }}"
-               class="inline-flex min-h-11 items-center gap-1.5 rounded-full border px-4 py-2 text-xs font-semibold transition {{ $currentStatus === $status ? 'border-brand bg-brand text-white' : 'border-hairline bg-surface text-meta hover:border-brand/50 hover:text-bright' }}">
+               class="inline-flex min-h-11 items-center gap-1.5 rounded-full border px-4 py-2 text-xs font-semibold transition-[transform,background-color,border-color,color,box-shadow] duration-150 ease-out hover:-translate-y-0.5 active:translate-y-0 {{ $currentStatus === $status ? 'border-brand bg-brand text-white hover:shadow-[0_4px_10px_-3px_rgba(30,73,118,0.32)]' : 'border-hairline bg-surface text-meta hover:border-brand/50 hover:text-bright hover:shadow-[0_3px_8px_-3px_rgba(24,32,29,0.1)]' }}">
                 {{ \Illuminate\Support\Str::headline($status) }}
             </a>
         @endforeach
