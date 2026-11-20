@@ -987,4 +987,32 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     });
+
+    /* ------------------------------------------------------------------ */
+    /* Keyboard "/" shortcut to focus queue or table search inputs        */
+    /* ------------------------------------------------------------------ */
+    document.addEventListener('keydown', (event) => {
+        if (event.key !== '/' || event.ctrlKey || event.metaKey || event.altKey) {
+            return;
+        }
+
+        const target = event.target;
+        if (
+            target instanceof HTMLElement
+            && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT' || target.isContentEditable)
+        ) {
+            return;
+        }
+
+        if (document.querySelector('[data-dialog]:not(.hidden), [data-drawer]:not(.hidden)')) {
+            return;
+        }
+
+        const searchInput = document.querySelector('[data-queue-search], main input[type="search"]');
+        if (searchInput instanceof HTMLInputElement && searchInput.offsetParent !== null) {
+            event.preventDefault();
+            searchInput.focus();
+            searchInput.select();
+        }
+    });
 });
