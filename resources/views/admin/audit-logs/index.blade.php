@@ -82,7 +82,15 @@
             @empty
                 <div class="p-8">
                     <x-empty icon="shield-check" title="No audit entries found"
-                             description="No audit entries match the current filters." />
+                             description="No audit entries match the current filters.">
+                        @if ($action !== '' || $userId)
+                            <x-slot:action>
+                                <a href="{{ route('admin.audit-logs.index') }}" class="btn btn-secondary btn-sm">
+                                    Clear filters
+                                </a>
+                            </x-slot:action>
+                        @endif
+                    </x-empty>
                 </div>
             @endforelse
         </div>
@@ -148,7 +156,15 @@
                         <tr>
                             <td colspan="6" class="px-4 py-12">
                                 <x-empty icon="shield-check" title="No audit entries found"
-                                         description="No audit entries match the current filters." />
+                                         description="No audit entries match the current filters.">
+                                    @if ($action !== '' || $userId)
+                                        <x-slot:action>
+                                            <a href="{{ route('admin.audit-logs.index') }}" class="btn btn-secondary btn-sm">
+                                                Clear filters
+                                            </a>
+                                        </x-slot:action>
+                                    @endif
+                                </x-empty>
                             </td>
                         </tr>
                     @endforelse
