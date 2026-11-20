@@ -2,57 +2,29 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\Role;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreWalkInRequest;
 use App\Http\Requests\UpdateAppointmentRequest;
 use App\Models\Appointment;
 use App\Models\Patient;
 use App\Models\Physician;
+use App\Models\User;
 use App\Services\AppointmentService;
 use App\Services\AuditLogger;
+use App\Services\SequenceGenerator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class QueueController extends Controller
 {
     public function __construct(private readonly AppointmentService $appointments) {}
-
-    /**
-     * Autocomplete endpoint for walk-in registration.
-     */
-    public function searchPatients(Request $request): JsonResponse
-    {
-        $query = trim((string) $request->query('q', ''));
-
-        if (mb_strlen($query) < 2) {
-            return response()->json([]);
-        }
-
-        $patients = Patient::query()
-            ->with('user')
-            ->where(function ($builder) use ($query) {
-                $builder->where('patient_number', 'like', "%{$query}%")
-                    ->orWhereHas('user', function ($q) use ($query) {
-                        $q->where('name', 'like', "%{$query}%")
-                            ->orWhere('email', 'like', "%{$query}%");
-                    });
-            })
-            ->limit(10)
-            ->get()
-            ->map(fn (Patient $patient) => [
-                'id' => $patient->id,
-                'name' => $patient->user?->name ?? 'Unknown',
-                'patient_number' => $patient->patient_number,
-                'label' => ($patient->user?->name ?? 'Unknown').' ('.$patient->patient_number.')',
-            ]);
-
-        return response()->json($patients);
-    }
 
     /**
      * Unified daily queue: online bookings and physical walk-ins together.
@@ -97,12 +69,18 @@ class QueueController extends Controller
             ];
         });
 
+        $nextPatientNumber = SequenceGenerator::next(
+            Patient::query()->orderByDesc('id')->value('patient_number'),
+            'PT-',
+        );
+
         $viewData = [
             'date' => $date,
             'physicianId' => $physicianId === '' ? null : $physicianId,
             'queue' => $queue,
             'physicians' => $physicians,
             'physicianCapacity' => $physicianCapacity,
+            'nextPatientNumber' => $nextPatientNumber,
             'currentlyCalled' => $queue->where('status', Appointment::STATUS_CONFIRMED)
                 ->filter(fn (Appointment $item) => $item->called_at !== null)
                 ->values(),
@@ -129,9 +107,16 @@ class QueueController extends Controller
     public function store(StoreWalkInRequest $request): RedirectResponse
     {
         $user = $request->user();
+        $patient = $this->createWalkInPatient($request);
+
+        AuditLogger::log($user, 'user.created', $patient->user, null, [
+            'role' => Role::Patient->value,
+            'patient_number' => $patient->patient_number,
+            'source' => 'walk_in',
+        ]);
 
         $appointment = $this->appointments->book(
-            Patient::findOrFail((int) $request->input('patient_id')),
+            $patient,
             Physician::findOrFail((int) $request->input('physician_id')),
             [
                 'appointment_date' => (string) $request->input('appointment_date'),
@@ -148,7 +133,44 @@ class QueueController extends Controller
 
         return redirect()
             ->route('admin.queue.index', ['date' => $appointment->appointment_date->toDateString()])
-            ->with('status', 'Walk-in added to queue as #'.$appointment->queue_number.'.');
+            ->with('status', 'Walk-in registered ('.$patient->patient_number.') and added to queue as #'.$appointment->queue_number.'.');
+    }
+
+    /**
+     * Create a patient account and profile with an auto-generated PT-XXXXXX ID.
+     */
+    private function createWalkInPatient(StoreWalkInRequest $request): Patient
+    {
+        return SequenceGenerator::retryTransaction(function () use ($request): Patient {
+            $latestNumber = Patient::query()
+                ->orderByDesc('id')
+                ->lockForUpdate()
+                ->value('patient_number');
+
+            $patientNumber = SequenceGenerator::next($latestNumber, 'PT-');
+            $providedEmail = trim((string) $request->input('email', ''));
+            $email = $providedEmail !== ''
+                ? $providedEmail
+                : strtolower(str_replace('-', '', $patientNumber)).'@walkin.clinicsync.local';
+
+            $patientUser = User::create([
+                'name' => trim((string) $request->input('patient_name')),
+                'email' => $email,
+                'phone' => $request->input('phone') ?: null,
+                'password' => Str::password(32),
+                'is_active' => true,
+            ]);
+
+            $patientUser->assignRole(Role::Patient->value);
+
+            $patient = $patientUser->patient()->create([
+                'patient_number' => $patientNumber,
+                'date_of_birth' => (string) $request->input('date_of_birth'),
+                'sex' => (string) $request->input('sex'),
+            ]);
+
+            return $patient->load('user');
+        });
     }
 
     /**

@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Models\Physician;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreWalkInRequest extends FormRequest
 {
@@ -26,7 +27,11 @@ class StoreWalkInRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'patient_id' => ['required', 'integer', 'exists:patients,id'],
+            'patient_name' => ['required', 'string', 'max:255'],
+            'date_of_birth' => ['required', 'date', 'before_or_equal:today'],
+            'sex' => ['required', 'in:male,female,other'],
+            'phone' => ['nullable', 'string', 'max:30'],
+            'email' => ['nullable', 'email', 'max:255', Rule::unique('users', 'email')],
             'physician_id' => ['required', 'integer', 'exists:physicians,id'],
             'appointment_date' => ['required', 'date'],
             'start_time' => ['required', 'date_format:H:i'],
