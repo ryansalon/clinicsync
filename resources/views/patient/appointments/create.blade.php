@@ -9,10 +9,10 @@
         {{-- Step 1 — availability calendar --}}
         <section class="card">
             <div class="card-header flex flex-wrap items-center justify-between gap-2">
-                <x-card-title>Step 1 — Pick a clinic date</x-card-title>
+                <x-card-title>Pick a clinic date</x-card-title>
                 <span class="chip">
-                    <x-icon name="calendar" class="h-3.5 w-3.5 text-[#0F766E]" />
-                    Tap any date to choose a physician & slot
+                    <x-icon name="calendar" class="h-3.5 w-3.5 text-brand" />
+                    Tap any date to choose a physician &amp; slot
                 </span>
             </div>
             <div class="card-body">
@@ -29,7 +29,7 @@
         {{-- Step 2 — booking form --}}
         <section class="card mt-6 {{ $formVisible ? '' : 'hidden' }}" id="booking-form" tabindex="-1">
             <div class="card-header">
-                <x-card-title>Step 2 — Choose your physician and time</x-card-title>
+                <x-card-title>Choose your physician and time</x-card-title>
             </div>
             <div class="card-body">
                 <form method="POST" action="{{ route('patient.appointments.store') }}" class="space-y-5">
@@ -64,7 +64,7 @@
                         </div>
                         <div class="flex items-end">
                             <p class="helper flex items-start gap-1.5">
-                                <x-icon name="information-circle" class="mt-0.5 h-4 w-4 shrink-0 text-[#0F766E]" />
+                                <x-icon name="information-circle" class="mt-0.5 h-4 w-4 shrink-0 text-brand" />
                                 <span>Slots reflect the physician's clinic hours in local clinic time.</span>
                             </p>
                         </div>
@@ -74,11 +74,11 @@
                         <label for="start_time" class="label">Appointment time</label>
                         <input type="hidden" name="start_time" id="start_time" value="{{ old('start_time') }}">
                         <div id="slot-grid" aria-live="polite" class="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
-                            <p class="col-span-full rounded-md border border-dashed border-[#DCE3E1] bg-[#F4F7F6] px-4 py-8 text-center text-sm text-[#465854]">
+                            <p class="col-span-full rounded-md border border-dashed border-hairline-2 bg-surface-subtle/60 px-4 py-8 text-center text-sm text-meta">
                                 Select a physician and date to load open slots.
                             </p>
                         </div>
-                        <p id="capacity-note" class="mt-2 rounded-md border border-[#9F1239]/25 bg-[#FCE7EA] px-3 py-2 text-sm font-medium text-[#9F1239]" role="alert" hidden></p>
+                        <p id="capacity-note" class="mt-2 rounded-md border border-danger-border bg-danger-tint px-3 py-2 text-sm font-medium text-danger" role="alert" hidden></p>
                         <p id="slot-helper" class="helper"></p>
                         <p id="slot-error" class="field-error" role="alert" hidden></p>
                         @error('start_time')
@@ -97,7 +97,7 @@
                     </div>
 
                     <div>
-                        <label for="reason" class="label">Reason for the visit <span class="font-normal text-[#465854]">(optional)</span></label>
+                        <label for="reason" class="label">Reason for the visit <span class="font-normal text-meta">(optional)</span></label>
                         <textarea id="reason" name="reason" rows="3" class="input @error('reason') input-invalid @enderror"
                                   placeholder="Anything else the physician should know before your visit…">{{ old('reason') }}</textarea>
                         @error('reason')
@@ -105,12 +105,12 @@
                         @enderror
                     </div>
 
-                    <div id="booking-summary" class="rounded-md border border-[#DCE3E1] bg-[#F4F7F6] px-4 py-3 text-xs text-[#465854]" hidden>
-                        <p class="font-semibold text-[#14201E]">Booking summary</p>
-                        <p id="booking-summary-text" class="cs-num mt-0.5 text-[#14201E]"></p>
+                    <div id="booking-summary" class="rounded-md border border-brand-border bg-brand-tint/65 px-4 py-3 text-xs text-meta" hidden>
+                        <p class="font-mono text-[10px] font-semibold tracking-wider text-brand uppercase">Booking summary</p>
+                        <p id="booking-summary-text" class="cs-num mt-0.5 text-sm font-medium text-bright"></p>
                     </div>
 
-                    <div class="flex flex-wrap items-center gap-3 border-t border-[#DCE3E1] pt-5">
+                    <div class="flex flex-wrap items-center gap-3 border-t border-hairline pt-5">
                         <button type="submit" class="btn btn-primary">
                             <x-icon name="calendar" class="h-4 w-4" />
                             Book appointment
@@ -148,9 +148,9 @@
             var IDLE_MESSAGE = 'Select a physician and date to load open slots.';
             var NO_SLOTS_MESSAGE = 'No open slots on this date. Pick another date.';
             var LOADING_MESSAGE = 'Loading available slots…';
-            var AVAILABLE_CLASS = 'cs-num min-h-11 rounded-md border border-[#DCE3E1] bg-white px-3 py-2 text-sm font-medium text-[#14201E] transition hover:border-[#0F766E] hover:bg-[#E6F4F1] hover:text-[#0F766E] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0F766E]';
-            var SELECTED_CLASS = 'cs-num min-h-11 rounded-md border border-[#0F766E] bg-[#0F766E] px-3 py-2 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0F766E]';
-            var DISABLED_CLASS = 'cs-num min-h-11 rounded-md border border-[#DCE3E1] bg-[#F4F7F6] px-3 py-2 text-sm font-medium text-[#465854]/70 line-through cursor-not-allowed';
+            var AVAILABLE_CLASS = 'cs-num font-mono min-h-11 rounded-md border border-hairline-2 bg-surface px-3 py-2 text-xs font-medium text-bright transition-colors hover:border-brand hover:bg-brand-tint hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand';
+            var SELECTED_CLASS = 'cs-num font-mono min-h-11 rounded-md border border-brand bg-brand px-3 py-2 text-xs font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand';
+            var DISABLED_CLASS = 'cs-num font-mono min-h-11 rounded-md border border-hairline bg-surface-subtle px-3 py-2 text-xs font-medium text-meta/70 line-through cursor-not-allowed';
             var summaryBox = document.getElementById('booking-summary');
             var summaryText = document.getElementById('booking-summary-text');
 
@@ -207,7 +207,7 @@
             function showMessage(message, helperText) {
                 slotContainer.innerHTML = '';
                 var paragraph = document.createElement('p');
-                paragraph.className = 'col-span-full rounded-md border border-dashed border-[#DCE3E1] bg-[#F4F7F6] px-4 py-8 text-center text-sm text-[#465854]';
+                paragraph.className = 'col-span-full rounded-md border border-dashed border-hairline-2 bg-surface-subtle/60 px-4 py-8 text-center text-sm text-meta';
                 paragraph.textContent = message;
                 slotContainer.appendChild(paragraph);
                 if (helper) helper.textContent = helperText || '';

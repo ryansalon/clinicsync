@@ -28,7 +28,7 @@
     </x-page-header>
 
     @if ($encounter->patient->activeAllergies->isNotEmpty())
-        <x-alert type="error" class="mb-6" title="Active allergies on file ({{ $encounter->patient->activeAllergies->count() }})">
+        <x-alert type="error" class="mb-5" title="Active allergies on file ({{ $encounter->patient->activeAllergies->count() }})">
             <ul class="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs">
                 @foreach ($encounter->patient->activeAllergies as $allergy)
                     <li>
@@ -46,8 +46,8 @@
             <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
                 <div>
                     <p class="section-title">Encounter #</p>
-                    <p class="mt-1 font-mono text-sm font-semibold text-[#14201E]">{{ $encounter->encounter_number }}</p>
-                    <p class="mt-0.5 cs-num text-xs text-[#465854]">
+                    <p class="mt-1 font-mono text-sm font-semibold text-brand">{{ $encounter->encounter_number }}</p>
+                    <p class="mt-0.5 cs-num font-mono text-xs text-meta">
                         {{ $encounter->encountered_at->isoFormat('MMM D, YYYY') }} · {{ $encounter->encountered_at->format('g:i A') }}
                     </p>
                 </div>
@@ -55,7 +55,7 @@
                     <p class="section-title">Physician</p>
                     <div class="mt-1.5 flex items-center gap-3">
                         <x-avatar :name="$encounter->physician->user->name" size="md" />
-                        <p class="min-w-0 text-sm font-semibold text-[#14201E]">{{ $encounter->physician->user->name }}</p>
+                        <p class="min-w-0 text-sm font-semibold text-bright">{{ $encounter->physician->user->name }}</p>
                     </div>
                 </div>
                 <div>
@@ -63,12 +63,12 @@
                     <div class="mt-1.5 flex items-center gap-3">
                         <x-avatar :name="$encounter->patient->user->name" size="md" />
                         <div class="min-w-0">
-                            <p class="text-sm font-semibold text-[#14201E]">{{ $encounter->patient->user->name }}</p>
-                            <p class="font-mono text-xs text-[#465854]">{{ $encounter->patient->patient_number }}</p>
+                            <p class="text-sm font-semibold text-bright">{{ $encounter->patient->user->name }}</p>
+                            <p class="font-mono text-xs text-meta">{{ $encounter->patient->patient_number }}</p>
                         </div>
                     </div>
                     <a href="{{ route('physician.patients.show', $encounter->patient) }}"
-                       class="mt-2 inline-flex items-center gap-1 text-xs font-medium text-[#0F766E] hover:underline">
+                       class="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-brand hover:underline">
                         View full record
                         <x-icon name="arrow-right" class="h-3.5 w-3.5" />
                     </a>
@@ -84,13 +84,13 @@
     {{-- Clinical record --}}
     <div class="card mt-6">
         <div class="card-header">
-            <h2 class="text-sm font-semibold text-[#14201E]">Clinical record</h2>
-            <p class="mt-0.5 text-xs text-[#465854]">Diagnosis, assessment and plan for this visit.</p>
+            <h2 class="text-sm font-semibold text-bright">Clinical record</h2>
+            <p class="mt-0.5 text-xs text-meta">Diagnosis, assessment and plan for this visit.</p>
         </div>
-        <div class="divide-y divide-[#DCE3E1] px-5">
+        <div class="divide-y divide-hairline px-5">
             <div class="py-4">
                 <p class="section-title">Chief complaint</p>
-                <p class="mt-1 text-sm {{ $encounter->chief_complaint ? 'text-[#243330]' : 'text-[#465854]' }}">
+                <p class="mt-1 text-sm {{ $encounter->chief_complaint ? 'text-read' : 'text-meta' }}">
                     {{ $encounter->chief_complaint ?: 'Not recorded' }}
                 </p>
             </div>
@@ -98,49 +98,49 @@
             <div class="py-4">
                 <p class="section-title">Diagnosis</p>
                 @if ($encounter->diagnosis)
-                    <p class="mt-1 text-sm font-medium text-[#14201E]">
+                    <p class="mt-1 text-sm font-semibold text-bright">
                         {{ $encounter->diagnosis }}
                         @if ($encounter->diagnosis_code)
-                            <span class="ml-1 inline-flex items-center rounded bg-[#EFF4F2] px-1.5 py-0.5 align-middle font-mono text-xs font-medium text-[#0F766E]">{{ $encounter->diagnosis_code }}</span>
+                            <span class="ml-1 inline-flex items-center rounded border border-hairline bg-surface-subtle px-1.5 py-0.5 align-middle font-mono text-xs font-medium text-brand">{{ $encounter->diagnosis_code }}</span>
                         @endif
                     </p>
                 @else
-                    <p class="mt-1 text-sm text-[#465854]">Not recorded</p>
+                    <p class="mt-1 text-sm text-meta">Not recorded</p>
                 @endif
             </div>
 
             <div class="py-4">
                 <p class="section-title">Assessment</p>
-                <p class="mt-1 whitespace-pre-line text-sm {{ $encounter->assessment ? 'text-[#243330]' : 'text-[#465854]' }}">
+                <p class="mt-1 whitespace-pre-line text-sm {{ $encounter->assessment ? 'text-read' : 'text-meta' }}">
                     {{ $encounter->assessment ?: 'Not recorded' }}
                 </p>
             </div>
 
             <div class="py-4">
                 <p class="section-title">Treatment plan</p>
-                <p class="mt-1 whitespace-pre-line text-sm {{ $encounter->treatment_plan ? 'text-[#243330]' : 'text-[#465854]' }}">
+                <p class="mt-1 whitespace-pre-line text-sm {{ $encounter->treatment_plan ? 'text-read' : 'text-meta' }}">
                     {{ $encounter->treatment_plan ?: 'Not recorded' }}
                 </p>
             </div>
 
             <div class="py-4">
                 <p class="section-title">Clinical notes</p>
-                <p class="mt-1 whitespace-pre-line text-sm {{ $encounter->clinical_notes ? 'text-[#243330]' : 'text-[#465854]' }}">
+                <p class="mt-1 whitespace-pre-line text-sm {{ $encounter->clinical_notes ? 'text-read' : 'text-meta' }}">
                     {{ $encounter->clinical_notes ?: 'Not recorded' }}
                 </p>
             </div>
         </div>
     </div>
 
-    {{-- Flat hairline Vitals grid (no nested rounded boxes) --}}
+    {{-- Flat hairline Vitals grid --}}
     <div class="card mt-6 overflow-hidden">
         <div class="card-header flex flex-wrap items-center justify-between gap-2">
             <div>
-                <h2 class="text-sm font-semibold text-[#14201E]">Vitals</h2>
-                <p class="mt-0.5 text-xs text-[#465854]">Recorded during this encounter.</p>
+                <h2 class="text-sm font-semibold text-bright">Vitals</h2>
+                <p class="mt-0.5 text-xs text-meta">Recorded during this encounter.</p>
             </div>
             <span class="chip">
-                <x-icon name="heart-pulse" class="h-4 w-4 text-[#0F766E]" />
+                <x-icon name="heart-pulse" class="h-4 w-4 text-brand" />
                 {{ $vitals !== null ? 'Recorded' : 'Not recorded' }}
             </span>
         </div>
@@ -150,43 +150,43 @@
                          description="You can add vitals below using “Update encounter”." />
             </div>
         @else
-            <dl class="grid grid-cols-2 divide-x divide-y divide-[#DCE3E1] sm:grid-cols-4">
+            <dl class="grid grid-cols-2 divide-x divide-y divide-hairline sm:grid-cols-4">
                 <div class="p-4">
                     <dt class="section-title">Temperature</dt>
-                    <dd class="mt-1 cs-num text-sm font-semibold text-[#14201E]">
-                        {{ $vitals->temperature_c ?? '—' }}<span class="ml-1 text-xs font-normal text-[#465854]">°C</span>
+                    <dd class="mt-1 cs-num font-mono text-sm font-semibold text-bright">
+                        {{ $vitals->temperature_c ?? '—' }}<span class="ml-1 text-xs font-normal text-meta">°C</span>
                     </dd>
                 </div>
                 <div class="p-4">
                     <dt class="section-title">Blood pressure</dt>
-                    <dd class="mt-1 cs-num text-sm font-semibold text-[#14201E]">
-                        {{ $vitals->systolic_bp && $vitals->diastolic_bp ? $vitals->systolic_bp.'/'.$vitals->diastolic_bp : '—' }}<span class="ml-1 text-xs font-normal text-[#465854]">mmHg</span>
+                    <dd class="mt-1 cs-num font-mono text-sm font-semibold text-bright">
+                        {{ $vitals->systolic_bp && $vitals->diastolic_bp ? $vitals->systolic_bp.'/'.$vitals->diastolic_bp : '—' }}<span class="ml-1 text-xs font-normal text-meta">mmHg</span>
                     </dd>
                 </div>
                 <div class="p-4">
                     <dt class="section-title">Heart rate</dt>
-                    <dd class="mt-1 cs-num text-sm font-semibold text-[#14201E]">
-                        {{ $vitals->heart_rate ?? '—' }}<span class="ml-1 text-xs font-normal text-[#465854]">bpm</span>
+                    <dd class="mt-1 cs-num font-mono text-sm font-semibold text-bright">
+                        {{ $vitals->heart_rate ?? '—' }}<span class="ml-1 text-xs font-normal text-meta">bpm</span>
                     </dd>
                 </div>
                 <div class="p-4">
                     <dt class="section-title">Respiratory rate</dt>
-                    <dd class="mt-1 cs-num text-sm font-semibold text-[#14201E]">
-                        {{ $vitals->respiratory_rate ?? '—' }}<span class="ml-1 text-xs font-normal text-[#465854]">/min</span>
+                    <dd class="mt-1 cs-num font-mono text-sm font-semibold text-bright">
+                        {{ $vitals->respiratory_rate ?? '—' }}<span class="ml-1 text-xs font-normal text-meta">/min</span>
                     </dd>
                 </div>
                 <div class="p-4">
                     <dt class="section-title">Weight</dt>
-                    <dd class="mt-1 cs-num text-sm font-semibold text-[#14201E]">
-                        {{ $vitals->weight_kg ?? '—' }}<span class="ml-1 text-xs font-normal text-[#465854]">kg</span>
+                    <dd class="mt-1 cs-num font-mono text-sm font-semibold text-bright">
+                        {{ $vitals->weight_kg ?? '—' }}<span class="ml-1 text-xs font-normal text-meta">kg</span>
                     </dd>
                 </div>
                 <div class="p-4">
                     <dt class="section-title">Height</dt>
-                    <dd class="mt-1 cs-num text-sm font-semibold text-[#14201E]">
-                        {{ $vitals->height_cm ?? '—' }}<span class="ml-1 text-xs font-normal text-[#465854]">cm</span>
+                    <dd class="mt-1 cs-num font-mono text-sm font-semibold text-bright">
+                        {{ $vitals->height_cm ?? '—' }}<span class="ml-1 text-xs font-normal text-meta">cm</span>
                         @if ($totalInches !== null)
-                            <span class="ml-1 text-xs font-normal text-[#465854]">
+                            <span class="ml-1 text-xs font-normal text-meta">
                                 ({{ intdiv($totalInches, 12) }}&#8242;{{ $totalInches % 12 }}&#8243;)
                             </span>
                         @endif
@@ -194,14 +194,14 @@
                 </div>
                 <div class="p-4">
                     <dt class="section-title">SpO₂</dt>
-                    <dd class="mt-1 cs-num text-sm font-semibold text-[#14201E]">
-                        {{ $vitals->spo2 ?? '—' }}<span class="ml-1 text-xs font-normal text-[#465854]">%</span>
+                    <dd class="mt-1 cs-num font-mono text-sm font-semibold text-bright">
+                        {{ $vitals->spo2 ?? '—' }}<span class="ml-1 text-xs font-normal text-meta">%</span>
                     </dd>
                 </div>
                 @if ($vitals->bmi !== null)
-                    <div class="bg-[#E6F4F1]/60 p-4">
-                        <dt class="section-title text-[#0F766E]">BMI</dt>
-                        <dd class="mt-1 cs-num text-sm font-semibold text-[#0F766E]">{{ number_format($vitals->bmi, 1) }}</dd>
+                    <div class="bg-brand-tint/65 p-4">
+                        <dt class="section-title text-brand">BMI</dt>
+                        <dd class="mt-1 cs-num font-mono text-sm font-semibold text-brand">{{ number_format($vitals->bmi, 1) }}</dd>
                     </div>
                 @endif
             </dl>
@@ -212,37 +212,37 @@
     <div class="card mt-6">
         <div class="card-header flex flex-wrap items-center justify-between gap-2">
             <div>
-                <h2 class="text-sm font-semibold text-[#14201E]">Prescriptions</h2>
-                <p class="mt-0.5 text-xs text-[#465854]">Medications issued for this encounter.</p>
+                <h2 class="text-sm font-semibold text-bright">Prescriptions</h2>
+                <p class="mt-0.5 text-xs text-meta">Medications issued for this encounter.</p>
             </div>
-            <span class="chip cs-num">
-                <x-icon name="document" class="h-4 w-4 text-[#465854]" />
+            <span class="chip cs-num font-mono text-[11px]">
+                <x-icon name="document" class="h-3.5 w-3.5 text-meta" />
                 {{ $encounter->prescriptions->count() }} issued
             </span>
         </div>
         <div class="card-body">
             @forelse ($encounter->prescriptions as $prescription)
-                <div class="{{ $loop->last ? '' : 'mb-4 border-b border-[#DCE3E1] pb-4' }}">
+                <div class="{{ $loop->last ? '' : 'mb-4 border-b border-hairline pb-4' }}">
                     <div class="flex flex-wrap items-center justify-between gap-2">
-                        <p class="flex items-center gap-2 text-sm font-semibold text-[#14201E]">
-                            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#E6F4F1] text-[#0F766E]">
+                        <p class="flex items-center gap-2 text-sm font-semibold text-bright">
+                            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-brand-border bg-brand-tint text-brand">
                                 <x-icon name="document" class="h-4 w-4" />
                             </span>
                             {{ $prescription->medication_name }}{{ $prescription->strength ? ' '.$prescription->strength : '' }}
                         </p>
-                        <span class="chip font-mono">{{ $prescription->prescription_number }}</span>
+                        <span class="chip font-mono text-[11px]">{{ $prescription->prescription_number }}</span>
                     </div>
-                    <p class="mt-1.5 cs-num text-sm text-[#243330]">
+                    <p class="mt-1.5 cs-num text-sm text-read">
                         {{ collect([
                             $prescription->dosage,
                             $prescription->frequency,
                             $prescription->route ? \Illuminate\Support\Str::headline($prescription->route) : null,
                             $prescription->duration,
                         ])->filter()->implode(' · ') ?: '—' }}
-                        <span class="text-[#465854]">·</span> Qty: {{ $prescription->quantity ?? '—' }}
+                        <span class="text-meta">·</span> Qty: {{ $prescription->quantity ?? '—' }}
                     </p>
                     @if ($prescription->instructions)
-                        <p class="mt-1 text-sm text-[#465854]">{{ $prescription->instructions }}</p>
+                        <p class="mt-1 text-sm text-meta">{{ $prescription->instructions }}</p>
                     @endif
                 </div>
             @empty
@@ -257,8 +257,8 @@
         {{-- Issue prescription --}}
         <div class="card self-start">
             <div class="card-header">
-                <h2 class="text-sm font-semibold text-[#14201E]">Issue prescription</h2>
-                <p class="mt-0.5 text-xs text-[#465854]">Attach a medication to this encounter.</p>
+                <h2 class="text-sm font-semibold text-bright">Issue prescription</h2>
+                <p class="mt-0.5 text-xs text-meta">Attach a medication to this encounter.</p>
             </div>
 
             <form method="POST" action="{{ route('physician.prescriptions.store', $encounter) }}" data-dirty-guard>
@@ -268,7 +268,7 @@
                     <p class="section-title">Medication</p>
 
                     <div>
-                        <label for="medication_name" class="label">Medication name <span class="text-rose-700">*</span></label>
+                        <label for="medication_name" class="label">Medication name <span class="text-danger">*</span></label>
                         <input id="medication_name" name="medication_name" type="text" required
                                class="input @error('medication_name') input-invalid @enderror"
                                value="{{ old('medication_name') }}" placeholder="e.g. Amoxicillin">
@@ -365,7 +365,7 @@
                     </div>
                 </div>
 
-                <div class="flex justify-end border-t border-[#DCE3E1] px-5 py-4">
+                <div class="flex justify-end border-t border-hairline px-5 py-4">
                     <button type="submit" class="btn btn-primary">
                         <x-icon name="plus" class="h-4 w-4" />
                         Issue prescription
@@ -377,8 +377,8 @@
         {{-- Update encounter + vitals amendment --}}
         <div class="card self-start">
             <div class="card-header">
-                <h2 class="text-sm font-semibold text-[#14201E]">Update encounter &amp; vitals</h2>
-                <p class="mt-0.5 text-xs text-[#465854]">Amend the diagnosis, clinical notes, or vitals.</p>
+                <h2 class="text-sm font-semibold text-bright">Update encounter &amp; vitals</h2>
+                <p class="mt-0.5 text-xs text-meta">Amend the diagnosis, clinical notes, or vitals.</p>
             </div>
 
             <form method="POST" action="{{ route('physician.encounters.update', $encounter) }}" data-dirty-guard>
@@ -400,7 +400,7 @@
 
                     <div class="grid gap-4 sm:grid-cols-3">
                         <div class="sm:col-span-2">
-                            <label for="diagnosis" class="label">Diagnosis <span class="text-rose-700">*</span></label>
+                            <label for="diagnosis" class="label">Diagnosis <span class="text-danger">*</span></label>
                             <input id="diagnosis" name="diagnosis" type="text" required
                                    class="input @error('diagnosis') input-invalid @enderror"
                                    value="{{ old('diagnosis', $encounter->diagnosis) }}">
@@ -450,9 +450,9 @@
                         @enderror
                     </div>
 
-                    <fieldset class="rounded-lg border border-[#DCE3E1] bg-[#F4F7F6] p-3.5">
-                        <legend class="section-title px-1">Amend vitals</legend>
-                        <div class="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    <fieldset class="border-t border-hairline pt-4">
+                        <legend class="section-title">Amend vitals</legend>
+                        <div class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
                             <div>
                                 <label for="edit_temperature_c" class="label">Temp (°C)</label>
                                 <input id="edit_temperature_c" name="temperature_c" type="number" step="0.1"
@@ -496,15 +496,17 @@
                         </div>
                     </fieldset>
 
-                    <label for="mark_completed" class="label flex cursor-pointer items-center gap-2">
-                        <input id="mark_completed" name="mark_completed" type="checkbox" value="1"
-                               class="h-4 w-4 shrink-0 rounded border-[#C5D0CD] accent-[#0F766E]"
-                               @checked(old('mark_completed', $encounter->status === 'completed'))>
-                        Mark this encounter as completed and close the appointment
-                    </label>
+                    <div class="border-t border-hairline pt-4">
+                        <label for="mark_completed" class="label mb-0 flex cursor-pointer items-center gap-2">
+                            <input id="mark_completed" name="mark_completed" type="checkbox" value="1"
+                                   class="h-4 w-4 shrink-0 rounded border-hairline-2 accent-brand"
+                                   @checked(old('mark_completed', $encounter->status === 'completed'))>
+                            <span>Mark this encounter as completed and close the appointment</span>
+                        </label>
+                    </div>
                 </div>
 
-                <div class="flex justify-end border-t border-[#DCE3E1] px-5 py-4">
+                <div class="flex justify-end border-t border-hairline px-5 py-4">
                     <button type="submit" class="btn btn-secondary">
                         <x-icon name="check" class="h-4 w-4" />
                         Save changes

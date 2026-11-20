@@ -13,10 +13,10 @@
         ->implode('');
 
     $palettes = [
-        'bg-[#E6F4F1] text-[#0F766E] ring-1 ring-[#0F766E]/15',
-        'bg-[#EAEFED] text-[#14201E] ring-1 ring-[#DCE3E1]',
-        'bg-[#EBF2F7] text-[#1B435E] ring-1 ring-[#1B435E]/15',
-        'bg-[#F4F1E8] text-[#4E4226] ring-1 ring-[#4E4226]/15',
+        'bg-brand-tint text-brand ring-brand-border',
+        'bg-rail text-bright ring-hairline-2',
+        'bg-ok-tint text-ok ring-ok-border',
+        'bg-warn-tint text-warn ring-warn-border',
     ];
 
     $palette = $palettes[abs(crc32($name)) % count($palettes)];
@@ -39,7 +39,7 @@
 @endphp
 
 @if ($photo)
-    <img {{ $attributes->merge(['class' => "avatar {$sizeClass} bg-[#EAEFED] object-cover ring-1 ring-[#DCE3E1]"]) }}
+    <img {{ $attributes->merge(['class' => "avatar {$sizeClass} bg-rail object-cover ring-hairline"]) }}
          src="{{ $photo }}" alt="{{ $name }}" title="{{ $name }}"
          loading="lazy" width="{{ $pixelSize }}" height="{{ $pixelSize }}">
 @else

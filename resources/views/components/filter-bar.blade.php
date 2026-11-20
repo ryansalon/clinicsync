@@ -5,26 +5,10 @@
     'chips' => [],
 ])
 
-{{-- Consistent filter bar: one card, one form, debounced live search on any text
-     input, and removable chips for the filters that are currently applied. --}}
-<div class="mb-6 space-y-3">
-    @if (count($chips) > 0)
-        <div class="flex flex-wrap items-center gap-2">
-            <span class="text-xs font-semibold tracking-wider text-[#465854] uppercase">Filters</span>
-
-            @foreach ($chips as $chip)
-                <a href="{{ $chip['url'] }}"
-                   class="chip min-h-9 transition hover:border-[#0F766E] hover:bg-[#E6F4F1] hover:text-[#0F766E] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F766E]"
-                   aria-label="Remove filter {{ $chip['label'] }}">
-                    {{ $chip['label'] }}
-                    <x-icon name="x" class="h-3.5 w-3.5" />
-                </a>
-            @endforeach
-        </div>
-    @endif
-
+{{-- Compact filter bar with debounced live search and integrated removable filter chips. --}}
+<div class="mb-5 space-y-2.5">
     <form method="GET" action="{{ $action }}" data-search-form class="card">
-        <div class="card-body flex flex-col gap-4 sm:flex-row sm:items-end">
+        <div class="flex flex-col gap-3.5 p-3.5 sm:flex-row sm:items-end sm:px-4">
             {{ $fields ?? $slot }}
 
             <button type="submit" class="btn btn-secondary sm:shrink-0">
@@ -32,5 +16,20 @@
                 {{ $submitLabel }}
             </button>
         </div>
+
+        @if (count($chips) > 0)
+            <div class="flex flex-wrap items-center gap-2 border-t border-hairline bg-surface-subtle/60 px-4 py-2">
+                <span class="font-mono text-[10px] font-semibold tracking-wider text-meta uppercase">Active</span>
+
+                @foreach ($chips as $chip)
+                    <a href="{{ $chip['url'] }}"
+                       class="chip min-h-8 bg-surface transition hover:border-brand hover:bg-brand-tint hover:text-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                       aria-label="Remove filter {{ $chip['label'] }}">
+                        {{ $chip['label'] }}
+                        <x-icon name="x" class="h-3.5 w-3.5" />
+                    </a>
+                @endforeach
+            </div>
+        @endif
     </form>
 </div>

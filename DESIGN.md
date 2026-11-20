@@ -1,79 +1,83 @@
 ---
 name: ClinicSync
-description: Light-only outpatient clinic management interface built on coastal porcelain surfaces, a bright sage-mineral rail, and Clinical Teal accents.
+description: Light-only outpatient clinic management interface built on sunlit archival ivory surfaces, a warm travertine navigation rail, and Specimen Indigo actions ("Camiguin Herbarium Dossier").
 colors:
-  clinical-teal: "#0F766E"
-  clinical-teal-deep: "#0D5D57"
-  mineral-wash: "#E6F4F1"
-  mineral-wash-strong: "#D5ECE7"
-  mineral-wash-border: "#B5DCD4"
-  sage-rail: "#EAEFED"
-  sage-rail-hover: "#DFE7E4"
-  porcelain-canvas: "#F4F7F6"
-  subtle-surface: "#EFF4F2"
-  exam-paper: "#FFFFFF"
-  stone-hairline: "#DCE3E1"
-  stone-hairline-strong: "#C5D0CD"
-  ink-primary: "#14201E"
-  ink-read: "#243330"
-  ink-muted: "#465854"
-  clinical-green: "#15803D"
-  emerald-completed: "#047857"
-  amber-caution: "#B45309"
-  allergy-crimson: "#9F1239"
-  danger-red: "#B91C1C"
-  allergy-wash: "#FCE7EA"
+  specimen-indigo: "#1E4976"
+  specimen-indigo-deep: "#163759"
+  indigo-wash: "#EAF1F7"
+  indigo-border: "#C5D7E8"
+  travertine-rail: "#ECE8DF"
+  travertine-hover: "#E2DDD1"
+  archival-ivory: "#FAF8F4"
+  subtle-paper: "#F4F1EA"
+  folio-paper: "#FFFFFF"
+  stone-hairline: "#DFDBD0"
+  stone-hairline-strong: "#CCC6B8"
+  ink-primary: "#18201D"
+  ink-read: "#2D3631"
+  ink-muted: "#565E58"
+  herbarium-moss: "#1F5438"
+  herbarium-moss-solid: "#245B3E"
+  moss-wash: "#EAF4EE"
+  moss-border: "#B5D7C2"
+  ochre-caution: "#8A4F0F"
+  ochre-wash: "#FDF4E7"
+  ochre-border: "#DFC08B"
+  vermilion-alert: "#96281B"
+  vermilion-solid: "#B83B2A"
+  vermilion-wash: "#FDF1EF"
+  vermilion-border: "#EABCB4"
 typography:
   display:
-    fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "2.75rem"
-    fontWeight: 500
+    fontFamily: "Public Sans, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "2.5rem"
+    fontWeight: 700
     lineHeight: 1.08
-    letterSpacing: "-0.025em"
+    letterSpacing: "-0.03em"
   display-lg:
-    fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "3.35rem"
-    fontWeight: 500
-    lineHeight: 1.05
-    letterSpacing: "-0.025em"
+    fontFamily: "Public Sans, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "3.1rem"
+    fontWeight: 700
+    lineHeight: 1.08
+    letterSpacing: "-0.03em"
   headline:
-    fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "Public Sans, ui-sans-serif, system-ui, sans-serif"
     fontSize: "1.5rem"
-    fontWeight: 600
+    fontWeight: 700
     lineHeight: 1.25
-    letterSpacing: "-0.02em"
+    letterSpacing: "-0.025em"
   lead:
-    fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "Public Sans, ui-sans-serif, system-ui, sans-serif"
     fontSize: "15px"
     fontWeight: 400
     lineHeight: 1.55
     letterSpacing: "0em"
   title:
-    fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "Public Sans, ui-sans-serif, system-ui, sans-serif"
     fontSize: "0.875rem"
     fontWeight: 600
     lineHeight: 1.4
     letterSpacing: "-0.01em"
   body:
-    fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "Public Sans, ui-sans-serif, system-ui, sans-serif"
     fontSize: "0.875rem"
     fontWeight: 400
     lineHeight: 1.5
     letterSpacing: "0em"
   label:
-    fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
     fontSize: "0.6875rem"
     fontWeight: 600
     lineHeight: 1.3
     letterSpacing: "0.06em"
   micro:
-    fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
     fontSize: "10px"
     fontWeight: 600
     lineHeight: 1.25
     letterSpacing: "0.08em"
   mono:
-    fontFamily: "Geist Mono, ui-monospace, SFMono-Regular, monospace"
+    fontFamily: "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
     fontSize: "0.8125rem"
     fontWeight: 500
     lineHeight: 1.4
@@ -90,19 +94,24 @@ spacing:
   xl: "24px"
 components:
   button-primary:
-    backgroundColor: "{colors.clinical-teal}"
-    textColor: "{colors.exam-paper}"
+    backgroundColor: "{colors.specimen-indigo}"
+    textColor: "{colors.folio-paper}"
     rounded: "{rounded.sm}"
     padding: "10px 16px"
   button-primary-hover:
-    backgroundColor: "{colors.clinical-teal-deep}"
+    backgroundColor: "{colors.specimen-indigo-deep}"
   button-secondary:
-    backgroundColor: "{colors.exam-paper}"
+    backgroundColor: "{colors.folio-paper}"
     textColor: "{colors.ink-primary}"
     rounded: "{rounded.sm}"
     padding: "10px 16px"
+  button-outline-danger:
+    backgroundColor: "{colors.folio-paper}"
+    textColor: "{colors.vermilion-alert}"
+    rounded: "{rounded.sm}"
+    padding: "8px 12px"
   card-ledger:
-    backgroundColor: "{colors.exam-paper}"
+    backgroundColor: "{colors.folio-paper}"
     textColor: "{colors.ink-primary}"
     rounded: "{rounded.md}"
     padding: "20px"
@@ -112,102 +121,68 @@ components:
 
 ## Overview
 
-**Creative North Star: "Civic Outpatient Chart"**
+**Creative North Star: "Camiguin Herbarium Dossier"**
 
-ClinicSync treats clinic operations software as a crisp paper medical chart digitized without ornament. High-volume triage receptionists, examining physicians, and outpatients share one calm, strictly light-only interface anchored by a bright sage-mineral navigation rail (`#EAEFED`), a coastal porcelain ambient canvas (`#F4F7F6`), pure exam-paper work surfaces (`#FFFFFF`), 1px cool-stone hairlines (`#DCE3E1`), and Clinical Teal (`#0F766E`) action controls.
+ClinicSync treats campus outpatient clinic operations as a sunlit archival dossier built for speed, legibility, and clinical safety. Triage receptionists, examining physicians, outpatients, and system administrators share one strictly light-only daylight interface anchored by a Warm Travertine navigation rail (`#ECE8DF`), an Archival Ivory ambient canvas (`#FAF8F4`), crisp Folio Paper work sheets (`#FFFFFF`), 1px Warm Stone hairlines (`#DFDBD0`), and Specimen Indigo (`#1E4976`) primary actions.
 
-Instead of SaaS marketing flourishes, glow effects, or multi-hue stat card rainbows, visual hierarchy comes from contrast, typographic weight, hairline-divided `.ledger-strip` metric bands, and strict color restraint. Color carries clinical signal rather than decoration: crimson is reserved for active allergies and destructive actions, amber for pending/caution states, and clinical teal for primary calls to action, live queue flow, and active calls.
+Visual hierarchy comes from typographic weight, flat 1px hairline separation, proportional physician capacity meters, unclipped right-hand slide-over row inspectors, and non-color state redundancy rather than stacked SaaS card chrome or decorative drop shadows.
 
 **Key Characteristics:**
-- Strictly light-only polarity (`color-scheme: light`) matched to bright reception desks and exam rooms, keeping full-color transparent clinic and school marks legible against light `#EAEFED` / `#F4F7F6` panels.
-- One-piece structural separation: 1px `#DCE3E1` hairlines and quiet tonal shifts instead of heavy drop shadows or nested cards.
-- Numeric discipline via `Geist` + `Geist Mono` with `font-variant-numeric: tabular-nums` (`.cs-num`) across queue tickets, timestamps, vitals, and chart identifiers.
-- Minimum `44px` (`min-h-11`) interactive hit targets across mobile triage controls, slot pickers, pagination, and dialog dismissals.
+- **Strictly light-only daylight polarity** (`color-scheme: light`) where full-color transparent CPSC and ClinicSync marks sit cleanly on Warm Travertine (`#ECE8DF`) without glow or drop-shadow halos.
+- **Flat-Hairline Layering:** Resting cards, `.ledger-strip` metric bands, and rails use 1px `#DFDBD0` borders without box shadows; soft shadows appear exclusively on transient overlays (dropdowns, slide-over drawers, confirmation dialogs).
+- **Tabular Catalog Discipline:** `Public Sans` paired with `JetBrains Mono` (`font-variant-numeric: tabular-nums` via `.cs-num`) across queue tickets (`#04`), patient numbers (`PT-0001`), encounter IDs (`ENC-*`), timestamps, and vitals.
+- **Four Clinical Safety & Operations Disciplines:**
+  1. **Isolated destructive actions** (`.btn-outline-danger`) separated into drawer footers or spaced away from primary dispatch actions.
+  2. **Proportional capacity meters** (`.capacity-bar` / `.capacity-fill`) visualizing physician daily slot utilization at a glance.
+  3. **Non-color state redundancy** (ringed active/called badges, dashed pending borders, struck-through cancelled badges, solid completed standing).
+  4. **Sticky tabbed clinical reference rails** (`[data-tabs]`) so physicians cross-check EMR history while charting SOAP notes.
 
 ## Colors
 
-ClinicSync uses a bright clinical neutral palette where over 90% of every screen remains coastal porcelain canvas, white exam paper, sage-mineral navigation panels, and deep slate-forest ink.
+Over 90% of every screen remains Archival Ivory (`#FAF8F4`), Folio Paper (`#FFFFFF`), Warm Travertine (`#ECE8DF`), and Deep Charcoal-Forest ink (`#18201D`). All tokens are exposed via Tailwind v4 `@theme` utilities in `resources/css/app.css` (`bg-canvas`, `bg-rail`, `bg-surface`, `bg-surface-subtle`, `border-hairline`, `text-bright`, `text-read`, `text-meta`, `text-brand`, `bg-brand`, `bg-brand-tint`, `text-danger`, `text-warn`, `text-ok`).
 
 ### Primary
-- **Clinical Teal** (`#0F766E`): Primary commit buttons, active calling badges, active navigation highlights, chart bars, and selected calendar dates. Hover deepens to `#0D5D57`.
-- **Mineral Wash** (`#E6F4F1` / `#D5ECE7` with `#B5DCD4` border): Soft foreground tint for active physician next-patient bands, icon pills, and selected state washes.
+- **Specimen Indigo** (`#1E4976`, hover `#163759`): Primary commit actions, active navigation highlight, queue ticket numerals, selected calendar dates, and appointment progress bars.
+- **Indigo Wash** (`#EAF1F7` with `#C5D7E8` border): Soft foreground tint for active calling bands, next-patient physician spotlights, and selected state washes.
 
 ### Neutral
-- **Coastal Porcelain** (`#F4F7F6`): Primary viewport background and subtle alternating canvas tone.
-- **Sage Mineral Rail** (`#EAEFED`, hover `#DFE7E4`): Sidebar rail and guest institution anchor panel ground, providing calm zoning and clean legibility for transparent clinic & college logos.
-- **Exam Paper** (`#FFFFFF`) & **Subtle Table Tint** (`#EFF4F2`): Elevated clinical surfaces, ledger tables, forms, table headers, and modal sheets.
-- **Stone Hairline** (`#DCE3E1` / strong `#C5D0CD`): Structural 1px borders, table dividers, and `.ledger-strip` cell rules.
-- **Ink Primary** (`#14201E`) & **Ink Read** (`#243330`): Headings, patient names, clinical diagnoses, and vital values.
-- **Ink Muted** (`#465854`): Field labels, timestamps, clinical units, and secondary metadata (strictly >= 4.5:1 contrast on `#FFFFFF`, `#EAEFED`, and `#F4F7F6`).
+- **Archival Ivory** (`#FAF8F4`): Primary viewport canvas and guest form stage.
+- **Warm Travertine Rail** (`#ECE8DF`, hover `#E2DDD1`): Persistent desktop sidebar rail and guest institutional anchor panel.
+- **Folio Paper** (`#FFFFFF`) & **Subtle Paper** (`#F4F1EA`): Work sheets, tables, forms, table headers, and overlay panels.
+- **Warm Stone Hairline** (`#DFDBD0` / strong `#CCC6B8`): Structural 1px borders, table rules, and `.ledger-strip` dividers.
+- **Ink Primary** (`#18201D`), **Ink Read** (`#2D3631`), **Ink Muted** (`#565E58`): >= 4.5:1 contrast across white, ivory, and travertine grounds.
 
 ### Semantic Status
-- **Clinical Green** (`#15803D`): Completed visits and active schedule badges.
-- **Amber Caution** (`#B45309`): Pending approvals and incomplete profile warnings.
-- **Allergy Crimson** (`#9F1239` on `#FCE7EA`): Active allergen banners, severe warnings, no-show flags, and cancellation actions.
-
-**The Single-Signal Rule.** Saturated semantic hues appear only in status badges, active allergy alerts, and live calling actions—never as decorative card top stripes or rainbow avatar grids.
+- **Herbarium Moss** (`#1F5438` / `#245B3E` on `#EAF4EE` with `#B5D7C2` border): Completed consultations and active schedules/accounts.
+- **Ochre Caution** (`#8A4F0F` on `#FDF4E7` with `#DFC08B` border): Pending triage states and incomplete profile reminders.
+- **Pressed Vermilion** (`#96281B` / `#B83B2A` on `#FDF1EF` with `#EABCB4` border): Active allergies, severe warnings, full-capacity indicators, no-shows, and destructive confirmations.
 
 ## Typography
 
-**Display & Body Font:** `Geist`, fallback `ui-sans-serif, system-ui, sans-serif`
-**Mono Font:** `Geist Mono`, fallback `ui-monospace, SFMono-Regular, monospace`
-
-**Character:** Compact geometric clarity designed for high-density patient ledgers, 12-hour clinic schedules, and multi-parameter vital sign grids without horizontal drift.
-
-### Hierarchy
-- **Headline (`<h1>`)** (`600`, `1.5rem`, `line-height: 1.25`, `letter-spacing: -0.02em`): View title inside `<x-page-header>`. Never preceded by eyebrow kickers.
-- **Section Title (`<h2>`)** (`600`, `0.875rem`, `line-height: 1.4`, `letter-spacing: -0.01em`): Card headers (`<x-card-title>`) and empty state headings.
-- **Body** (`400`, `0.875rem`, `line-height: 1.5`): Form inputs, clinical notes, table cells, and patient instructions.
-- **Label** (`600`, `0.6875rem`, `line-height: 1.3`, `letter-spacing: 0.06em`, `uppercase`): Table column heads (`<th scope="col">`), ledger strip labels, and field labels.
-- **Clinical Mono** (`500`, `0.8125rem`, `font-variant-numeric: tabular-nums`): Encounter IDs (`ENC-*`), record numbers, vitals, and queue tickets (`#1`..`#N`).
-
-**The Strict Heading Ladder Rule.** Pages carry a single `<h1>` in `<x-page-header>`; card sections use `<h2>`; sub-items within an already-headed card use `<h3>`. Never jump directly from `<h1>` to `<h3>`.
+- **UI & Headings:** `Public Sans` (`400, 500, 600, 700`), self-hosted via Laravel Vite Bunny Fonts.
+- **Mono & Data:** `JetBrains Mono` (`400, 500, 600`), self-hosted via Laravel Vite Bunny Fonts.
+- **Hierarchy:** Single `<h1>` (`1.5rem` bold, `-0.025em`) inside `<x-page-header>` with zero eyebrow kickers above it; card headings use `<h2>` (`0.875rem` semibold); table heads and metadata labels use `10px–11px` uppercase `JetBrains Mono`.
 
 ## Layout
 
-- **Application Shell:** Persistent `240px` `#EAEFED` light sage-mineral left sidebar rail on desktop (`lg+`) separated by a 1px `#DCE3E1` hairline with compact top utility bar; drawer navigation on mobile. Main workspace container sits on `#F4F7F6` with generous `24px` (`gap-6`) section rhythm.
-- **Summary Ledgers:** Replaced boxed KPI card grids with single-row horizontal `.ledger-strip` `<dl>` bars divided by 1px `#DCE3E1` hairlines (`sm:grid-cols-2 lg:grid-cols-4` / `5` / `7`).
-- **Clinical Workspaces:** Physician encounter creation allocates `7/12` columns to the active clinical documentation and vitals form (`sm:grid-cols-3`) and `5/12` columns to the read-only EMR history rail.
-- **Responsive Tables:** Desktop tables (`md:block`) include `<caption class="sr-only">` and `scope="col"`; mobile viewports (`md:hidden`) switch to structured stacked `<article>` items with explicit `<label>` bindings on inline actions.
+- **Application Shell:** Persistent `248px` Warm Travertine rail on desktop (`md+`) with crisp CPSC + ClinicSync lockup and compact utility topbar (`56px`). Mobile uses a focus-trapped off-canvas drawer.
+- **Reception Daily Queue:** Consolidated single-bar command toolbar (Date, Physician, `.tab-strip` status filter, Quick Search) above a 5-cell `.ledger-strip`, unified Now Calling + proportional Daily Capacity bar band, hairline table, and unclipped right-hand slide-over inspector drawers (`[data-drawer]`).
+- **Physician Consultation Workspace:** `7/12` SOAP + hairline-divided Vitals form beside a `5/12` sticky tabbed EMR reference rail (`Profile`, `History`, `Visits`).
+- **Responsive Tables:** Desktop tables (`md:block`) carry `<caption class="sr-only">` and `scope="col"` headers; mobile viewports (`md:hidden`) switch to stacked `<article>` items with >= `44px` (`min-h-11`) touch targets.
 
-## Elevation & Depth
+## Components & Interactions
 
-ClinicSync operates on a **Flat-Hairline Layering** model. Resting cards, ledger strips, and navigation rails sit flush on the canvas and separate strictly through `1px solid #DCE3E1` borders and canvas-to-paper contrast (`#F4F7F6` vs. `#FFFFFF`). Soft ambient shadows appear exclusively on transient overlays (modals, popovers, dropdown menus).
-
-**The No-Nested-Cards Rule.** Never nest bordered rounded cards inside another bordered card; represent inner groupings (vital grids, allergy lists, prescriptions, consultation timelines) using `divide-y divide-[#DCE3E1]` or `divide-x divide-[#DCE3E1]` hairlines.
-
-## Shapes
-
-- **Cards & Dialogs:** `8px` (`rounded-lg`) sharp-institutional corners with `1px solid #DCE3E1` stroke.
-- **Controls & Badges:** `6px` (`rounded-md`) on buttons, inputs, time-slot buttons, and date cells.
-- **Filter Pills & Status Tags:** Full pill (`rounded-full`) reserved exclusively for clickable filter chips and semantic badges so status tags remain distinct from source metadata tags (`.badge-online`, `.badge-walk_in`).
-
-## Components
-
-### Buttons
-- **Shape:** `6px` (`rounded-md`), `min-h-11` (`44px`) on mobile / compact `36px+` inline actions on desktop (`min-h-11` preserved for standalone controls).
-- **Primary:** `#0F766E` fill, `#FFFFFF` text, `font-semibold`. Hover `#0D5D57`; focus ring `2px solid #0F766E` with `2px` offset.
-- **Secondary / Ghost:** `#FFFFFF` surface with `1px solid #DCE3E1` border and `#14201E` text. Hover shifts canvas to `#F4F7F6`.
-
-### Metric Ledger Strip (`.ledger-strip`)
-- **Style:** Full-width `#FFFFFF` container with `1px solid #DCE3E1` perimeter and `divide-y` / `divide-x` internal `.ledger-cell` compartments. Zero multi-color top bars.
-
-### Inputs & Modals
-- **Style:** `1px solid #DCE3E1` border, `#FFFFFF` fill, `#14201E` text, `6px` radius, `caret-color: #0F766E`.
-- **Modals (`[data-dialog]`):** Trap keyboard `Tab` focus inside the open dialog, apply `inert` to `#app-shell`, restore trigger focus on close, and keep dismissal targets >= `44px`.
-
-### Availability & Queue Pollers
-- **Polling Feedback:** Persistent `aria-live="polite"` containers carry `[data-poll-status]` (`Synced HH:MM` / `Offline — retrying`) rather than disappearing silently on transient network drops.
+- **Slide-Over Inspector Drawers (`[data-drawer]`):** Document-delegated so triggers survive live queue polling (`clinicsync:polled`). Live polling pauses automatically while any drawer is open; Tab focus traps inside the drawer and restores to the opener on Escape or close.
+- **Destructive Action Isolation:** `.btn-outline-danger` keeps high-impact actions (`No show`, `Cancel visit`, `Remove appointment`, `Suspend`, `Delete`) quiet until focused/hovered and places them in dedicated drawer footers or spaced apart from primary controls.
+- **Live Queue Polling (`[data-poll]`):** Persistent `aria-live="polite"` containers update `[data-poll-status]` (`Synced HH:MM` / `Offline — retrying`) cleanly without yanking focus.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** use `cs-num` (`tabular-nums`) on every queue number, appointment time, vital sign reading, and encounter code.
-- **Do** keep text contrast at `#14201E` or `#465854` on light surfaces—never use washed-out `#94A3B8` (`slate-400`) on text.
-- **Do** pair every desktop `<table>` with a `<caption class="sr-only">` and `scope="col"` column headers, plus `md:hidden` stacked cards on mobile.
-- **Do** standardize Blade directives on `@php ... @endphp` multi-line blocks rather than mixing inline `@php(...)` inside the same template.
+- **Do** use semantic Tailwind v4 tokens (`bg-canvas`, `border-hairline`, `text-bright`, `text-brand`, etc.) instead of hardcoded hex values.
+- **Do** use `cs-num` (`tabular-nums`) and `font-mono` on queue numbers, patient/encounter IDs, timestamps, and vitals.
+- **Do** keep Blade `@php` directives in block `@php ... @endphp` syntax (never mix inline `@php(...)` and `@endphp` in the same file).
 
 ### Don't:
-- **Don't** introduce dark mode toggles, glassmorphism blurs over workspace cards, WebGL shaders, or decorative accent top/left borders (`>1px`) on rounded cards.
-- **Don't** place eyebrow kickers or small uppercase subtitles directly above `<h1>` page titles.
-- **Don't** show pre-visit arrival instructions (`"arrive 15 minutes early"`) on completed, cancelled, or no-show visits.
+- **Don't** add dark mode toggles, colored `border-left` / `border-right` stripes `>1px` on cards/alerts, nested bordered cards inside cards, or eyebrow kickers above `<h1>`.
+- **Don't** place multi-form dropdowns inside `overflow-x-auto` table containers; use `[data-drawer]` or `[data-dialog]` overlays instead.

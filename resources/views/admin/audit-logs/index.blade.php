@@ -29,7 +29,7 @@
             <div class="flex-1 sm:max-w-xs">
                 <label for="action" class="label">Action</label>
                 <div class="relative">
-                    <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-[#465854]">
+                    <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-meta">
                         <x-icon name="magnifying-glass" class="h-4 w-4" />
                     </span>
                     <input id="action" type="text" name="action" value="{{ $action }}" class="input pl-9"
@@ -40,7 +40,7 @@
             <div class="sm:w-60">
                 <label for="user_id" class="label">User</label>
                 <div class="relative">
-                    <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-[#465854]">
+                    <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-meta">
                         <x-icon name="funnel" class="h-4 w-4" />
                     </span>
                     <select id="user_id" name="user_id" class="input pl-9" data-auto-submit>
@@ -60,19 +60,19 @@
     <div class="card">
         <div class="card-header flex flex-wrap items-center justify-between gap-2">
             <h2 class="section-title">Recorded events</h2>
-            <span class="text-xs text-[#465854] cs-num">{{ $logs->total() }} entries</span>
+            <span class="font-mono text-xs text-meta cs-num">{{ $logs->total() }} entries</span>
         </div>
 
         {{-- Mobile audit list --}}
-        <div class="divide-y divide-[#DCE3E1] md:hidden">
+        <div class="divide-y divide-hairline md:hidden">
             @forelse ($logs as $log)
                 <article class="space-y-2 p-4">
                     <div class="flex items-center justify-between gap-2">
-                        <code class="rounded bg-[#EFF4F2] px-1.5 py-0.5 font-mono text-xs text-[#0F766E]">{{ $log->action }}</code>
-                        <span class="cs-num font-mono text-[11px] text-[#465854]">{{ $log->created_at->format('M d, g:i A') }}</span>
+                        <code class="rounded border border-hairline bg-surface-subtle px-1.5 py-0.5 font-mono text-xs text-brand">{{ $log->action }}</code>
+                        <span class="cs-num font-mono text-[11px] text-meta">{{ $log->created_at->format('M d, g:i A') }}</span>
                     </div>
-                    <p class="text-sm font-medium text-[#14201E]">{{ $log->user?->name ?? 'System' }}</p>
-                    <p class="cs-num text-xs text-[#465854]">
+                    <p class="text-sm font-semibold text-bright">{{ $log->user?->name ?? 'System' }}</p>
+                    <p class="cs-num font-mono text-xs text-meta">
                         {{ $log->auditable_type ? class_basename($log->auditable_type).' #'.$log->auditable_id : '—' }}
                         @if ($log->ip_address)
                             · {{ $log->ip_address }}
@@ -103,44 +103,44 @@
                 <tbody>
                     @forelse ($logs as $log)
                         <tr class="table-row">
-                            <td class="table-cell cs-num whitespace-nowrap font-mono text-xs text-[#465854]">{{ $log->created_at->format('M d, Y g:i:s A') }}</td>
+                            <td class="table-cell cs-num whitespace-nowrap font-mono text-xs text-meta">{{ $log->created_at->format('M d, Y g:i:s A') }}</td>
                             <td class="table-cell">
                                 @if ($log->user)
-                                    <div class="flex items-center gap-3">
+                                    <div class="flex items-center gap-2.5">
                                         <x-avatar :name="$log->user->name" size="sm" />
-                                        <span class="font-medium text-[#14201E]">{{ $log->user->name }}</span>
+                                        <span class="font-medium text-bright">{{ $log->user->name }}</span>
                                     </div>
                                 @else
-                                    <span class="text-[#465854]">System</span>
+                                    <span class="text-meta">System</span>
                                 @endif
                             </td>
                             <td class="table-cell">
-                                <code class="rounded bg-[#EFF4F2] px-1.5 py-0.5 font-mono text-xs text-[#0F766E]">{{ $log->action }}</code>
+                                <code class="rounded border border-hairline bg-surface-subtle px-1.5 py-0.5 font-mono text-xs text-brand">{{ $log->action }}</code>
                             </td>
-                            <td class="table-cell cs-num whitespace-nowrap">
+                            <td class="table-cell cs-num font-mono text-xs whitespace-nowrap">
                                 {{ $log->auditable_type ? class_basename($log->auditable_type).' #'.$log->auditable_id : '—' }}
                             </td>
-                            <td class="table-cell cs-num whitespace-nowrap font-mono text-xs text-[#465854]">{{ $log->ip_address }}</td>
+                            <td class="table-cell cs-num whitespace-nowrap font-mono text-xs text-meta">{{ $log->ip_address }}</td>
                             <td class="table-cell">
                                 @if ($log->old_values !== null || $log->new_values !== null)
                                     <details>
-                                        <summary class="inline-flex cursor-pointer items-center gap-1.5 text-xs font-medium text-[#0F766E] transition hover:underline">
+                                        <summary class="inline-flex cursor-pointer items-center gap-1.5 text-xs font-semibold text-brand transition hover:underline">
                                             <x-icon name="eye" class="h-4 w-4" />
                                             View changes
                                         </summary>
-                                        <div class="mt-2 max-h-48 w-72 overflow-auto rounded-md border border-[#DCE3E1] bg-[#F4F7F6] p-2">
+                                        <div class="mt-2 max-h-48 w-72 overflow-auto rounded-md border border-hairline bg-canvas p-2.5">
                                             @if ($log->old_values !== null)
-                                                <p class="mb-1 text-xs font-semibold text-[#465854]">Before</p>
-                                                <pre class="whitespace-pre-wrap break-all font-mono text-xs text-[#14201E]">{{ json_encode($log->old_values, JSON_PRETTY_PRINT) }}</pre>
+                                                <p class="mb-1 font-mono text-[10px] font-semibold text-meta uppercase">Before</p>
+                                                <pre class="whitespace-pre-wrap break-all font-mono text-xs text-bright">{{ json_encode($log->old_values, JSON_PRETTY_PRINT) }}</pre>
                                             @endif
                                             @if ($log->new_values !== null)
-                                                <p class="mb-1 {{ $log->old_values !== null ? 'mt-3' : '' }} text-xs font-semibold text-[#465854]">After</p>
-                                                <pre class="whitespace-pre-wrap break-all font-mono text-xs text-[#14201E]">{{ json_encode($log->new_values, JSON_PRETTY_PRINT) }}</pre>
+                                                <p class="mb-1 {{ $log->old_values !== null ? 'mt-3' : '' }} font-mono text-[10px] font-semibold text-meta uppercase">After</p>
+                                                <pre class="whitespace-pre-wrap break-all font-mono text-xs text-bright">{{ json_encode($log->new_values, JSON_PRETTY_PRINT) }}</pre>
                                             @endif
                                         </div>
                                     </details>
                                 @else
-                                    <span class="text-[#465854]">—</span>
+                                    <span class="text-meta">—</span>
                                 @endif
                             </td>
                         </tr>
@@ -157,7 +157,7 @@
         </div>
 
         @if ($logs->hasPages())
-            <div class="border-t border-[#DCE3E1] px-5 py-3">
+            <div class="border-t border-hairline px-5 py-3">
                 {{ $logs->links() }}
             </div>
         @endif

@@ -26,12 +26,12 @@
 
     <div id="create-schedule-dialog" data-dialog role="dialog" aria-modal="true" aria-labelledby="create-schedule-title"
          class="fixed inset-0 z-[60] hidden items-center justify-center p-4">
-        <div class="absolute inset-0 bg-[#14201E]/50 backdrop-blur-xs" data-dialog-close></div>
-        <div class="relative max-h-[90dvh] w-full max-w-xl overflow-y-auto rounded-lg border border-[#DCE3E1] bg-white shadow-xl">
-            <div class="flex items-center justify-between border-b border-[#DCE3E1] px-5 py-4">
-                <h2 id="create-schedule-title" class="text-base font-semibold text-[#14201E]">Add physician schedule</h2>
+        <div class="absolute inset-0 bg-bright/45 backdrop-blur-xs" data-dialog-close></div>
+        <div class="relative max-h-[90dvh] w-full max-w-xl overflow-y-auto rounded-lg border border-hairline bg-surface shadow-[0_16px_40px_-10px_rgba(24,32,29,0.22)]">
+            <div class="flex items-center justify-between border-b border-hairline bg-surface-subtle/80 px-5 py-4">
+                <h2 id="create-schedule-title" class="text-base font-semibold text-bright">Add physician schedule</h2>
                 <button type="button" data-dialog-close aria-label="Close"
-                        class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md text-[#465854] transition hover:bg-[#F4F7F6] hover:text-[#14201E]">
+                        class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md text-meta transition hover:bg-rail-hover hover:text-bright md:min-h-9 md:min-w-9">
                     <x-icon name="x" class="h-4 w-4" />
                 </button>
             </div>
@@ -103,12 +103,12 @@
 
                 <div class="flex items-center gap-2.5">
                     <input id="schedule-active" type="checkbox" name="is_active" value="1"
-                           class="h-4 w-4 rounded border-[#DCE3E1] text-[#0F766E] focus:ring-[#0F766E]"
+                           class="h-4 w-4 rounded border-hairline-2 accent-brand"
                            {{ old('is_active', 1) ? 'checked' : '' }}>
                     <label for="schedule-active" class="label mb-0">Active schedule</label>
                 </div>
 
-                <div class="flex justify-end gap-3 border-t border-[#DCE3E1] pt-4">
+                <div class="flex justify-end gap-3 border-t border-hairline pt-4">
                     <button type="button" class="btn btn-secondary" data-dialog-close>Cancel</button>
                     <button type="submit" class="btn btn-primary">
                         <x-icon name="plus" class="h-4 w-4" />
@@ -138,7 +138,7 @@
             <div class="flex-1">
                 <label for="filter-physician" class="label">Physician</label>
                 <div class="relative sm:max-w-md">
-                    <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-[#465854]">
+                    <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-meta">
                         <x-icon name="funnel" class="h-4 w-4" />
                     </span>
                     <select id="filter-physician" name="physician_id" class="input pl-9" data-auto-submit>
@@ -155,29 +155,29 @@
     </x-filter-bar>
 
     {{-- Schedules grouped by physician --}}
-    <div class="mt-6 space-y-6">
+    <div class="mt-5 space-y-5">
         @forelse ($schedules->groupBy(fn ($s) => $s->physician->user->name) as $physicianName => $items)
             <section class="card">
                 <div class="card-header flex flex-wrap items-center justify-between gap-2">
                     <div class="flex items-center gap-3">
                         <x-avatar :name="$physicianName" />
                         <div>
-                            <h2 class="text-sm font-semibold tracking-tight text-[#14201E]">Dr. {{ $physicianName }}</h2>
-                            <p class="mt-0.5 text-xs text-[#465854]">{{ $items->first()->physician->specialization }}</p>
+                            <h2 class="text-sm font-semibold tracking-tight text-bright">Dr. {{ $physicianName }}</h2>
+                            <p class="mt-0.5 text-xs text-meta">{{ $items->first()->physician->specialization }}</p>
                         </div>
                     </div>
-                    <span class="chip cs-num">
-                        <x-icon name="calendar" class="h-3.5 w-3.5 text-[#0F766E]" />
+                    <span class="chip cs-num font-mono text-[11px]">
+                        <x-icon name="calendar" class="h-3.5 w-3.5 text-brand" />
                         {{ $items->count() }} {{ \Illuminate\Support\Str::plural('window', $items->count()) }}
                     </span>
                 </div>
 
                 {{-- Mobile stacked cards --}}
-                <div class="divide-y divide-[#DCE3E1] md:hidden">
+                <div class="divide-y divide-hairline md:hidden">
                     @foreach ($items as $schedule)
                         <article class="space-y-2 p-4">
                             <div class="flex items-center justify-between gap-2">
-                                <span class="text-sm font-semibold text-[#14201E]">
+                                <span class="text-sm font-semibold text-bright">
                                     {{ $days[$schedule->day_of_week] ?? '—' }}
                                 </span>
                                 <span class="badge badge-{{ $schedule->is_active ? 'enabled' : 'inactive' }}">
@@ -185,11 +185,11 @@
                                 </span>
                             </div>
 
-                            <p class="cs-num text-xs font-medium text-[#14201E]">
+                            <p class="cs-num font-mono text-xs font-medium text-bright">
                                 {{ \Illuminate\Support\Carbon::parse($schedule->start_time)->isoFormat('h:mm A') }} – {{ \Illuminate\Support\Carbon::parse($schedule->end_time)->isoFormat('h:mm A') }}
                             </p>
 
-                            <p class="cs-num text-xs text-[#465854]">
+                            <p class="cs-num text-xs text-meta">
                                 @if ($schedule->effective_from && $schedule->effective_until)
                                     {{ $schedule->effective_from->isoFormat('MMM D, YYYY') }} – {{ $schedule->effective_until->isoFormat('MMM D, YYYY') }}
                                 @elseif ($schedule->effective_from)
@@ -201,7 +201,7 @@
                                 @endif
                             </p>
 
-                            <div class="flex items-center gap-2 border-t border-[#DCE3E1] pt-2.5">
+                            <div class="flex items-center justify-between gap-3 border-t border-hairline pt-2.5">
                                 <form method="POST" action="{{ route('admin.schedules.update', $schedule) }}" class="flex-1">
                                     @csrf
                                     @method('PUT')
@@ -219,7 +219,7 @@
                                 <form method="POST" action="{{ route('admin.schedules.destroy', $schedule) }}">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm"
+                                    <button type="submit" class="btn btn-outline-danger btn-sm"
                                             data-confirm="Remove this availability window?">
                                         <x-icon name="trash" class="h-4 w-4" />
                                         Delete
@@ -243,16 +243,16 @@
                                 <th scope="col" class="table-head text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-[#DCE3E1]">
+                        <tbody class="divide-y divide-hairline">
                             @foreach ($items as $schedule)
                                 <tr class="table-row">
-                                    <td class="table-cell font-medium text-[#14201E]">
+                                    <td class="table-cell font-medium text-bright">
                                         {{ $days[$schedule->day_of_week] ?? '—' }}
                                     </td>
-                                    <td class="table-cell cs-num whitespace-nowrap text-[#14201E]">
+                                    <td class="table-cell cs-num font-mono text-xs whitespace-nowrap text-bright">
                                         {{ \Illuminate\Support\Carbon::parse($schedule->start_time)->isoFormat('h:mm A') }} – {{ \Illuminate\Support\Carbon::parse($schedule->end_time)->isoFormat('h:mm A') }}
                                     </td>
-                                    <td class="table-cell cs-num whitespace-nowrap text-[#465854]">
+                                    <td class="table-cell cs-num whitespace-nowrap text-meta">
                                         @if ($schedule->effective_from && $schedule->effective_until)
                                             {{ $schedule->effective_from->isoFormat('MMM D, YYYY') }} – {{ $schedule->effective_until->isoFormat('MMM D, YYYY') }}
                                         @elseif ($schedule->effective_from)
@@ -269,7 +269,7 @@
                                         </span>
                                     </td>
                                     <td class="table-cell text-right">
-                                        <div class="inline-flex items-center gap-2">
+                                        <div class="inline-flex items-center gap-4">
                                             <form method="POST" action="{{ route('admin.schedules.update', $schedule) }}">
                                                 @csrf
                                                 @method('PUT')
@@ -287,7 +287,7 @@
                                             <form method="POST" action="{{ route('admin.schedules.destroy', $schedule) }}">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm"
+                                                <button type="submit" class="btn btn-outline-danger btn-sm"
                                                         data-confirm="Remove this availability window?">
                                                     <x-icon name="trash" class="h-4 w-4" />
                                                     Delete

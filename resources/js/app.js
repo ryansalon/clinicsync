@@ -377,6 +377,13 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const openDrawer = document.querySelector('[data-drawer]:not(.hidden)');
+        if (openDrawer) {
+            openDrawer.dispatchEvent(new CustomEvent('drawer:close'));
+
+            return;
+        }
+
         const openDialog = document.querySelector('[data-dialog]:not(.hidden)');
         if (openDialog) {
             openDialog.dispatchEvent(new CustomEvent('dialog:close'));
@@ -444,12 +451,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             label.textContent = text;
-            label.classList.toggle('text-amber-700', warn);
+            label.classList.toggle('text-warn', warn);
         };
 
         const refresh = async () => {
-            // Never yank content out from under someone who is using it.
-            if (inFlight || document.hidden || container.contains(document.activeElement)) {
+            // Never yank content out from under someone who is actively using a form or inspector drawer.
+            if (
+                inFlight
+                || document.hidden
+                || container.contains(document.activeElement)
+                || document.querySelector('[data-drawer]:not(.hidden)')
+            ) {
                 return;
             }
 
@@ -467,7 +479,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const note = document.createElement('div');
                         note.setAttribute('data-poll-expired', 'true');
                         note.setAttribute('role', 'status');
-                        note.className = 'mb-3 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-900';
+                        note.className = 'mb-3 rounded-lg border border-warn-border bg-warn-tint px-3 py-2 text-xs text-warn';
                         note.textContent = 'Live updates paused — your session may have expired. Refresh or sign in to resume.';
                         container.prepend(note);
                     }
@@ -544,7 +556,8 @@ document.addEventListener('DOMContentLoaded', () => {
             items.forEach((item, itemIndex) => {
                 const active = itemIndex === index;
                 item.setAttribute('aria-selected', String(active));
-                item.classList.toggle('bg-teal-50', active);
+                item.classList.toggle('bg-brand-tint', active);
+                item.classList.toggle('text-brand', active);
             });
 
             activeIndex = index;
@@ -591,9 +604,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 item.id = `${input.id}-option-${index}`;
                 item.setAttribute('role', 'option');
                 item.setAttribute('aria-selected', 'false');
-                item.className = 'cursor-pointer px-3 py-2 text-sm text-slate-700';
+                item.className = 'cursor-pointer rounded-md px-3 py-2 text-sm text-read transition-colors hover:bg-surface-subtle';
                 item.innerHTML =
-                    '<span class="font-medium text-slate-900"></span><span class="block text-xs text-slate-500"></span>';
+                    '<span class="font-medium text-bright"></span><span class="block font-mono text-xs text-meta"></span>';
                 item.children[0].textContent = option.name;
                 item.children[1].textContent = option.patient_number;
 
@@ -810,8 +823,12 @@ document.addEventListener('DOMContentLoaded', () => {
             tabButtons.forEach((button) => {
                 const selected = button.dataset.queueTab === activeStatus;
                 button.setAttribute('aria-pressed', String(selected));
-                button.classList.toggle('btn-primary', selected);
-                button.classList.toggle('btn-secondary', !selected);
+                if (button.classList.contains('tab-btn')) {
+                    button.classList.toggle('tab-btn-active', selected);
+                } else {
+                    button.classList.toggle('btn-primary', selected);
+                    button.classList.toggle('btn-secondary', !selected);
+                }
             });
 
             const rows = root.querySelectorAll('[data-queue-row]');
@@ -848,5 +865,126 @@ document.addEventListener('DOMContentLoaded', () => {
         searchInput?.addEventListener('input', apply);
         root.addEventListener('clinicsync:polled', apply);
         apply();
+    });
+
+    /* ------------------------------------------------------------------ */
+    /* Delegated slide-over row inspector drawers (survives live polling) */
+    /* ------------------------------------------------------------------ */
+    let activeDrawer = null;
+    let drawerOpener = null;
+
+    const closeActiveDrawer = () => {
+        if (!activeDrawer) {
+            return;
+        }
+
+        activeDrawer.classList.add('hidden');
+        activeDrawer.classList.remove('flex');
+        activeDrawer.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('overflow-hidden');
+
+        if (drawerOpener instanceof HTMLElement) {
+            drawerOpener.focus();
+        }
+
+        activeDrawer = null;
+        drawerOpener = null;
+    };
+
+    const openDrawerById = (drawerId, trigger) => {
+        const drawer = document.getElementById(drawerId);
+        if (!drawer) {
+            return;
+        }
+
+        if (activeDrawer && activeDrawer !== drawer) {
+            closeActiveDrawer();
+        }
+
+        activeDrawer = drawer;
+        drawerOpener = trigger || document.activeElement;
+        drawer.classList.remove('hidden');
+        drawer.classList.add('flex');
+        drawer.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('overflow-hidden');
+
+        const firstFocusable = drawer.querySelector(FOCUSABLE);
+        firstFocusable?.focus();
+    };
+
+    document.addEventListener('click', (event) => {
+        const opener = event.target.closest('[data-drawer-open]');
+        if (opener) {
+            const targetId = opener.getAttribute('data-drawer-open');
+            if (targetId) {
+                openDrawerById(targetId, opener);
+            }
+
+            return;
+        }
+
+        if (event.target.closest('[data-drawer-close]')) {
+            closeActiveDrawer();
+        }
+    });
+
+    document.addEventListener('drawer:close', closeActiveDrawer, true);
+
+    document.addEventListener('keydown', (event) => {
+        if (!activeDrawer || event.key !== 'Tab') {
+            return;
+        }
+
+        const focusable = Array.from(activeDrawer.querySelectorAll(FOCUSABLE)).filter((el) => el.offsetParent !== null);
+        if (focusable.length === 0) {
+            return;
+        }
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
+        }
+    });
+
+    /* ------------------------------------------------------------------ */
+    /* Client-side tabbed panels (Sticky Physician EMR Reference Rail)    */
+    /* ------------------------------------------------------------------ */
+    document.querySelectorAll('[data-tabs]').forEach((root) => {
+        const tabs = Array.from(root.querySelectorAll('[data-tab-trigger]'));
+        const panels = Array.from(root.querySelectorAll('[data-tab-panel]'));
+
+        const activate = (targetName) => {
+            tabs.forEach((tab) => {
+                const active = tab.dataset.tabTrigger === targetName;
+                tab.setAttribute('aria-selected', String(active));
+                tab.setAttribute('tabindex', active ? '0' : '-1');
+                tab.classList.toggle('tab-btn-active', active);
+            });
+
+            panels.forEach((panel) => {
+                panel.hidden = panel.dataset.tabPanel !== targetName;
+            });
+        };
+
+        tabs.forEach((tab, index) => {
+            tab.addEventListener('click', () => activate(tab.dataset.tabTrigger));
+            tab.addEventListener('keydown', (event) => {
+                if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') {
+                    return;
+                }
+
+                event.preventDefault();
+                const delta = event.key === 'ArrowRight' ? 1 : -1;
+                const next = tabs[(index + delta + tabs.length) % tabs.length];
+                activate(next.dataset.tabTrigger);
+                next.focus();
+            });
+        });
     });
 });

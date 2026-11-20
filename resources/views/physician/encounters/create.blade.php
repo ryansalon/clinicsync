@@ -10,9 +10,9 @@
         </x-slot:actions>
     </x-page-header>
 
-    {{-- Single unified allergy alert at top of workspace (eliminates duplicate card) --}}
+    {{-- Unified active allergy alert at top of clinical workspace --}}
     @if ($allergies->isNotEmpty())
-        <x-alert type="error" class="mb-6" title="Active allergies on file ({{ $allergies->count() }})">
+        <x-alert type="error" class="mb-5" title="Active allergies on file ({{ $allergies->count() }})">
             <ul class="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs">
                 @foreach ($allergies as $allergy)
                     <li>
@@ -51,7 +51,7 @@
 
                         <div class="grid gap-4 sm:grid-cols-3">
                             <div class="sm:col-span-2">
-                                <label for="diagnosis" class="label">Diagnosis <span class="text-rose-700">*</span></label>
+                                <label for="diagnosis" class="label">Diagnosis <span class="text-danger">*</span></label>
                                 <input id="diagnosis" name="diagnosis" type="text" required
                                        class="input @error('diagnosis') input-invalid @enderror"
                                        value="{{ old('diagnosis') }}" placeholder="Primary diagnosis">
@@ -104,8 +104,9 @@
                             @enderror
                         </div>
 
-                        <fieldset class="rounded-lg border border-[#DCE3E1] bg-[#F4F7F6] p-4">
-                            <legend class="section-title px-1">Vitals</legend>
+                        {{-- Hairline-divided Vitals section (no nested bordered card box) --}}
+                        <fieldset class="border-t border-hairline pt-5">
+                            <legend class="section-title">Vitals</legend>
 
                             @php
                                 $legacyCm = old('height_cm');
@@ -113,7 +114,7 @@
                                 $presetInches = old('height_inches', is_numeric($legacyCm) ? round((($legacyCm / 2.54) - ((int) floor($legacyCm / 30.48)) * 12), 1) : '');
                             @endphp
 
-                            <div class="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-3">
+                            <div class="mt-3.5 grid grid-cols-2 gap-4 sm:grid-cols-3">
                                 <div>
                                     <label for="temperature_c" class="label">Temperature</label>
                                     <div class="relative">
@@ -205,7 +206,6 @@
                                     @enderror
                                 </div>
 
-                                {{-- Height in feet & inches with explicit label on each field --}}
                                 <div class="col-span-2">
                                     <p class="label">Height</p>
                                     <div class="flex items-center gap-2">
@@ -239,15 +239,17 @@
                             </div>
                         </fieldset>
 
-                        <label for="mark_completed" class="label flex cursor-pointer items-center gap-2">
-                            <input id="mark_completed" name="mark_completed" type="checkbox" value="1"
-                                   class="h-4 w-4 shrink-0 rounded border-[#C5D0CD] accent-[#0F766E]"
-                                   @checked(old('mark_completed'))>
-                            Mark this consultation as completed and close the appointment (you can still add prescriptions right after saving)
-                        </label>
+                        <div class="border-t border-hairline pt-4">
+                            <label for="mark_completed" class="label mb-0 flex cursor-pointer items-center gap-2">
+                                <input id="mark_completed" name="mark_completed" type="checkbox" value="1"
+                                       class="h-4 w-4 shrink-0 rounded border-hairline-2 accent-brand"
+                                       @checked(old('mark_completed'))>
+                                <span>Mark this consultation as completed and close the appointment (you can still add prescriptions right after saving)</span>
+                            </label>
+                        </div>
                     </div>
 
-                    <div class="sticky bottom-0 z-10 flex items-center justify-end gap-3 rounded-b-xl border-t border-[#DCE3E1] bg-white/95 px-5 py-4 backdrop-blur-xs">
+                    <div class="sticky bottom-0 z-10 flex items-center justify-end gap-3 rounded-b-lg border-t border-hairline bg-surface/95 px-5 py-4 backdrop-blur-xs">
                         <a href="{{ route('physician.dashboard') }}" class="btn btn-secondary">
                             <x-icon name="x" class="h-4 w-4" />
                             Cancel
@@ -261,112 +263,128 @@
             </div>
         </div>
 
-        {{-- Reference rail (5/12): Patient Chart at a glance --}}
-        <aside class="space-y-5 lg:col-span-5">
-            <div class="card">
+        {{-- Sticky tabbed EMR reference rail (5/12): cross-check patient chart without losing scroll position --}}
+        <aside class="lg:col-span-5 lg:sticky lg:top-0 lg:self-start">
+            <div class="card overflow-hidden" data-tabs>
                 <div class="card-header flex items-center justify-between gap-3">
-                    <div class="flex items-center gap-3">
+                    <div class="flex min-w-0 items-center gap-3">
                         <x-avatar :name="$patient->user->name" size="md" />
                         <div class="min-w-0">
-                            <h2 class="text-sm font-semibold tracking-tight text-[#14201E]">{{ $patient->user->name }}</h2>
-                            <p class="font-mono text-xs text-[#465854]">{{ $patient->patient_number }}</p>
+                            <h2 class="truncate text-sm font-semibold tracking-tight text-bright">{{ $patient->user->name }}</h2>
+                            <p class="font-mono text-xs text-meta">{{ $patient->patient_number }}</p>
                         </div>
                     </div>
                     <a href="{{ route('physician.patients.show', $patient) }}"
-                       class="text-xs font-semibold text-[#0F766E] hover:underline">
+                       class="shrink-0 text-xs font-semibold text-brand hover:underline">
                         Full chart &rarr;
                     </a>
                 </div>
-                <div class="card-body">
-                    <dl class="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+
+                {{-- Tab navigation --}}
+                <div class="border-b border-hairline bg-canvas px-4 py-2.5">
+                    <div class="tab-strip w-full" role="tablist" aria-label="Patient reference chart sections">
+                        <button type="button" role="tab" id="emr-tab-profile" aria-controls="emr-panel-profile" aria-selected="true" tabindex="0"
+                                data-tab-trigger="profile" class="tab-btn tab-btn-active flex-1">
+                            Profile
+                        </button>
+                        <button type="button" role="tab" id="emr-tab-history" aria-controls="emr-panel-history" aria-selected="false" tabindex="-1"
+                                data-tab-trigger="history" class="tab-btn flex-1">
+                            History ({{ $histories->count() }})
+                        </button>
+                        <button type="button" role="tab" id="emr-tab-visits" aria-controls="emr-panel-visits" aria-selected="false" tabindex="-1"
+                                data-tab-trigger="visits" class="tab-btn flex-1">
+                            Visits ({{ $previousEncounters->count() }})
+                        </button>
+                    </div>
+                </div>
+
+                {{-- Tab 1: Demographics & Contact --}}
+                <div id="emr-panel-profile" role="tabpanel" aria-labelledby="emr-tab-profile" data-tab-panel="profile" class="card-body">
+                    <dl class="grid grid-cols-2 gap-x-4 gap-y-3.5 text-sm">
                         <div>
                             <dt class="section-title">Age / Sex</dt>
-                            <dd class="mt-0.5 text-[#14201E] cs-num">
+                            <dd class="mt-0.5 text-bright cs-num">
                                 {{ $patient->age ?? '—' }} yrs · {{ $patient->sex ? \Illuminate\Support\Str::headline($patient->sex) : '—' }}
                             </dd>
                         </div>
                         <div>
                             <dt class="section-title">Blood type</dt>
-                            <dd class="mt-0.5 font-mono text-[#14201E]">{{ $patient->blood_type ?: '—' }}</dd>
+                            <dd class="mt-0.5 font-mono font-semibold text-bright">{{ $patient->blood_type ?: '—' }}</dd>
                         </div>
                         <div>
                             <dt class="section-title">Civil status</dt>
-                            <dd class="mt-0.5 text-[#243330]">{{ $patient->civil_status ? \Illuminate\Support\Str::headline($patient->civil_status) : '—' }}</dd>
+                            <dd class="mt-0.5 text-read">{{ $patient->civil_status ? \Illuminate\Support\Str::headline($patient->civil_status) : '—' }}</dd>
                         </div>
                         <div>
                             <dt class="section-title">Emergency contact</dt>
-                            <dd class="mt-0.5 text-[#243330]">
+                            <dd class="mt-0.5 text-read">
                                 {{ $patient->emergency_contact_name ?: '—' }}
                                 @if ($patient->emergency_contact_phone)
-                                    <span class="block font-mono text-xs text-[#465854]">{{ $patient->emergency_contact_phone }}</span>
+                                    <span class="block font-mono text-xs text-meta">{{ $patient->emergency_contact_phone }}</span>
                                 @endif
                             </dd>
                         </div>
-                        <div class="col-span-2">
+                        <div class="col-span-2 border-t border-hairline pt-3">
                             <dt class="section-title">Address</dt>
-                            <dd class="mt-0.5 text-[#243330]">{{ $patient->address ?: '—' }}</dd>
+                            <dd class="mt-0.5 text-read">{{ $patient->address ?: '—' }}</dd>
                         </div>
                     </dl>
                 </div>
-            </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <x-card-title description="Past conditions recorded by the clinic.">Medical history</x-card-title>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left">
-                        <caption class="sr-only">Patient medical history</caption>
-                        <thead>
-                            <tr>
-                                <th scope="col" class="table-head">Condition</th>
-                                <th scope="col" class="table-head">Year</th>
-                                <th scope="col" class="table-head">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($histories as $history)
-                                <tr class="table-row">
-                                    <td class="table-cell">
-                                        <p class="font-medium text-[#14201E]">{{ $history->condition_name }}</p>
-                                        <p class="text-xs text-[#465854]">{{ \Illuminate\Support\Str::headline($history->type) }}</p>
-                                    </td>
-                                    <td class="table-cell cs-num">{{ $history->year_diagnosed ?? '—' }}</td>
-                                    <td class="table-cell">{{ $history->status ? \Illuminate\Support\Str::headline($history->status) : '—' }}</td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="3" class="px-4 py-8 text-center text-xs text-[#465854]">
-                                        No medical history recorded.
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <x-card-title description="Most recent 5 encounters.">Previous consultations</x-card-title>
-                </div>
-                <div class="divide-y divide-[#DCE3E1]">
-                    @forelse ($previousEncounters as $previous)
-                        <div class="flex items-start justify-between gap-3 px-5 py-3 transition-colors hover:bg-[#F4F7F6]">
-                            <div class="min-w-0">
-                                <p class="text-sm">
-                                    <a href="{{ route('physician.encounters.show', $previous) }}" class="font-mono font-medium text-[#0F766E] hover:underline">{{ $previous->encounter_number }}</a>
-                                    <span class="ml-2 cs-num text-xs text-[#465854]">{{ $previous->encountered_at->isoFormat('MMM D, YYYY') }}</span>
-                                </p>
-                                <p class="mt-0.5 truncate text-xs text-[#243330]">
-                                    {{ $previous->diagnosis }} · Dr. {{ $previous->physician->user->name }}
-                                </p>
-                            </div>
-                            <span class="badge badge-{{ $previous->status }}">{{ \Illuminate\Support\Str::headline($previous->status) }}</span>
+                {{-- Tab 2: Medical History --}}
+                <div id="emr-panel-history" role="tabpanel" aria-labelledby="emr-tab-history" data-tab-panel="history" hidden>
+                    @if ($histories->isNotEmpty())
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <caption class="sr-only">Patient medical history</caption>
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="table-head">Condition</th>
+                                        <th scope="col" class="table-head">Year</th>
+                                        <th scope="col" class="table-head">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($histories as $history)
+                                        <tr class="table-row">
+                                            <td class="table-cell">
+                                                <p class="font-semibold text-bright">{{ $history->condition_name }}</p>
+                                                <p class="text-xs text-meta">{{ \Illuminate\Support\Str::headline($history->type) }}</p>
+                                            </td>
+                                            <td class="table-cell cs-num font-mono text-xs">{{ $history->year_diagnosed ?? '—' }}</td>
+                                            <td class="table-cell text-xs">{{ $history->status ? \Illuminate\Support\Str::headline($history->status) : '—' }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
-                    @empty
-                        <p class="px-5 py-8 text-center text-xs text-[#465854]">No previous consultations on file.</p>
-                    @endforelse
+                    @else
+                        <p class="px-5 py-10 text-center text-xs text-meta">No medical history recorded.</p>
+                    @endif
+                </div>
+
+                {{-- Tab 3: Previous Consultations --}}
+                <div id="emr-panel-visits" role="tabpanel" aria-labelledby="emr-tab-visits" data-tab-panel="visits" hidden>
+                    @if ($previousEncounters->isNotEmpty())
+                        <div class="divide-y divide-hairline">
+                            @foreach ($previousEncounters as $previous)
+                                <div class="flex items-start justify-between gap-3 px-5 py-3.5 transition-colors hover:bg-canvas">
+                                    <div class="min-w-0">
+                                        <p class="text-sm">
+                                            <a href="{{ route('physician.encounters.show', $previous) }}" class="font-mono text-xs font-semibold text-brand hover:underline">{{ $previous->encounter_number }}</a>
+                                            <span class="ml-2 cs-num font-mono text-xs text-meta">{{ $previous->encountered_at->isoFormat('MMM D, YYYY') }}</span>
+                                        </p>
+                                        <p class="mt-0.5 truncate text-xs text-read">
+                                            {{ $previous->diagnosis }} · Dr. {{ $previous->physician->user->name }}
+                                        </p>
+                                    </div>
+                                    <span class="badge badge-{{ $previous->status }}">{{ \Illuminate\Support\Str::headline($previous->status) }}</span>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <p class="px-5 py-10 text-center text-xs text-meta">No previous consultations on file.</p>
+                    @endif
                 </div>
             </div>
         </aside>

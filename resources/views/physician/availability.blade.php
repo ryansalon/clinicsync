@@ -24,15 +24,14 @@
         </x-slot:actions>
     </x-page-header>
 
-    {{-- Modal dialog prevents header reflow on toggle --}}
     <div id="availability-dialog" data-dialog role="dialog" aria-modal="true" aria-labelledby="availability-dialog-title"
          class="fixed inset-0 z-[60] hidden items-center justify-center p-4">
-        <div class="absolute inset-0 bg-black/55 backdrop-blur-xs" data-dialog-close></div>
-        <div class="relative max-h-[90dvh] w-full max-w-lg overflow-y-auto rounded-xl border border-[#DCE3E1] bg-white shadow-xl">
-            <div class="flex items-center justify-between border-b border-[#DCE3E1] px-5 py-4">
-                <h2 id="availability-dialog-title" class="text-base font-semibold text-[#14201E]">Add availability window</h2>
+        <div class="absolute inset-0 bg-bright/45 backdrop-blur-xs" data-dialog-close></div>
+        <div class="relative max-h-[90dvh] w-full max-w-lg overflow-y-auto rounded-lg border border-hairline bg-surface shadow-[0_16px_40px_-10px_rgba(24,32,29,0.22)]">
+            <div class="flex items-center justify-between border-b border-hairline bg-surface-subtle/80 px-5 py-4">
+                <h2 id="availability-dialog-title" class="text-base font-semibold text-bright">Add availability window</h2>
                 <button type="button" data-dialog-close aria-label="Close availability form"
-                        class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg text-[#465854] transition hover:bg-[#EFF4F2] hover:text-[#14201E] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F766E] md:min-h-9 md:min-w-9">
+                        class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md text-meta transition hover:bg-rail-hover hover:text-bright focus:outline-none focus-visible:ring-2 focus-visible:ring-brand md:min-h-9 md:min-w-9">
                     <x-icon name="x" class="h-4 w-4" />
                 </button>
             </div>
@@ -93,12 +92,12 @@
 
                 <div class="flex items-center gap-2">
                     <input id="schedule-active" type="checkbox" name="is_active" value="1"
-                           class="h-4 w-4 rounded border-[#C5D0CD] accent-[#0F766E]"
+                           class="h-4 w-4 rounded border-hairline-2 accent-brand"
                            {{ old('is_active', 1) ? 'checked' : '' }}>
                     <label for="schedule-active" class="label mb-0">Active schedule</label>
                 </div>
 
-                <div class="flex justify-end gap-3 border-t border-[#DCE3E1] pt-4">
+                <div class="flex justify-end gap-3 border-t border-hairline pt-4">
                     <button type="button" class="btn btn-secondary" data-dialog-close>Cancel</button>
                     <button type="submit" class="btn btn-primary">
                         <x-icon name="plus" class="h-4 w-4" />
@@ -109,18 +108,24 @@
         </div>
     </div>
 
-    {{-- Daily patient limit --}}
+    {{-- Daily patient limit + proportional meter --}}
     <div class="grid gap-6 lg:grid-cols-3">
         <div class="card lg:col-span-2">
             <div class="card-header">
-                <h2 class="text-sm font-semibold tracking-tight text-[#14201E]">Daily patient limit</h2>
+                <h2 class="text-sm font-semibold tracking-tight text-bright">Daily patient limit</h2>
             </div>
             <div class="card-body">
+                @php
+                    $capLimit = max((int) $physician->daily_patient_limit, 1);
+                    $capPct = min(100, (int) round(($bookedToday / $capLimit) * 100));
+                    $isCapFull = $bookedToday >= $capLimit;
+                @endphp
+
                 <form method="POST" action="{{ route('physician.availability.limit') }}" class="flex flex-wrap items-end gap-4">
                     @csrf
                     @method('PATCH')
 
-                    <div class="w-44">
+                    <div class="w-48">
                         <label for="daily-patient-limit" class="label">Patients you can cater per day</label>
                         <input id="daily-patient-limit" type="number" name="daily_patient_limit"
                                min="1" max="100" step="1"
@@ -137,10 +142,19 @@
                     </button>
                 </form>
 
-                <p class="mt-4 cs-num text-xs text-[#465854]">
-                    {{ $bookedToday }} of {{ $physician->daily_patient_limit }} patient{{ $physician->daily_patient_limit === 1 ? '' : 's' }} booked today.
-                    Once the limit is reached, patients see “This date is full” on the availability calendar.
-                </p>
+                <div class="mt-4 max-w-md">
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="cs-num font-mono font-medium text-bright">{{ $bookedToday }} / {{ $physician->daily_patient_limit }} booked today</span>
+                        <span class="font-mono {{ $isCapFull ? 'font-semibold text-danger' : 'text-brand' }}">{{ $capPct }}%</span>
+                    </div>
+                    <div class="capacity-bar mt-1.5">
+                        <span class="capacity-fill {{ $isCapFull ? 'capacity-fill-full' : '' }}" style="width: {{ $capPct }}%"></span>
+                    </div>
+                    <p class="mt-2 cs-num text-xs text-meta">
+                        {{ $bookedToday }} of {{ $physician->daily_patient_limit }} patient{{ $physician->daily_patient_limit === 1 ? '' : 's' }} booked today.
+                        Once the limit is reached, patients see “This date is full” on the availability calendar.
+                    </p>
+                </div>
             </div>
         </div>
 
@@ -151,11 +165,11 @@
                         <x-avatar :name="$physician->user->name" />
                     @endif
                     <div>
-                        <p class="text-sm font-medium text-[#14201E]">Dr. {{ $physician->user?->name ?? '—' }}</p>
-                        <p class="text-xs text-[#465854]">{{ $physician->specialization }}</p>
+                        <p class="text-sm font-semibold text-bright">Dr. {{ $physician->user?->name ?? '—' }}</p>
+                        <p class="text-xs text-meta">{{ $physician->specialization }}</p>
                     </div>
                 </div>
-                <p class="mt-3 cs-num text-xs text-[#465854]">
+                <p class="mt-3 cs-num font-mono text-xs text-meta">
                     {{ $schedules->count() }} availability window{{ $schedules->count() === 1 ? '' : 's' }} posted ·
                     {{ $physician->appointment_slot_minutes }}-minute slots
                 </p>
@@ -166,9 +180,9 @@
     {{-- Own availability windows --}}
     <div class="card mt-6">
         <div class="card-header flex items-center justify-between gap-2">
-            <h2 class="text-sm font-semibold tracking-tight text-[#14201E]">Posted availability</h2>
-            <span class="chip cs-num">
-                <x-icon name="calendar" class="h-3.5 w-3.5 text-[#465854]" />
+            <h2 class="text-sm font-semibold tracking-tight text-bright">Posted availability</h2>
+            <span class="chip cs-num font-mono text-[11px]">
+                <x-icon name="calendar" class="h-3.5 w-3.5 text-meta" />
                 {{ $schedules->count() }} window{{ $schedules->count() === 1 ? '' : 's' }}
             </span>
         </div>
@@ -180,11 +194,11 @@
             </div>
         @else
             {{-- Mobile stacked cards (below md) --}}
-            <div class="divide-y divide-[#DCE3E1] md:hidden">
+            <div class="divide-y divide-hairline md:hidden">
                 @foreach ($schedules as $schedule)
                     <article class="space-y-2 p-4">
                         <div class="flex items-center justify-between gap-2">
-                            <span class="text-sm font-semibold text-[#14201E]">
+                            <span class="text-sm font-semibold text-bright">
                                 {{ $days[$schedule->day_of_week] ?? '—' }}
                             </span>
                             <span class="badge badge-{{ $schedule->is_active ? 'enabled' : 'inactive' }}">
@@ -192,11 +206,11 @@
                             </span>
                         </div>
 
-                        <p class="cs-num text-xs font-medium text-[#243330]">
+                        <p class="cs-num font-mono text-xs font-medium text-read">
                             {{ \Illuminate\Support\Carbon::parse($schedule->start_time)->isoFormat('h:mm A') }} – {{ \Illuminate\Support\Carbon::parse($schedule->end_time)->isoFormat('h:mm A') }}
                         </p>
 
-                        <p class="cs-num text-xs text-[#465854]">
+                        <p class="cs-num text-xs text-meta">
                             @if ($schedule->effective_from && $schedule->effective_until)
                                 {{ $schedule->effective_from->isoFormat('MMM D, YYYY') }} – {{ $schedule->effective_until->isoFormat('MMM D, YYYY') }}
                             @elseif ($schedule->effective_from)
@@ -208,7 +222,7 @@
                             @endif
                         </p>
 
-                        <div class="flex items-center gap-2 border-t border-[#DCE3E1] pt-2">
+                        <div class="flex items-center justify-between gap-3 border-t border-hairline pt-2.5">
                             <form method="POST" action="{{ route('physician.availability.update', $schedule) }}" class="flex-1">
                                 @csrf
                                 @method('PUT')
@@ -225,7 +239,7 @@
                             <form method="POST" action="{{ route('physician.availability.destroy', $schedule) }}">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm"
+                                <button type="submit" class="btn btn-outline-danger btn-sm"
                                         data-confirm="Remove this availability window?">
                                     <x-icon name="trash" class="h-4 w-4" />
                                     Delete
@@ -252,13 +266,13 @@
                     <tbody>
                         @foreach ($schedules as $schedule)
                             <tr class="table-row">
-                                <td class="table-cell font-medium text-[#14201E]">
+                                <td class="table-cell font-semibold text-bright">
                                     {{ $days[$schedule->day_of_week] ?? '—' }}
                                 </td>
-                                <td class="table-cell cs-num whitespace-nowrap">
+                                <td class="table-cell cs-num font-mono text-xs whitespace-nowrap text-bright">
                                     {{ \Illuminate\Support\Carbon::parse($schedule->start_time)->isoFormat('h:mm A') }} – {{ \Illuminate\Support\Carbon::parse($schedule->end_time)->isoFormat('h:mm A') }}
                                 </td>
-                                <td class="table-cell cs-num whitespace-nowrap">
+                                <td class="table-cell cs-num whitespace-nowrap text-meta">
                                     @if ($schedule->effective_from && $schedule->effective_until)
                                         {{ $schedule->effective_from->isoFormat('MMM D, YYYY') }} – {{ $schedule->effective_until->isoFormat('MMM D, YYYY') }}
                                     @elseif ($schedule->effective_from)
@@ -275,7 +289,7 @@
                                     </span>
                                 </td>
                                 <td class="table-cell text-right">
-                                    <div class="inline-flex items-center gap-2">
+                                    <div class="inline-flex items-center gap-4">
                                         <form method="POST" action="{{ route('physician.availability.update', $schedule) }}">
                                             @csrf
                                             @method('PUT')
@@ -292,7 +306,7 @@
                                         <form method="POST" action="{{ route('physician.availability.destroy', $schedule) }}">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm"
+                                            <button type="submit" class="btn btn-outline-danger btn-sm"
                                                     data-confirm="Remove this availability window?">
                                                 <x-icon name="trash" class="h-4 w-4" />
                                                 Delete

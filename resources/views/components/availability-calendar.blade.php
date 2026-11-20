@@ -22,7 +22,7 @@
         <button type="button" data-cal-prev disabled class="btn btn-secondary btn-sm" aria-label="Previous month">
             <x-icon name="chevron-left" class="h-4 w-4" />
         </button>
-        <p data-cal-label class="text-sm font-semibold text-[#14201E]" aria-live="polite">&nbsp;</p>
+        <p data-cal-label class="text-sm font-semibold text-bright" aria-live="polite">&nbsp;</p>
         <button type="button" data-cal-next disabled class="btn btn-secondary btn-sm" aria-label="Next month">
             <x-icon name="chevron-right" class="h-4 w-4" />
         </button>
@@ -30,19 +30,19 @@
 
     <div class="grid grid-cols-7 gap-1">
         @foreach (['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'] as $weekdayLabel)
-            <span class="text-center text-[11px] font-semibold tracking-wider text-[#465854] uppercase">{{ $weekdayLabel }}</span>
+            <span class="text-center font-mono text-[10px] font-semibold tracking-wider text-meta uppercase">{{ $weekdayLabel }}</span>
         @endforeach
     </div>
 
     <div data-cal-grid class="grid grid-cols-7 gap-1"></div>
 
-    <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-[#465854]">
-        <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-[#0F766E]"></span> Available</span>
-        <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-rose-600"></span> Full</span>
-        <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-[#C5D0CD]"></span> No availability</span>
+    <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-meta">
+        <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-brand"></span> Available</span>
+        <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-danger-solid"></span> Full</span>
+        <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-hairline-2"></span> No availability</span>
     </div>
 
-    <div data-cal-panel class="rounded-lg border border-dashed border-[#C5D0CD] bg-[#EFF4F2]/55 px-4 py-6 text-center text-sm text-[#465854]">
+    <div data-cal-panel class="rounded-md border border-dashed border-hairline-2 bg-surface-subtle/60 px-4 py-6 text-center text-sm text-meta">
         Loading physician availability…
     </div>
 </div>
@@ -55,15 +55,15 @@
             var MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
             var WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-            var DAY_BASE = 'flex h-9 w-full items-center justify-center rounded-lg text-sm font-medium cs-num transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F766E] max-md:min-h-11';
-            var DAY_PAST = 'bg-[#EFF4F2]/60 text-[#465854]/60 cursor-not-allowed';
-            var DAY_AVAILABLE = 'bg-[#E6F4F1] text-[#0F766E] hover:bg-[#D5ECE7]';
-            var DAY_FULL = 'bg-rose-50 text-rose-800 hover:bg-rose-100';
-            var DAY_NONE = 'bg-[#EFF4F2] text-[#465854] hover:bg-[#DFE7E4]';
-            var DAY_SELECTED = 'btn-primary shadow-xs';
-            var DAY_TODAY = 'border border-[#0F766E]';
-            var PANEL_IDLE = 'rounded-lg border border-dashed border-[#C5D0CD] bg-[#EFF4F2]/55 px-4 py-6 text-center';
-            var PANEL_LIST = 'rounded-lg border border-[#DCE3E1] bg-[#F4F7F6] p-3';
+            var DAY_BASE = 'flex h-9 w-full items-center justify-center rounded-md text-sm font-medium cs-num transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand max-md:min-h-11';
+            var DAY_PAST = 'bg-surface-subtle/60 text-meta/60 cursor-not-allowed';
+            var DAY_AVAILABLE = 'bg-brand-tint text-brand hover:bg-brand-border/60';
+            var DAY_FULL = 'bg-danger-tint text-danger hover:bg-danger-border/50';
+            var DAY_NONE = 'bg-surface-subtle text-meta hover:bg-rail-hover';
+            var DAY_SELECTED = 'btn-primary';
+            var DAY_TODAY = 'border border-brand';
+            var PANEL_IDLE = 'rounded-md border border-dashed border-hairline-2 bg-surface-subtle/60 px-4 py-6 text-center';
+            var PANEL_LIST = 'rounded-md border border-hairline bg-canvas p-3';
 
             var roots = document.querySelectorAll('[data-availability-calendar]');
 
@@ -280,7 +280,7 @@
                     panel.innerHTML = '';
 
                     var paragraph = document.createElement('p');
-                    paragraph.className = 'text-sm text-slate-500';
+                    paragraph.className = 'text-sm text-meta';
                     paragraph.textContent = message;
                     panel.appendChild(paragraph);
                 }
@@ -300,7 +300,7 @@
 
                     if (entry.state === 'none') {
                         var empty = document.createElement('p');
-                        empty.className = 'mt-1 text-xs text-slate-500';
+                        empty.className = 'mt-1 text-xs text-meta';
                         empty.textContent = 'No physician availability is posted for this date. Please pick another date.';
                         panel.appendChild(empty);
 
@@ -309,7 +309,7 @@
 
                     if (entry.state === 'full') {
                         var full = document.createElement('p');
-                        full.className = 'mt-1 text-xs font-medium text-rose-600';
+                        full.className = 'mt-1 text-xs font-medium text-danger';
                         full.textContent = 'This date is full — every physician is already fully booked.';
                         panel.appendChild(full);
                     }
@@ -334,7 +334,7 @@
 
                 function buildBookFooter() {
                     var footer = document.createElement('div');
-                    footer.className = 'mt-3 border-t border-[#DCE3E1] pt-3';
+                    footer.className = 'mt-3 border-t border-hairline pt-3';
 
                     var button = document.createElement('button');
                     button.type = 'button';
@@ -352,7 +352,6 @@
                         return;
                     }
 
-                    // Exactly one physician open on this date and none chosen yet → preselect them.
                     if (selectInput && !selectInput.value && selected && payload && payload.dates && payload.dates[selected]) {
                         var openPhysicians = payload.dates[selected].physicians.filter(function (info) {
                             return info.state === 'available';
@@ -386,7 +385,7 @@
                     var dateObject = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
                     var title = document.createElement('p');
 
-                    title.className = 'text-sm font-semibold text-[#14201E]';
+                    title.className = 'text-sm font-semibold text-bright';
                     title.textContent = WEEKDAY_NAMES[dateObject.getDay()] + ', ' + MONTH_NAMES[dateObject.getMonth()] + ' ' + dateObject.getDate() + ', ' + dateObject.getFullYear();
 
                     return title;
@@ -394,18 +393,18 @@
 
                 function buildPhysicianRow(doctor, info) {
                     var row = document.createElement('div');
-                    row.className = 'flex flex-wrap items-center justify-between gap-2 rounded-md border border-[#DCE3E1] bg-white px-3 py-2.5'
-                        + (chosenPhysician === doctor.id ? ' ring-2 ring-[#0F766E]' : '');
+                    row.className = 'flex flex-wrap items-center justify-between gap-2 rounded-md border border-hairline bg-surface px-3 py-2.5'
+                        + (chosenPhysician === doctor.id ? ' ring-2 ring-brand' : '');
 
                     var details = document.createElement('div');
                     details.className = 'min-w-0';
 
                     var name = document.createElement('p');
-                    name.className = 'text-sm font-medium text-[#14201E]';
+                    name.className = 'text-sm font-medium text-bright';
                     name.textContent = 'Dr. ' + doctor.name;
 
                     var specialization = document.createElement('p');
-                    specialization.className = 'text-xs text-[#465854]';
+                    specialization.className = 'text-xs text-meta';
                     specialization.textContent = doctor.specialization;
 
                     details.appendChild(name);
@@ -413,7 +412,7 @@
 
                     if (info.state === 'available') {
                         var slotsLeft = document.createElement('p');
-                        slotsLeft.className = 'cs-num text-xs font-medium text-[#0F766E]';
+                        slotsLeft.className = 'cs-num font-mono text-xs font-medium text-brand';
                         slotsLeft.textContent = info.remaining + ' slot' + (info.remaining === 1 ? '' : 's') + ' left on this date';
                         details.appendChild(slotsLeft);
                     }
@@ -434,7 +433,7 @@
                         side.appendChild(fullBadge);
                     } else {
                         var notAvailable = document.createElement('span');
-                        notAvailable.className = 'text-xs text-[#465854]';
+                        notAvailable.className = 'text-xs text-meta';
                         notAvailable.textContent = 'Not available this day';
                         side.appendChild(notAvailable);
                     }

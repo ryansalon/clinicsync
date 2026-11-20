@@ -65,30 +65,30 @@
                                 @endphp
                                 <li class="relative flex-1 text-center">
                                     @if (! $loop->first)
-                                        <span class="absolute top-[15px] -left-1/2 z-0 h-0.5 w-full {{ $step['done'] ? 'bg-[#0F766E]' : 'bg-[#DCE3E1]' }}"></span>
+                                        <span class="absolute top-[15px] -left-1/2 z-0 h-0.5 w-full {{ $step['done'] ? 'bg-brand' : 'bg-hairline' }}"></span>
                                     @endif
 
-                                    <span class="relative z-10 mx-auto flex h-8 w-8 items-center justify-center rounded-full ring-4 ring-white
+                                    <span class="relative z-10 mx-auto flex h-8 w-8 items-center justify-center rounded-full ring-4 ring-surface
                                         @if ($step['done'])
-                                            bg-[#0F766E] text-white
+                                            bg-brand text-white
                                         @elseif ($isCurrent)
-                                            border-2 border-[#0F766E] bg-[#E6F4F1] text-[#0F766E]
+                                            border-2 border-brand bg-brand-tint text-brand
                                         @else
-                                            border border-[#DCE3E1] bg-[#F4F7F6] text-[#465854]
+                                            border border-hairline bg-surface-subtle text-meta
                                         @endif">
                                         @if ($step['done'])
                                             <x-icon name="check" class="h-4 w-4" />
                                         @elseif ($isCurrent)
-                                            <span class="h-2 w-2 rounded-full bg-[#0F766E]"></span>
+                                            <span class="h-2 w-2 rounded-full bg-brand"></span>
                                         @else
-                                            <span class="cs-num text-[11px] font-semibold">{{ $index + 1 }}</span>
+                                            <span class="cs-num font-mono text-[11px] font-semibold">{{ $index + 1 }}</span>
                                         @endif
                                     </span>
 
-                                    <p class="mt-2 text-xs font-semibold {{ $step['done'] || $isCurrent ? 'text-[#14201E]' : 'text-[#465854]' }}">
+                                    <p class="mt-2 text-xs font-semibold {{ $step['done'] || $isCurrent ? 'text-bright' : 'text-meta' }}">
                                         {{ $step['label'] }}
                                     </p>
-                                    <p class="cs-num mt-0.5 text-[11px] text-[#465854]">
+                                    <p class="cs-num mt-0.5 text-[11px] text-meta">
                                         {{ $step['time'] ?? ($isCurrent ? 'In progress' : 'Pending') }}
                                     </p>
                                 </li>
@@ -99,15 +99,15 @@
             @endif
 
             {{-- Visit details --}}
-            <section class="card">
+            <section class="card overflow-hidden">
                 <div class="card-header">
                     <x-card-title>Visit details</x-card-title>
                 </div>
                 <div class="card-body p-0">
-                    <dl class="grid grid-cols-1 divide-y divide-[#DCE3E1] sm:grid-cols-2 sm:divide-x">
+                    <dl class="grid grid-cols-1 divide-y divide-hairline sm:grid-cols-2 sm:divide-x">
                         <div class="px-5 py-3.5">
-                            <dt class="text-[11px] font-semibold tracking-wider text-[#465854] uppercase">Physician</dt>
-                            <dd class="mt-1.5 flex items-center gap-2.5 text-sm font-medium text-[#14201E]">
+                            <dt class="section-title">Physician</dt>
+                            <dd class="mt-1.5 flex items-center gap-2.5 text-sm font-semibold text-bright">
                                 @if ($appointment->physician?->user?->name)
                                     <x-avatar :name="$appointment->physician->user->name" size="sm" />
                                 @endif
@@ -115,16 +115,16 @@
                             </dd>
                         </div>
                         <div class="px-5 py-3.5">
-                            <dt class="text-[11px] font-semibold tracking-wider text-[#465854] uppercase">Specialization</dt>
-                            <dd class="mt-1.5 text-sm text-[#14201E]">{{ $appointment->physician?->specialization ?? '—' }}</dd>
+                            <dt class="section-title">Specialization</dt>
+                            <dd class="mt-1.5 text-sm text-bright">{{ $appointment->physician?->specialization ?? '—' }}</dd>
                         </div>
                         <div class="px-5 py-3.5">
-                            <dt class="text-[11px] font-semibold tracking-wider text-[#465854] uppercase">Date</dt>
-                            <dd class="cs-num mt-1.5 text-sm font-medium text-[#14201E]">{{ $appointment->appointment_date->isoFormat('dddd, MMM D, YYYY') }}</dd>
+                            <dt class="section-title">Date</dt>
+                            <dd class="cs-num mt-1.5 text-sm font-medium text-bright">{{ $appointment->appointment_date->isoFormat('dddd, MMM D, YYYY') }}</dd>
                         </div>
                         <div class="px-5 py-3.5">
-                            <dt class="text-[11px] font-semibold tracking-wider text-[#465854] uppercase">Time</dt>
-                            <dd class="cs-num mt-1.5 text-sm font-medium text-[#14201E]">
+                            <dt class="section-title">Time</dt>
+                            <dd class="cs-num font-mono mt-1.5 text-sm font-medium text-bright">
                                 {{ date('g:i A', strtotime($appointment->start_time)) }}
                                 @if ($appointment->end_time)
                                     – {{ date('g:i A', strtotime($appointment->end_time)) }}
@@ -132,21 +132,21 @@
                             </dd>
                         </div>
                         <div class="px-5 py-3.5">
-                            <dt class="text-[11px] font-semibold tracking-wider text-[#465854] uppercase">Queue number</dt>
-                            <dd class="cs-num mt-1.5 font-mono text-sm font-semibold text-[#0F766E]">#{{ $appointment->queue_number }}</dd>
+                            <dt class="section-title">Queue number</dt>
+                            <dd class="cs-num mt-1.5 font-mono text-sm font-semibold text-brand">#{{ $appointment->queue_number }}</dd>
                         </div>
                         <div class="px-5 py-3.5">
-                            <dt class="text-[11px] font-semibold tracking-wider text-[#465854] uppercase">Booked on</dt>
-                            <dd class="cs-num mt-1.5 text-sm text-[#465854]">{{ $appointment->created_at->isoFormat('MMM D, YYYY · h:mm A') }}</dd>
+                            <dt class="section-title">Booked on</dt>
+                            <dd class="cs-num mt-1.5 text-sm text-meta">{{ $appointment->created_at->isoFormat('MMM D, YYYY · h:mm A') }}</dd>
                         </div>
                         <div class="px-5 py-3.5 sm:col-span-2">
-                            <dt class="text-[11px] font-semibold tracking-wider text-[#465854] uppercase">Chief complaint</dt>
-                            <dd class="mt-1.5 text-sm text-[#14201E]">{{ $appointment->chief_complaint ?: '—' }}</dd>
+                            <dt class="section-title">Chief complaint</dt>
+                            <dd class="mt-1.5 text-sm text-bright">{{ $appointment->chief_complaint ?: '—' }}</dd>
                         </div>
                         @if ($appointment->reason)
                             <div class="px-5 py-3.5 sm:col-span-2">
-                                <dt class="text-[11px] font-semibold tracking-wider text-[#465854] uppercase">Additional notes</dt>
-                                <dd class="mt-1.5 text-sm text-[#14201E]">{{ $appointment->reason }}</dd>
+                                <dt class="section-title">Additional notes</dt>
+                                <dd class="mt-1.5 text-sm text-bright">{{ $appointment->reason }}</dd>
                             </div>
                         @endif
                     </dl>
@@ -170,30 +170,30 @@
                     <div class="card-body space-y-5">
                         <dl class="space-y-3 text-sm">
                             <div>
-                                <dt class="text-[11px] font-semibold tracking-wider text-[#465854] uppercase">Diagnosis</dt>
-                                <dd class="mt-1 text-[#14201E]">
+                                <dt class="section-title">Diagnosis</dt>
+                                <dd class="mt-1 font-medium text-bright">
                                     {{ $appointment->encounter->diagnosis ?: '—' }}
                                     @if ($appointment->encounter->diagnosis_code)
-                                        <span class="cs-num font-mono text-xs text-[#465854]">({{ $appointment->encounter->diagnosis_code }})</span>
+                                        <span class="cs-num font-mono text-xs text-meta">({{ $appointment->encounter->diagnosis_code }})</span>
                                     @endif
                                 </dd>
                             </div>
                             @if ($appointment->encounter->assessment)
                                 <div>
-                                    <dt class="text-[11px] font-semibold tracking-wider text-[#465854] uppercase">Assessment</dt>
-                                    <dd class="mt-1 text-[#14201E]">{{ $appointment->encounter->assessment }}</dd>
+                                    <dt class="section-title">Assessment</dt>
+                                    <dd class="mt-1 text-bright">{{ $appointment->encounter->assessment }}</dd>
                                 </div>
                             @endif
                             @if ($appointment->encounter->treatment_plan)
                                 <div>
-                                    <dt class="text-[11px] font-semibold tracking-wider text-[#465854] uppercase">Treatment plan</dt>
-                                    <dd class="mt-1 text-[#14201E]">{{ $appointment->encounter->treatment_plan }}</dd>
+                                    <dt class="section-title">Treatment plan</dt>
+                                    <dd class="mt-1 text-bright">{{ $appointment->encounter->treatment_plan }}</dd>
                                 </div>
                             @endif
                             @if ($appointment->encounter->clinical_notes)
                                 <div>
-                                    <dt class="text-[11px] font-semibold tracking-wider text-[#465854] uppercase">Clinical notes</dt>
-                                    <dd class="mt-1 text-[#14201E]">{{ $appointment->encounter->clinical_notes }}</dd>
+                                    <dt class="section-title">Clinical notes</dt>
+                                    <dd class="mt-1 text-bright">{{ $appointment->encounter->clinical_notes }}</dd>
                                 </div>
                             @endif
                         </dl>
@@ -201,18 +201,18 @@
                         @if ($appointment->encounter->prescriptions?->isNotEmpty())
                             <div>
                                 <p class="section-title mb-2">Prescriptions</p>
-                                <ul class="divide-y divide-[#DCE3E1] border-y border-[#DCE3E1]">
+                                <ul class="divide-y divide-hairline border-y border-hairline">
                                     @foreach ($appointment->encounter->prescriptions as $prescription)
                                         <li class="py-2.5 text-sm">
-                                            <span class="font-medium text-[#14201E]">{{ $prescription->medication_name }}</span>
+                                            <span class="font-semibold text-bright">{{ $prescription->medication_name }}</span>
                                             @if ($prescription->strength)
-                                                <span class="text-[#465854]">{{ $prescription->strength }}</span>
+                                                <span class="text-meta">{{ $prescription->strength }}</span>
                                             @endif
-                                            <span class="cs-num text-[#465854]">
+                                            <span class="cs-num text-meta">
                                                 — {{ $prescription->dosage }}, {{ $prescription->frequency }}, {{ $prescription->duration }}
                                             </span>
                                             @if ($prescription->instructions)
-                                                <p class="mt-0.5 text-xs text-[#465854]">{{ $prescription->instructions }}</p>
+                                                <p class="mt-0.5 text-xs text-meta">{{ $prescription->instructions }}</p>
                                             @endif
                                         </li>
                                     @endforeach
@@ -223,15 +223,15 @@
                 </section>
             @endif
 
-            {{-- Actions --}}
-            <div class="flex flex-wrap items-center justify-between gap-3 border-t border-[#DCE3E1] pt-5">
+            {{-- Actions (destructive Cancel separated cleanly with outline-danger styling) --}}
+            <div class="flex flex-wrap items-center justify-between gap-4 border-t border-hairline pt-5">
                 <a class="btn btn-secondary" href="{{ route('patient.appointments.index') }}">
                     <x-icon name="arrow-left" class="h-4 w-4" />
                     Back to my appointments
                 </a>
 
                 @if ($appointment->isCancellable())
-                    <div class="flex flex-wrap gap-3">
+                    <div class="flex flex-wrap items-center gap-4">
                         <a class="btn btn-secondary" href="{{ route('patient.appointments.reschedule', $appointment) }}">
                             <x-icon name="refresh" class="h-4 w-4" />
                             Reschedule
@@ -239,7 +239,7 @@
                         <form method="POST" action="{{ route('patient.appointments.destroy', $appointment) }}">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-danger"
+                            <button type="submit" class="btn btn-outline-danger"
                                     data-confirm="Cancel this appointment? The slot will be released for other patients.">
                                 <x-icon name="x" class="h-4 w-4" />
                                 Cancel appointment

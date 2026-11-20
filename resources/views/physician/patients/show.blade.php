@@ -24,7 +24,7 @@
     @endphp
 
     @if ($activeAllergies->isNotEmpty())
-        <x-alert type="error" class="mb-6" title="Active allergies ({{ $activeAllergies->count() }})">
+        <x-alert type="error" class="mb-5" title="Active allergies ({{ $activeAllergies->count() }})">
             <ul class="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm">
                 @foreach ($activeAllergies as $allergy)
                     <li>
@@ -37,46 +37,46 @@
     @endif
 
     {{-- Clinical identity ledger --}}
-    <section class="card">
+    <section class="card overflow-hidden">
         <div class="card-header flex flex-wrap items-center justify-between gap-2">
             <x-card-title>Patient profile</x-card-title>
-            <span class="cs-num font-mono text-xs font-semibold text-[#0F766E]">
+            <span class="cs-num font-mono text-xs font-semibold text-brand">
                 Record #{{ $patient->patient_number }}
             </span>
         </div>
         <div class="card-body p-0">
-            <dl class="grid grid-cols-2 divide-y divide-[#DCE3E1] sm:grid-cols-4 sm:divide-x">
+            <dl class="grid grid-cols-2 divide-y divide-hairline sm:grid-cols-4 sm:divide-x">
                 <div class="px-5 py-3.5">
-                    <dt class="text-[11px] font-semibold tracking-wider text-[#465854] uppercase">Age / Sex</dt>
-                    <dd class="cs-num mt-1 text-sm font-medium text-[#14201E]">
+                    <dt class="section-title">Age / Sex</dt>
+                    <dd class="cs-num mt-1 text-sm font-medium text-bright">
                         {{ $patient->age !== null ? $patient->age.' yrs' : '—' }} · {{ $patient->sex ? \Illuminate\Support\Str::headline($patient->sex) : '—' }}
                     </dd>
                 </div>
                 <div class="px-5 py-3.5">
-                    <dt class="text-[11px] font-semibold tracking-wider text-[#465854] uppercase">Date of birth</dt>
-                    <dd class="cs-num mt-1 text-sm font-medium text-[#14201E]">
+                    <dt class="section-title">Date of birth</dt>
+                    <dd class="cs-num mt-1 text-sm font-medium text-bright">
                         {{ $patient->date_of_birth?->isoFormat('MMM D, YYYY') ?? '—' }}
                     </dd>
                 </div>
                 <div class="px-5 py-3.5">
-                    <dt class="text-[11px] font-semibold tracking-wider text-[#465854] uppercase">Blood type</dt>
-                    <dd class="mt-1 text-sm font-semibold text-[#14201E]">
+                    <dt class="section-title">Blood type</dt>
+                    <dd class="mt-1 font-mono text-sm font-semibold text-bright">
                         {{ $patient->blood_type ?: '—' }}
                     </dd>
                 </div>
                 <div class="px-5 py-3.5">
-                    <dt class="text-[11px] font-semibold tracking-wider text-[#465854] uppercase">Civil status</dt>
-                    <dd class="mt-1 text-sm font-medium text-[#14201E]">
+                    <dt class="section-title">Civil status</dt>
+                    <dd class="mt-1 text-sm font-medium text-bright">
                         {{ $patient->civil_status ? \Illuminate\Support\Str::headline($patient->civil_status) : '—' }}
                     </dd>
                 </div>
                 <div class="col-span-2 px-5 py-3.5">
-                    <dt class="text-[11px] font-semibold tracking-wider text-[#465854] uppercase">Address</dt>
-                    <dd class="mt-1 text-sm text-[#14201E]">{{ $patient->address ?: 'Not recorded' }}</dd>
+                    <dt class="section-title">Address</dt>
+                    <dd class="mt-1 text-sm text-bright">{{ $patient->address ?: 'Not recorded' }}</dd>
                 </div>
                 <div class="col-span-2 px-5 py-3.5">
-                    <dt class="text-[11px] font-semibold tracking-wider text-[#465854] uppercase">Emergency contact</dt>
-                    <dd class="cs-num mt-1 text-sm text-[#14201E]">
+                    <dt class="section-title">Emergency contact</dt>
+                    <dd class="cs-num mt-1 text-sm text-bright">
                         @if ($patient->emergency_contact_name)
                             {{ $patient->emergency_contact_name }}
                             @if ($patient->emergency_contact_relationship)
@@ -99,18 +99,18 @@
         <section class="card">
             <div class="card-header flex items-center justify-between gap-2">
                 <x-card-title>Allergy list</x-card-title>
-                <span class="cs-num text-xs text-[#465854]">{{ $allergies->count() }} recorded</span>
+                <span class="cs-num font-mono text-xs text-meta">{{ $allergies->count() }} recorded</span>
             </div>
             <div class="card-body p-0">
                 @if ($allergies->isNotEmpty())
-                    <ul class="divide-y divide-[#DCE3E1]">
+                    <ul class="divide-y divide-hairline">
                         @foreach ($allergies as $allergy)
-                            <li class="flex items-start justify-between gap-3 px-5 py-3.5 {{ $allergy->is_active ? '' : 'bg-[#F4F7F6]/70' }}">
+                            <li class="flex items-start justify-between gap-3 px-5 py-3.5 {{ $allergy->is_active ? '' : 'bg-canvas' }}">
                                 <div class="min-w-0">
-                                    <p class="text-sm font-medium {{ $allergy->is_active ? 'text-[#14201E]' : 'text-[#465854]' }}">
+                                    <p class="text-sm font-semibold {{ $allergy->is_active ? 'text-bright' : 'text-meta' }}">
                                         {{ $allergy->allergen }}
                                     </p>
-                                    <p class="mt-0.5 text-xs text-[#465854]">{{ $allergy->reaction ?: 'Reaction not specified' }}</p>
+                                    <p class="mt-0.5 text-xs text-meta">{{ $allergy->reaction ?: 'Reaction not specified' }}</p>
                                 </div>
                                 <div class="flex shrink-0 items-center gap-1.5">
                                     <span class="badge badge-{{ $allergy->severity }}">
@@ -135,24 +135,24 @@
         <section class="card">
             <div class="card-header flex items-center justify-between gap-2">
                 <x-card-title>Medical history</x-card-title>
-                <span class="cs-num text-xs text-[#465854]">{{ $histories->count() }} {{ \Illuminate\Support\Str::plural('condition', $histories->count()) }}</span>
+                <span class="cs-num font-mono text-xs text-meta">{{ $histories->count() }} {{ \Illuminate\Support\Str::plural('condition', $histories->count()) }}</span>
             </div>
             <div class="card-body p-0">
                 @if ($histories->isNotEmpty())
-                    <ul class="divide-y divide-[#DCE3E1]">
+                    <ul class="divide-y divide-hairline">
                         @foreach ($histories as $history)
                             <li class="px-5 py-3.5">
                                 <div class="flex items-start justify-between gap-3">
                                     <div class="min-w-0">
-                                        <p class="text-sm font-medium text-[#14201E]">{{ $history->condition_name }}</p>
-                                        <p class="cs-num mt-0.5 text-xs text-[#465854]">
+                                        <p class="text-sm font-semibold text-bright">{{ $history->condition_name }}</p>
+                                        <p class="cs-num mt-0.5 text-xs text-meta">
                                             {{ \Illuminate\Support\Str::headline($history->type) }}
                                             @if ($history->year_diagnosed)
                                                 · Diagnosed {{ $history->year_diagnosed }}
                                             @endif
                                         </p>
                                         @if ($history->notes)
-                                            <p class="mt-1 text-xs text-[#465854]">{{ $history->notes }}</p>
+                                            <p class="mt-1 text-xs text-meta">{{ $history->notes }}</p>
                                         @endif
                                     </div>
                                     <span class="badge badge-{{ $history->status ?: 'inactive' }} shrink-0">
@@ -172,38 +172,38 @@
         </section>
     </div>
 
-    {{-- Consultation history --}}
+    {{-- Consultation history (flat hairline divisions, zero nested cards) --}}
     <section class="card mt-6">
         <div class="card-header flex items-center justify-between gap-2">
             <x-card-title>Consultation history</x-card-title>
-            <span class="cs-num text-xs text-[#465854]">{{ $encounters->count() }} {{ \Illuminate\Support\Str::plural('visit', $encounters->count()) }}</span>
+            <span class="cs-num font-mono text-xs text-meta">{{ $encounters->count() }} {{ \Illuminate\Support\Str::plural('visit', $encounters->count()) }}</span>
         </div>
         <div class="card-body p-0">
             @if ($encounters->isNotEmpty())
-                <div class="divide-y divide-[#DCE3E1]">
+                <div class="divide-y divide-hairline">
                     @foreach ($encounters as $encounter)
                         <article class="space-y-3 p-5">
                             <div class="flex flex-wrap items-start justify-between gap-3">
                                 <div class="min-w-0">
                                     <div class="flex flex-wrap items-center gap-2">
-                                        <a class="cs-num font-mono text-xs font-semibold text-[#0F766E] hover:underline"
+                                        <a class="cs-num font-mono text-xs font-semibold text-brand hover:underline"
                                            href="{{ route('physician.encounters.show', $encounter) }}">
                                             {{ $encounter->encounter_number }}
                                         </a>
                                         <span class="badge badge-{{ $encounter->status }}">
                                             {{ \Illuminate\Support\Str::headline($encounter->status) }}
                                         </span>
-                                        <span class="cs-num text-xs text-[#465854]">
+                                        <span class="cs-num font-mono text-xs text-meta">
                                             {{ $encounter->encountered_at?->isoFormat('MMM D, YYYY') ?? '—' }}
                                         </span>
                                     </div>
-                                    <h3 class="mt-1 text-sm font-semibold text-[#14201E]">
+                                    <h3 class="mt-1 text-sm font-semibold text-bright">
                                         {{ $encounter->diagnosis ?: 'Diagnosis pending' }}
                                         @if ($encounter->diagnosis_code)
-                                            <span class="cs-num ml-1 font-mono text-xs font-normal text-[#465854]">({{ $encounter->diagnosis_code }})</span>
+                                            <span class="cs-num ml-1 font-mono text-xs font-normal text-meta">({{ $encounter->diagnosis_code }})</span>
                                         @endif
                                     </h3>
-                                    <p class="mt-0.5 text-xs text-[#465854]">
+                                    <p class="mt-0.5 text-xs text-meta">
                                         Dr. {{ $encounter->physician?->user?->name ?? '—' }}
                                     </p>
                                 </div>
@@ -213,30 +213,30 @@
                             </div>
 
                             @if ($encounter->assessment || $encounter->treatment_plan || $encounter->clinical_notes)
-                                <dl class="grid gap-2 text-xs sm:grid-cols-3">
+                                <dl class="grid divide-y divide-hairline border-y border-hairline bg-canvas/70 text-xs sm:grid-cols-3 sm:divide-x sm:divide-y-0">
                                     @if ($encounter->assessment)
-                                        <div class="rounded border border-[#DCE3E1] bg-[#F4F7F6]/70 px-3 py-2">
-                                            <dt class="font-semibold text-[#465854] uppercase">Assessment</dt>
-                                            <dd class="mt-0.5 text-[#14201E]">{{ $encounter->assessment }}</dd>
+                                        <div class="px-3.5 py-2.5">
+                                            <dt class="section-title">Assessment</dt>
+                                            <dd class="mt-1 text-bright">{{ $encounter->assessment }}</dd>
                                         </div>
                                     @endif
                                     @if ($encounter->treatment_plan)
-                                        <div class="rounded border border-[#DCE3E1] bg-[#F4F7F6]/70 px-3 py-2">
-                                            <dt class="font-semibold text-[#465854] uppercase">Treatment plan</dt>
-                                            <dd class="mt-0.5 text-[#14201E]">{{ $encounter->treatment_plan }}</dd>
+                                        <div class="px-3.5 py-2.5">
+                                            <dt class="section-title">Treatment plan</dt>
+                                            <dd class="mt-1 text-bright">{{ $encounter->treatment_plan }}</dd>
                                         </div>
                                     @endif
                                     @if ($encounter->clinical_notes)
-                                        <div class="rounded border border-[#DCE3E1] bg-[#F4F7F6]/70 px-3 py-2">
-                                            <dt class="font-semibold text-[#465854] uppercase">Clinical notes</dt>
-                                            <dd class="mt-0.5 text-[#14201E]">{{ $encounter->clinical_notes }}</dd>
+                                        <div class="px-3.5 py-2.5">
+                                            <dt class="section-title">Clinical notes</dt>
+                                            <dd class="mt-1 text-bright">{{ $encounter->clinical_notes }}</dd>
                                         </div>
                                     @endif
                                 </dl>
                             @endif
 
                             @if ($encounter->vitals)
-                                <p class="cs-num font-mono text-xs text-[#465854]">
+                                <p class="cs-num font-mono text-xs text-meta">
                                     Vitals:
                                     @if ($encounter->vitals->temperature_c) Temp {{ $encounter->vitals->temperature_c }}°C · @endif
                                     @if ($encounter->vitals->systolic_bp && $encounter->vitals->diastolic_bp) BP {{ $encounter->vitals->systolic_bp }}/{{ $encounter->vitals->diastolic_bp }} · @endif
@@ -251,9 +251,9 @@
                             @if ($encounter->prescriptions->isNotEmpty())
                                 <ul class="flex flex-wrap gap-2">
                                     @foreach ($encounter->prescriptions as $prescription)
-                                        <li class="rounded border border-[#DCE3E1] bg-white px-2.5 py-1 text-xs text-[#14201E]">
-                                            <span class="font-medium">{{ $prescription->medication_name }}</span>
-                                            <span class="cs-num text-[#465854]">
+                                        <li class="rounded-md border border-hairline bg-surface-subtle px-2.5 py-1 text-xs text-bright">
+                                            <span class="font-semibold">{{ $prescription->medication_name }}</span>
+                                            <span class="cs-num text-meta">
                                                 {{ $prescription->strength }} · {{ $prescription->dosage }} · {{ $prescription->frequency }}
                                                 @if ($prescription->duration) · {{ $prescription->duration }} @endif
                                             </span>
@@ -277,25 +277,25 @@
     <section class="card mt-6">
         <div class="card-header flex items-center justify-between gap-2">
             <x-card-title>Appointments history</x-card-title>
-            <span class="cs-num text-xs text-[#465854]">Last {{ $appointments->count() }}</span>
+            <span class="cs-num font-mono text-xs text-meta">Last {{ $appointments->count() }}</span>
         </div>
         <div class="card-body p-0">
-            <div class="divide-y divide-[#DCE3E1] md:hidden">
+            <div class="divide-y divide-hairline md:hidden">
                 @forelse ($appointments as $appointment)
                     <article class="space-y-1.5 p-4">
                         <div class="flex items-center justify-between gap-2">
-                            <span class="cs-num text-xs font-medium text-[#14201E]">
+                            <span class="cs-num font-mono text-xs font-medium text-bright">
                                 {{ $appointment->appointment_date->isoFormat('MMM D, YYYY') }} · {{ date('g:i A', strtotime($appointment->start_time)) }}
                             </span>
                             <span class="badge badge-{{ $appointment->status }}">
                                 {{ \Illuminate\Support\Str::headline($appointment->status) }}
                             </span>
                         </div>
-                        <p class="cs-num text-xs text-[#465854]">
+                        <p class="cs-num text-xs text-meta">
                             Queue #{{ $appointment->queue_number }} · Dr. {{ $appointment->physician?->user?->name ?? '—' }}
                         </p>
                         @if ($appointment->chief_complaint)
-                            <p class="text-xs text-[#14201E]">{{ $appointment->chief_complaint }}</p>
+                            <p class="text-xs text-bright">{{ $appointment->chief_complaint }}</p>
                         @endif
                     </article>
                 @empty
@@ -320,19 +320,19 @@
                             <th scope="col" class="table-head text-right">Status</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-[#DCE3E1]">
+                    <tbody class="divide-y divide-hairline">
                         @forelse ($appointments as $appointment)
                             <tr class="table-row">
-                                <td class="table-cell cs-num whitespace-nowrap text-[#14201E]">
+                                <td class="table-cell cs-num whitespace-nowrap text-bright">
                                     {{ $appointment->appointment_date->isoFormat('MMM D, YYYY') }}
                                 </td>
-                                <td class="table-cell cs-num whitespace-nowrap text-[#465854]">
+                                <td class="table-cell cs-num font-mono text-xs whitespace-nowrap text-meta">
                                     {{ date('g:i A', strtotime($appointment->start_time)) }}
                                 </td>
-                                <td class="table-cell cs-num font-mono font-semibold text-[#0F766E] whitespace-nowrap">
+                                <td class="table-cell cs-num font-mono font-semibold text-brand whitespace-nowrap">
                                     #{{ $appointment->queue_number }}
                                 </td>
-                                <td class="table-cell whitespace-nowrap text-[#14201E]">
+                                <td class="table-cell whitespace-nowrap text-bright">
                                     Dr. {{ $appointment->physician?->user?->name ?? '—' }}
                                 </td>
                                 <td class="table-cell whitespace-nowrap">
@@ -340,7 +340,7 @@
                                         {{ \Illuminate\Support\Str::headline($appointment->source) }}
                                     </span>
                                 </td>
-                                <td class="table-cell text-[#465854]">
+                                <td class="table-cell text-meta">
                                     {{ $appointment->chief_complaint ?: '—' }}
                                 </td>
                                 <td class="table-cell whitespace-nowrap text-right">

@@ -17,7 +17,7 @@
         </x-slot:actions>
     </x-page-header>
 
-    {{-- Live caseload stats, next patient spotlight, and today's queue (aria-live on persistent container) --}}
+    {{-- Live caseload stats, next patient spotlight, and today's queue --}}
     <div id="live-physician-queue"
          data-poll
          data-poll-url="{{ route('physician.dashboard') }}"
@@ -30,33 +30,33 @@
     <div class="card mt-6">
         <div class="card-header flex flex-wrap items-center justify-between gap-2">
             <div>
-                <h2 class="text-sm font-semibold tracking-tight text-[#14201E]">Upcoming appointments</h2>
-                <p class="mt-0.5 text-xs text-[#465854]">Scheduled after today, with active status.</p>
+                <h2 class="text-sm font-semibold tracking-tight text-bright">Upcoming appointments</h2>
+                <p class="mt-0.5 text-xs text-meta">Scheduled after today, with active status.</p>
             </div>
-            <span class="chip cs-num">
-                <x-icon name="calendar" class="h-3.5 w-3.5 text-[#465854]" />
+            <span class="chip cs-num font-mono text-[11px]">
+                <x-icon name="calendar" class="h-3.5 w-3.5 text-meta" />
                 {{ $upcoming->count() }} upcoming
             </span>
         </div>
 
         {{-- Mobile stacked cards (below md) --}}
-        <div class="divide-y divide-[#DCE3E1] md:hidden">
+        <div class="divide-y divide-hairline md:hidden">
             @forelse ($upcoming as $appointment)
                 <article class="space-y-2 p-4">
                     <div class="flex items-center justify-between gap-2">
-                        <span class="cs-num text-xs font-semibold text-[#14201E]">
+                        <span class="cs-num font-mono text-xs font-semibold text-bright">
                             {{ $appointment->appointment_date->isoFormat('ddd, MMM D, YYYY') }}
                         </span>
                         <div class="flex items-center gap-1.5">
-                            <span class="font-mono text-xs font-bold text-[#0F766E] cs-num">#{{ $appointment->queue_number }}</span>
+                            <span class="font-mono text-xs font-bold text-brand cs-num">#{{ $appointment->queue_number }}</span>
                             <span class="badge badge-{{ $appointment->status }}">{{ \Illuminate\Support\Str::headline($appointment->status) }}</span>
                         </div>
                     </div>
                     <div class="flex items-center gap-3">
                         <x-avatar :name="$appointment->patient->user->name" size="sm" />
                         <div class="min-w-0">
-                            <p class="text-sm font-medium text-[#14201E]">{{ $appointment->patient->user->name }}</p>
-                            <p class="cs-num text-xs text-[#465854]">
+                            <p class="text-sm font-semibold text-bright">{{ $appointment->patient->user->name }}</p>
+                            <p class="cs-num font-mono text-xs text-meta">
                                 {{ \Illuminate\Support\Carbon::parse($appointment->start_time)->isoFormat('h:mm A') }}
                                 · {{ $appointment->patient->patient_number }}
                             </p>
@@ -87,23 +87,23 @@
                     </thead>
                     <tbody>
                         @foreach ($upcoming as $appointment)
-                        <tr class="table-row">
-                            <td class="table-cell cs-num whitespace-nowrap">{{ $appointment->appointment_date->isoFormat('dddd, MMM D, YYYY') }}</td>
-                            <td class="table-cell cs-num whitespace-nowrap">{{ \Illuminate\Support\Carbon::parse($appointment->start_time)->isoFormat('h:mm A') }}</td>
-                            <td class="table-cell">
-                                <div class="flex items-center gap-3">
-                                    <x-avatar :name="$appointment->patient->user->name" size="sm" />
-                                    <div class="min-w-0">
-                                        <p class="font-medium text-[#14201E]">{{ $appointment->patient->user->name }}</p>
-                                        <p class="font-mono text-xs text-[#465854]">{{ $appointment->patient->patient_number }}</p>
+                            <tr class="table-row">
+                                <td class="table-cell cs-num whitespace-nowrap text-bright">{{ $appointment->appointment_date->isoFormat('dddd, MMM D, YYYY') }}</td>
+                                <td class="table-cell cs-num font-mono text-xs whitespace-nowrap text-bright">{{ \Illuminate\Support\Carbon::parse($appointment->start_time)->isoFormat('h:mm A') }}</td>
+                                <td class="table-cell">
+                                    <div class="flex items-center gap-3">
+                                        <x-avatar :name="$appointment->patient->user->name" size="sm" />
+                                        <div class="min-w-0">
+                                            <p class="font-semibold text-bright">{{ $appointment->patient->user->name }}</p>
+                                            <p class="font-mono text-xs text-meta">{{ $appointment->patient->patient_number }}</p>
+                                        </div>
                                     </div>
-                                </div>
-                            </td>
-                            <td class="table-cell cs-num font-mono font-semibold text-[#14201E]">#{{ $appointment->queue_number }}</td>
-                            <td class="table-cell">
-                                <span class="badge badge-{{ $appointment->status }}">{{ \Illuminate\Support\Str::headline($appointment->status) }}</span>
-                            </td>
-                        </tr>
+                                </td>
+                                <td class="table-cell cs-num font-mono font-semibold text-brand">#{{ $appointment->queue_number }}</td>
+                                <td class="table-cell">
+                                    <span class="badge badge-{{ $appointment->status }}">{{ \Illuminate\Support\Str::headline($appointment->status) }}</span>
+                                </td>
+                            </tr>
                         @endforeach
                     </tbody>
                 </table>

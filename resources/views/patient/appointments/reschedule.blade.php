@@ -12,8 +12,8 @@
                 <div class="flex items-center gap-3">
                     <x-avatar :name="$appointment->physician?->user?->name ?? 'Physician'" />
                     <div class="leading-tight">
-                        <p class="text-sm font-semibold text-[#14201E]">Dr. {{ $appointment->physician?->user?->name ?? '—' }}</p>
-                        <p class="cs-num text-xs text-[#465854]">
+                        <p class="text-sm font-semibold text-bright">Dr. {{ $appointment->physician?->user?->name ?? '—' }}</p>
+                        <p class="cs-num text-xs text-meta">
                             {{ $appointment->physician?->specialization ?? '—' }}
                             · Currently {{ $appointment->appointment_date->isoFormat('MMM D, YYYY') }}
                             at {{ date('g:i A', strtotime($appointment->start_time)) }}
@@ -21,7 +21,7 @@
                     </div>
                 </div>
                 <span class="chip cs-num font-mono text-xs">
-                    <x-icon name="clock" class="h-4 w-4 text-[#465854]" />
+                    <x-icon name="clock" class="h-4 w-4 text-meta" />
                     {{ max((int) $appointment->physician?->appointment_slot_minutes, 1) }}-min slot · Queue #{{ $appointment->queue_number }}
                 </span>
             </div>
@@ -53,11 +53,11 @@
                         <input type="hidden" name="start_time" id="start_time"
                                value="{{ old('start_time', substr($appointment->start_time, 0, 5)) }}">
                         <div id="slot-grid" aria-live="polite" class="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
-                            <p class="col-span-full rounded-md border border-dashed border-[#DCE3E1] bg-[#F4F7F6] px-4 py-8 text-center text-sm text-[#465854]">
+                            <p class="col-span-full rounded-md border border-dashed border-hairline-2 bg-surface-subtle/60 px-4 py-8 text-center text-sm text-meta">
                                 Loading available slots…
                             </p>
                         </div>
-                        <p id="capacity-note" class="mt-2 rounded-md border border-[#9F1239]/25 bg-[#FCE7EA] px-3 py-2 text-sm font-medium text-[#9F1239]" role="alert" hidden></p>
+                        <p id="capacity-note" class="mt-2 rounded-md border border-danger-border bg-danger-tint px-3 py-2 text-sm font-medium text-danger" role="alert" hidden></p>
                         <p id="slot-helper" class="helper"></p>
                         <p id="slot-error" class="field-error" role="alert" hidden></p>
                         @error('start_time')
@@ -65,7 +65,7 @@
                         @enderror
                     </div>
 
-                    <div class="flex flex-wrap items-center gap-3 border-t border-[#DCE3E1] pt-5">
+                    <div class="flex flex-wrap items-center gap-3 border-t border-hairline pt-5">
                         <button type="submit" class="btn btn-primary">
                             <x-icon name="refresh" class="h-4 w-4" />
                             Confirm new time
@@ -103,9 +103,9 @@
 
             var NO_SLOTS_MESSAGE = 'No open slots on this date. Pick another date.';
             var LOADING_MESSAGE = 'Loading available slots…';
-            var AVAILABLE_CLASS = 'cs-num min-h-11 rounded-md border border-[#DCE3E1] bg-white px-3 py-2 text-sm font-medium text-[#14201E] transition hover:border-[#0F766E] hover:bg-[#E6F4F1] hover:text-[#0F766E] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0F766E]';
-            var SELECTED_CLASS = 'cs-num min-h-11 rounded-md border border-[#0F766E] bg-[#0F766E] px-3 py-2 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0F766E]';
-            var DISABLED_CLASS = 'cs-num min-h-11 rounded-md border border-[#DCE3E1] bg-[#F4F7F6] px-3 py-2 text-sm font-medium text-[#465854]/70 line-through cursor-not-allowed';
+            var AVAILABLE_CLASS = 'cs-num font-mono min-h-11 rounded-md border border-hairline-2 bg-surface px-3 py-2 text-xs font-medium text-bright transition-colors hover:border-brand hover:bg-brand-tint hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand';
+            var SELECTED_CLASS = 'cs-num font-mono min-h-11 rounded-md border border-brand bg-brand px-3 py-2 text-xs font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand';
+            var DISABLED_CLASS = 'cs-num font-mono min-h-11 rounded-md border border-hairline bg-surface-subtle px-3 py-2 text-xs font-medium text-meta/70 line-through cursor-not-allowed';
 
             function setError(message) {
                 if (!errorBox) return;
@@ -145,7 +145,7 @@
             function showMessage(message, helperText) {
                 slotContainer.innerHTML = '';
                 var paragraph = document.createElement('p');
-                paragraph.className = 'col-span-full rounded-md border border-dashed border-[#DCE3E1] bg-[#F4F7F6] px-4 py-8 text-center text-sm text-[#465854]';
+                paragraph.className = 'col-span-full rounded-md border border-dashed border-hairline-2 bg-surface-subtle/60 px-4 py-8 text-center text-sm text-meta';
                 paragraph.textContent = message;
                 slotContainer.appendChild(paragraph);
                 if (helper) helper.textContent = helperText || '';

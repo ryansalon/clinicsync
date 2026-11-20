@@ -3,10 +3,10 @@
 @section('title', 'Register')
 
 @section('content')
-    <h1 class="text-2xl font-semibold tracking-tight text-[#14201E] sm:text-3xl">Patient registration</h1>
-    <p class="mt-2 text-sm leading-relaxed text-[#465854]">Create an account to book appointments and view your medical records.</p>
+    <h1 class="text-2xl font-bold tracking-tight text-bright sm:text-3xl">Patient registration</h1>
+    <p class="mt-2 text-sm leading-relaxed text-meta">Create an account to book appointments and view your medical records.</p>
 
-    <form method="POST" action="{{ route('register') }}" class="mt-8 space-y-5">
+    <form method="POST" action="{{ route('register') }}" class="mt-7 space-y-5">
         @csrf
 
         <div>
@@ -30,7 +30,7 @@
             <div>
                 <label for="phone" class="label">Mobile number</label>
                 <input id="phone" type="tel" name="phone" value="{{ old('phone') }}" inputmode="numeric" autocomplete="tel"
-                       class="input @error('phone') input-invalid @enderror" placeholder="09XXXXXXXXX">
+                       class="input cs-num @error('phone') input-invalid @enderror" placeholder="09XXXXXXXXX">
                 @error('phone')
                     <p class="field-error">{{ $message }}</p>
                 @enderror
@@ -41,7 +41,7 @@
             <div>
                 <label for="date_of_birth" class="label">Date of birth</label>
                 <input id="date_of_birth" type="date" name="date_of_birth" value="{{ old('date_of_birth') }}" required
-                       class="input @error('date_of_birth') input-invalid @enderror">
+                       class="input cs-num @error('date_of_birth') input-invalid @enderror">
                 @error('date_of_birth')
                     <p class="field-error">{{ $message }}</p>
                 @enderror
@@ -66,13 +66,13 @@
                 || old('emergency_contact_name') || old('emergency_contact_phone') || old('emergency_contact_relationship');
         @endphp
 
-        <details class="rounded-lg border border-[#DCE3E1] bg-[#F4F7F6]/70 p-4" @if ($hasOptionalInput) open @endif>
-            <summary class="flex min-h-8 cursor-pointer list-none items-center justify-between text-xs font-semibold uppercase tracking-[0.1em] text-[#465854] hover:text-[#14201E]">
+        <details class="rounded-md border border-hairline bg-surface-subtle/75 p-4" @if ($hasOptionalInput) open @endif>
+            <summary class="flex min-h-8 cursor-pointer list-none items-center justify-between text-xs font-semibold uppercase tracking-wider text-meta hover:text-bright">
                 <span>Optional demographics &amp; emergency contact</span>
-                <span class="text-[11px] font-normal normal-case text-[#465854]">Can be added later</span>
+                <span class="text-[11px] font-normal normal-case text-meta">Can be added later</span>
             </summary>
 
-            <div class="mt-4 space-y-4 border-t border-[#DCE3E1] pt-4">
+            <div class="mt-4 space-y-4 border-t border-hairline pt-4">
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                         <label for="civil_status" class="label">Civil status</label>
@@ -105,8 +105,8 @@
                     @enderror
                 </div>
 
-                <fieldset class="border-t border-[#DCE3E1] pt-3">
-                    <legend class="pr-2 font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-[#465854]">Emergency contact</legend>
+                <fieldset class="border-t border-hairline pt-3">
+                    <legend class="pr-2 font-mono text-[11px] font-semibold uppercase tracking-wider text-meta">Emergency contact</legend>
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div>
                             <label for="emergency_contact_name" class="label">Contact name</label>
@@ -117,7 +117,7 @@
                             <label for="emergency_contact_phone" class="label">Contact number</label>
                             <input id="emergency_contact_phone" type="tel" name="emergency_contact_phone"
                                    value="{{ old('emergency_contact_phone') }}" inputmode="numeric" autocomplete="tel"
-                                   class="input" placeholder="09XXXXXXXXX">
+                                   class="input cs-num" placeholder="09XXXXXXXXX">
                         </div>
                         <div class="sm:col-span-2">
                             <label for="emergency_contact_relationship" class="label">Relationship</label>
@@ -161,6 +161,6 @@
 
     <p class="text-center text-sm text-meta">
         Already registered?
-        <a href="{{ route('login') }}" class="font-medium text-bright hover:text-brand-strong">Sign in</a>
+        <a href="{{ route('login') }}" class="font-semibold text-brand hover:underline">Sign in</a>
     </p>
 @endsection

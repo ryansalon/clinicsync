@@ -3,22 +3,23 @@
     'value',
     'icon' => null,
     'hint' => null,
-    'tone' => 'teal',
+    'tone' => 'brand',
 ])
 
 @php
     $tones = [
-        'slate' => 'bg-[#EFF4F2] text-[#465854] border-[#DCE3E1]',
-        'teal' => 'bg-[#E6F4F1] text-[#0F766E] border-[#B5DCD4]',
-        'sky' => 'bg-sky-50 text-sky-900 border-sky-200',
-        'indigo' => 'bg-indigo-50 text-indigo-900 border-indigo-200',
-        'violet' => 'bg-violet-50 text-violet-900 border-violet-200',
-        'amber' => 'bg-amber-50 text-amber-900 border-amber-200',
-        'rose' => 'bg-rose-50 text-rose-900 border-rose-200',
-        'emerald' => 'bg-emerald-50 text-emerald-900 border-emerald-200',
+        'slate' => 'bg-surface-subtle text-meta border-hairline',
+        'teal' => 'bg-brand-tint text-brand border-brand-border',
+        'brand' => 'bg-brand-tint text-brand border-brand-border',
+        'sky' => 'bg-brand-tint text-brand border-brand-border',
+        'indigo' => 'bg-brand-tint text-brand border-brand-border',
+        'violet' => 'bg-brand-tint text-brand border-brand-border',
+        'amber' => 'bg-warn-tint text-warn border-warn-border',
+        'rose' => 'bg-danger-tint text-danger border-danger-border',
+        'emerald' => 'bg-ok-tint text-ok border-ok-border',
     ];
 
-    $toneClass = $tones[$tone] ?? $tones['teal'];
+    $toneClass = $tones[$tone] ?? $tones['brand'];
 @endphp
 
 <div {{ $attributes->merge(['class' => 'stat flex items-start justify-between gap-4']) }}>
@@ -34,7 +35,7 @@
     </div>
 
     @if ($icon)
-        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border {{ $toneClass }}">
+        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border {{ $toneClass }}">
             <x-icon :name="$icon" class="h-5 w-5" />
         </span>
     @endif

@@ -30,13 +30,13 @@
         {{-- Desktop pagination controls --}}
         <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
             <div>
-                <p class="cs-num text-xs text-[#465854]">
+                <p class="cs-num text-xs text-meta">
                     Showing
-                    <span class="font-semibold text-[#14201E]">{{ $paginator->firstItem() }}</span>
+                    <span class="font-semibold text-bright">{{ $paginator->firstItem() }}</span>
                     to
-                    <span class="font-semibold text-[#14201E]">{{ $paginator->lastItem() }}</span>
+                    <span class="font-semibold text-bright">{{ $paginator->lastItem() }}</span>
                     of
-                    <span class="font-semibold text-[#14201E]">{{ $paginator->total() }}</span>
+                    <span class="font-semibold text-bright">{{ $paginator->total() }}</span>
                     results
                 </p>
             </div>
@@ -56,19 +56,19 @@
 
                 @foreach ($elements as $element)
                     @if (is_string($element))
-                        <span aria-disabled="true" class="px-2 text-xs font-semibold text-[#465854]">{{ $element }}</span>
+                        <span aria-disabled="true" class="px-2 text-xs font-semibold text-meta">{{ $element }}</span>
                     @endif
 
                     @if (is_array($element))
                         @foreach ($element as $page => $url)
                             @if ($page == $paginator->currentPage())
                                 <span aria-current="page"
-                                      class="cs-num inline-flex h-9 min-w-9 items-center justify-center rounded-md border border-[#0F766E] bg-[#0F766E] px-2.5 text-xs font-semibold text-white">
+                                      class="cs-num inline-flex h-9 min-w-9 items-center justify-center rounded-md border border-brand bg-brand px-2.5 font-mono text-xs font-semibold text-white">
                                     {{ $page }}
                                 </span>
                             @else
                                 <a href="{{ $url }}"
-                                   class="cs-num inline-flex h-9 min-w-9 items-center justify-center rounded-md border border-[#DCE3E1] bg-white px-2.5 text-xs font-medium text-[#14201E] transition hover:border-[#0F766E]/50 hover:bg-[#F4F7F6] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0F766E]"
+                                   class="cs-num inline-flex h-9 min-w-9 items-center justify-center rounded-md border border-hairline bg-surface px-2.5 font-mono text-xs font-medium text-bright transition hover:border-brand/50 hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
                                    aria-label="Go to page {{ $page }}">
                                     {{ $page }}
                                 </a>

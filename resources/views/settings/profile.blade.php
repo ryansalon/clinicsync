@@ -21,7 +21,7 @@
 
             <div class="card-header">
                 <x-card-title>Profile</x-card-title>
-                <p class="mt-0.5 text-xs text-[#465854]">Display name, mobile number, and portrait photo.</p>
+                <p class="mt-0.5 text-xs text-meta">Display name, mobile number, and portrait photo.</p>
             </div>
 
             <div class="card-body space-y-5">
@@ -29,7 +29,7 @@
                     @if ($photoPath)
                         <img src="{{ route('profile.photo') }}" alt="{{ $user->name }}"
                              width="64" height="64" loading="lazy"
-                             class="h-16 w-16 shrink-0 rounded-full object-cover ring-1 ring-[#DCE3E1]">
+                             class="h-16 w-16 shrink-0 rounded-full object-cover ring-1 ring-hairline">
                     @else
                         <x-avatar :name="$user->name" size="lg" />
                     @endif
@@ -38,7 +38,7 @@
                         <div class="min-w-0 flex-1">
                             <label for="photo" class="label">Profile photo</label>
                             <input id="photo" type="file" name="photo" accept="image/png,image/jpeg,image/webp"
-                                   class="block w-full cursor-pointer text-sm text-[#465854] file:mr-3 file:min-h-11 file:cursor-pointer file:rounded-md file:border file:border-[#DCE3E1] file:bg-[#F4F7F6] file:px-3.5 file:py-2 file:text-xs file:font-semibold file:text-[#14201E] transition hover:file:bg-[#E6F4F1]">
+                                   class="block w-full cursor-pointer text-sm text-meta file:mr-3 file:min-h-11 file:cursor-pointer file:rounded-md file:border file:border-hairline-2 file:bg-surface-subtle file:px-3.5 file:py-2 file:text-xs file:font-semibold file:text-bright transition hover:file:bg-brand-tint hover:file:text-brand">
                             <p class="helper">JPG, PNG, or WebP · max 2 MB.</p>
                             @error('photo')
                                 <p class="field-error">{{ $message }}</p>
@@ -65,22 +65,22 @@
                     @enderror
                 </div>
 
-                <dl class="divide-y divide-[#DCE3E1] rounded-md border border-[#DCE3E1] bg-[#F4F7F6]/70">
-                    <div class="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 text-sm">
-                        <dt class="text-[#465854]">Login email</dt>
-                        <dd class="font-medium text-[#14201E]">{{ $user->email }}</dd>
+                <dl class="divide-y divide-hairline border-y border-hairline bg-canvas/70">
+                    <div class="flex flex-wrap items-center justify-between gap-2 px-3 py-2.5 text-sm">
+                        <dt class="text-meta">Login email</dt>
+                        <dd class="font-medium text-bright">{{ $user->email }}</dd>
                     </div>
-                    <div class="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 text-sm">
-                        <dt class="text-[#465854]">Role</dt>
+                    <div class="flex flex-wrap items-center justify-between gap-2 px-3 py-2.5 text-sm">
+                        <dt class="text-meta">Role</dt>
                         <dd>
-                            <span class="badge bg-[#E6F4F1] text-[#0F766E]">{{ $roleLabel }}</span>
+                            <span class="badge badge-confirmed">{{ $roleLabel }}</span>
                         </dd>
                     </div>
                 </dl>
                 <p class="helper -mt-3">Contact the clinic administrator to update your login email or role.</p>
             </div>
 
-            <div class="border-t border-[#DCE3E1] px-5 py-4">
+            <div class="border-t border-hairline px-5 py-4">
                 <button type="submit" class="btn btn-primary">
                     <x-icon name="check" class="h-4 w-4" />
                     Save changes
@@ -95,7 +95,7 @@
 
             <div class="card-header">
                 <x-card-title>Change password</x-card-title>
-                <p class="mt-0.5 text-xs text-[#465854]">Use at least 8 characters with letters and numbers.</p>
+                <p class="mt-0.5 text-xs text-meta">Use at least 8 characters with letters and numbers.</p>
             </div>
 
             <div class="card-body space-y-5">
@@ -138,7 +138,7 @@
                 </x-alert>
             </div>
 
-            <div class="border-t border-[#DCE3E1] px-5 py-4">
+            <div class="border-t border-hairline px-5 py-4">
                 <button type="submit" class="btn btn-secondary">
                     <x-icon name="lock" class="h-4 w-4" />
                     Update password

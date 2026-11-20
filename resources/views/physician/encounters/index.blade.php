@@ -23,7 +23,7 @@
             <div class="flex-1 sm:max-w-md">
                 <label for="q" class="label">Search encounters</label>
                 <div class="relative">
-                    <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-[#465854]">
+                    <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-meta">
                         <x-icon name="magnifying-glass" class="h-4 w-4" />
                     </span>
                     <input id="q" type="search" name="q" value="{{ $search }}" class="input pl-9"
@@ -33,28 +33,28 @@
         </x-slot:fields>
     </x-filter-bar>
 
-    <section class="card mt-6">
+    <section class="card mt-5">
         <div class="card-header flex items-center justify-between gap-2">
             <x-card-title>Recorded consultations</x-card-title>
-            <span class="cs-num text-xs text-[#465854]">
+            <span class="cs-num font-mono text-xs text-meta">
                 {{ $encounters->total() }} {{ \Illuminate\Support\Str::plural('encounter', $encounters->total()) }}
             </span>
         </div>
 
         <div class="card-body p-0">
             {{-- Mobile stacked cards --}}
-            <div class="divide-y divide-[#DCE3E1] md:hidden">
+            <div class="divide-y divide-hairline md:hidden">
                 @forelse ($encounters as $encounter)
                     <article class="space-y-2.5 p-4">
                         <div class="flex items-start justify-between gap-2">
                             <div class="min-w-0">
-                                <p class="cs-num font-mono text-xs font-semibold text-[#0F766E]">
+                                <p class="cs-num font-mono text-xs font-semibold text-brand">
                                     {{ $encounter->encounter_number }}
                                 </p>
-                                <p class="mt-0.5 text-sm font-medium text-[#14201E]">
+                                <p class="mt-0.5 text-sm font-semibold text-bright">
                                     {{ $encounter->patient?->user?->name ?? 'Unknown patient' }}
                                 </p>
-                                <p class="cs-num text-xs text-[#465854]">
+                                <p class="cs-num font-mono text-xs text-meta">
                                     {{ $encounter->patient?->patient_number ?? '—' }} · {{ $encounter->encountered_at?->isoFormat('MMM D, YYYY') ?? '—' }}
                                 </p>
                             </div>
@@ -63,15 +63,15 @@
                             </span>
                         </div>
 
-                        <p class="text-sm text-[#14201E]">
+                        <p class="text-sm text-bright">
                             {{ $encounter->diagnosis ?: 'Diagnosis pending' }}
                             @if ($encounter->diagnosis_code)
-                                <span class="cs-num font-mono text-xs text-[#465854]">({{ $encounter->diagnosis_code }})</span>
+                                <span class="cs-num font-mono text-xs text-meta">({{ $encounter->diagnosis_code }})</span>
                             @endif
                         </p>
 
                         <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
-                            <span class="cs-num text-xs text-[#465854]">
+                            <span class="cs-num text-xs text-meta">
                                 {{ $encounter->vitals ? 'Vitals recorded' : 'No vitals' }} · {{ $encounter->prescriptions->count() }} Rx
                             </span>
                             <a class="btn btn-secondary btn-sm" href="{{ route('physician.encounters.show', $encounter) }}">
@@ -104,13 +104,13 @@
                             <th scope="col" class="table-head text-right">Action</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-[#DCE3E1]">
+                    <tbody class="divide-y divide-hairline">
                         @forelse ($encounters as $encounter)
                             <tr class="table-row">
-                                <td class="table-cell cs-num font-mono text-xs font-semibold text-[#0F766E] whitespace-nowrap">
+                                <td class="table-cell cs-num font-mono text-xs font-semibold text-brand whitespace-nowrap">
                                     {{ $encounter->encounter_number }}
                                 </td>
-                                <td class="table-cell cs-num whitespace-nowrap text-[#465854]">
+                                <td class="table-cell cs-num font-mono text-xs whitespace-nowrap text-meta">
                                     {{ $encounter->encountered_at?->isoFormat('MMM D, YYYY') ?? '—' }}
                                 </td>
                                 <td class="table-cell">
@@ -120,29 +120,29 @@
                                         @endif
                                         <div class="min-w-0">
                                             @if ($encounter->patient)
-                                                <a class="font-medium text-[#14201E] hover:text-[#0F766E] hover:underline"
+                                                <a class="font-semibold text-bright hover:text-brand hover:underline"
                                                    href="{{ route('physician.patients.show', $encounter->patient) }}">
                                                     {{ $encounter->patient->user?->name ?? 'Unknown' }}
                                                 </a>
                                             @else
-                                                <span class="font-medium text-[#14201E]">Unknown</span>
+                                                <span class="font-semibold text-bright">Unknown</span>
                                             @endif
-                                            <p class="cs-num font-mono text-xs text-[#465854]">
+                                            <p class="cs-num font-mono text-xs text-meta">
                                                 {{ $encounter->patient?->patient_number ?? '—' }}
                                             </p>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="table-cell">
-                                    <span class="text-[#14201E]">{{ $encounter->diagnosis ?: 'Diagnosis pending' }}</span>
+                                    <span class="text-bright">{{ $encounter->diagnosis ?: 'Diagnosis pending' }}</span>
                                     @if ($encounter->diagnosis_code)
-                                        <span class="cs-num ml-1 font-mono text-xs text-[#465854]">{{ $encounter->diagnosis_code }}</span>
+                                        <span class="cs-num ml-1 font-mono text-xs text-meta">{{ $encounter->diagnosis_code }}</span>
                                     @endif
                                 </td>
-                                <td class="table-cell whitespace-nowrap text-xs text-[#465854]">
+                                <td class="table-cell whitespace-nowrap text-xs text-meta">
                                     {{ $encounter->vitals ? 'Recorded' : '—' }}
                                 </td>
-                                <td class="table-cell cs-num whitespace-nowrap text-[#14201E]">
+                                <td class="table-cell cs-num font-mono whitespace-nowrap text-bright">
                                     {{ $encounter->prescriptions->count() }}
                                 </td>
                                 <td class="table-cell whitespace-nowrap">
@@ -171,7 +171,7 @@
         </div>
 
         @if ($encounters->hasPages())
-            <div class="border-t border-[#DCE3E1] px-5 py-3.5">
+            <div class="border-t border-hairline px-5 py-3.5">
                 {{ $encounters->links() }}
             </div>
         @endif

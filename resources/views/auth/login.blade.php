@@ -3,8 +3,8 @@
 @section('title', 'Sign in')
 
 @section('content')
-    <h1 class="text-2xl font-semibold tracking-tight text-[#14201E] sm:text-3xl">Welcome back</h1>
-    <p class="mt-1.5 text-sm leading-relaxed text-[#465854]">Sign in with the email address registered with the clinic.</p>
+    <h1 class="text-2xl font-bold tracking-tight text-bright sm:text-3xl">Welcome back</h1>
+    <p class="mt-1.5 text-sm leading-relaxed text-meta">Sign in with the email address registered with the clinic.</p>
 
     <form method="POST" action="{{ route('login') }}" class="mt-7 space-y-5">
         @csrf
@@ -28,7 +28,7 @@
             <div class="mb-1.5 flex items-center justify-between gap-2">
                 <label for="password" class="label mb-0">Password</label>
                 <a href="{{ route('password.request') }}"
-                   class="text-xs font-medium text-[#0F766E] transition hover:underline">
+                   class="text-xs font-semibold text-brand transition hover:underline">
                     Forgot password?
                 </a>
             </div>
@@ -48,13 +48,13 @@
 
         <div class="flex items-center">
             <input id="remember" type="checkbox" name="remember" value="1"
-                   class="h-4 w-4 rounded border-[#C5D0CD] accent-[#0F766E]">
+                   class="h-4 w-4 rounded border-hairline-2 accent-brand">
             <label for="remember" class="ml-2 cursor-pointer text-sm text-read">
                 Keep me signed in on this device
             </label>
         </div>
 
-        <button type="submit" class="btn btn-primary w-full py-2.5 flex items-center justify-center gap-2">
+        <button type="submit" class="btn btn-primary w-full py-2.5">
             Sign in
             <x-icon name="arrow-right" class="h-4 w-4" />
         </button>
@@ -64,7 +64,7 @@
         <a href="{{ route('register') }}"
            class="btn btn-secondary w-full justify-between px-4 text-sm font-medium">
             <span>New patient? Register an account</span>
-            <x-icon name="arrow-right" class="h-4 w-4 text-[#465854]" />
+            <x-icon name="arrow-right" class="h-4 w-4 text-meta" />
         </a>
         <p class="text-center text-xs text-meta">
             Physicians and clinic staff sign in with clinic-issued credentials.
