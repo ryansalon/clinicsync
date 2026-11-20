@@ -398,6 +398,7 @@
 
             var feetInput = document.getElementById('height_feet');
             var inchesInput = document.getElementById('height_inches');
+            var weightInput = document.getElementById('weight_kg');
             var hiddenCm = document.getElementById('height_cm');
             var preview = document.getElementById('height-preview');
 
@@ -410,6 +411,7 @@
             function normalizeHeight() {
                 var feet = parseFloat(feetInput.value) || 0;
                 var inches = parseFloat(inchesInput.value) || 0;
+                var weightKg = weightInput ? (parseFloat(weightInput.value) || 0) : 0;
 
                 if (inches >= 12) {
                     feet += Math.floor(inches / 12);
@@ -429,12 +431,21 @@
                 var cm = Math.round((feet * 30.48 + inches * 2.54) * 10) / 10;
                 hiddenCm.value = String(cm);
                 if (preview) {
-                    preview.textContent = 'Recorded as ≈ ' + cm + ' cm';
+                    var summary = 'Recorded as ≈ ' + cm + ' cm';
+                    if (weightKg > 0 && cm > 0) {
+                        var meters = cm / 100;
+                        var bmi = Math.round((weightKg / (meters * meters)) * 10) / 10;
+                        summary += ' · Est. BMI ' + bmi.toFixed(1) + ' kg/m²';
+                    }
+                    preview.textContent = summary;
                 }
             }
 
             feetInput.addEventListener('input', normalizeHeight);
             inchesInput.addEventListener('input', normalizeHeight);
+            if (weightInput) {
+                weightInput.addEventListener('input', normalizeHeight);
+            }
             normalizeHeight();
         })();
     </script>
