@@ -8,7 +8,12 @@
 @endphp
 
 @section('content')
-    <x-breadcrumb :items="[
+    <div class="print-only mb-5 border-b border-hairline pb-3">
+        <p class="font-mono text-[10px] font-semibold tracking-wider text-meta uppercase">Camiguin Polytechnic State College · Outpatient Clinic</p>
+        <p class="mt-0.5 text-base font-bold text-bright">Outpatient Clinical Summary &amp; E-Prescription — {{ $encounter->encounter_number }}</p>
+    </div>
+
+    <x-breadcrumb class="no-print" :items="[
         ['label' => 'Encounter log', 'href' => route('physician.encounters.index')],
         ['label' => 'Encounter '.$encounter->encounter_number],
     ]" />
