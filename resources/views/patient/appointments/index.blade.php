@@ -107,10 +107,17 @@
                  title="{{ $currentStatus ? 'No '.\Illuminate\Support\Str::headline($currentStatus).' appointments found.' : 'You have no appointments yet.' }}"
                  description="Keep track of every clinic visit from this page.">
             <x-slot:action>
-                <a class="btn btn-primary" href="{{ route('patient.appointments.create') }}">
-                    <x-icon name="plus" class="h-4 w-4" />
-                    Book one now
-                </a>
+                <div class="flex flex-wrap items-center justify-center gap-2.5">
+                    @if ($currentStatus)
+                        <a class="btn btn-secondary" href="{{ route('patient.appointments.index') }}">
+                            Show all appointments
+                        </a>
+                    @endif
+                    <a class="btn btn-primary" href="{{ route('patient.appointments.create') }}">
+                        <x-icon name="plus" class="h-4 w-4" />
+                        Book one now
+                    </a>
+                </div>
             </x-slot:action>
         </x-empty>
     @endif
