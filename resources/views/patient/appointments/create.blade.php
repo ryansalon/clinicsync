@@ -148,8 +148,8 @@
             var IDLE_MESSAGE = 'Select a physician and date to load open slots.';
             var NO_SLOTS_MESSAGE = 'No open slots on this date. Pick another date.';
             var LOADING_MESSAGE = 'Loading available slots…';
-            var AVAILABLE_CLASS = 'cs-num font-mono min-h-11 rounded-md border border-hairline-2 bg-surface px-3 py-2 text-xs font-medium text-bright transition-colors hover:border-brand hover:bg-brand-tint hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand';
-            var SELECTED_CLASS = 'cs-num font-mono min-h-11 rounded-md border border-brand bg-brand px-3 py-2 text-xs font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand';
+            var AVAILABLE_CLASS = 'cs-num font-mono min-h-11 cursor-pointer rounded-md border border-hairline-2 bg-surface px-3 py-2 text-xs font-medium text-bright transition-[transform,background-color,border-color,color,box-shadow] duration-150 ease-out hover:-translate-y-0.5 hover:border-brand hover:bg-brand-tint hover:text-brand hover:shadow-[0_3px_8px_-3px_rgba(24,32,29,0.12)] active:translate-y-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand';
+            var SELECTED_CLASS = 'cs-num font-mono min-h-11 cursor-pointer rounded-md border border-brand bg-brand px-3 py-2 text-xs font-semibold text-white transition-[transform,background-color,border-color,color,box-shadow] duration-150 ease-out hover:-translate-y-0.5 hover:bg-brand-strong hover:shadow-[0_4px_10px_-3px_rgba(30,73,118,0.32)] active:translate-y-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand';
             var DISABLED_CLASS = 'cs-num font-mono min-h-11 rounded-md border border-hairline bg-surface-subtle px-3 py-2 text-xs font-medium text-meta/70 line-through cursor-not-allowed';
             var summaryBox = document.getElementById('booking-summary');
             var summaryText = document.getElementById('booking-summary-text');
