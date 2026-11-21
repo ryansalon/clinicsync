@@ -20,17 +20,25 @@
     {{-- Mobile stacked cards (below md) --}}
     <div class="divide-y divide-hairline md:hidden">
         @forelse ($queue as $appointment)
-            <article class="space-y-3 p-4">
+            @php
+                $isCallingRow = $appointment->called_at !== null && $appointment->status === 'confirmed';
+            @endphp
+            <article class="space-y-3 p-4 {{ $isCallingRow ? 'bg-brand-tint/45' : '' }}">
                 <div class="flex items-center justify-between gap-2">
                     <span class="cs-num font-mono text-base font-bold text-brand">#{{ $appointment->queue_number }}</span>
-                    <span class="badge badge-{{ $appointment->status }}">{{ \Illuminate\Support\Str::headline($appointment->status) }}</span>
+                    <span class="badge badge-{{ $isCallingRow ? 'in_progress' : $appointment->status }}">
+                        {{ $isCallingRow ? 'Called' : \Illuminate\Support\Str::headline($appointment->status) }}
+                    </span>
                 </div>
 
                 <div class="flex items-start gap-3">
                     <x-avatar :name="$appointment->patient->user->name" size="sm" />
                     <div class="min-w-0 flex-1">
                         <div class="flex flex-wrap items-center gap-1.5">
-                            <p class="font-semibold text-bright">{{ $appointment->patient->user->name }}</p>
+                            <a href="{{ route('physician.patients.show', $appointment->patient) }}"
+                               class="font-semibold text-bright hover:text-brand hover:underline">
+                                {{ $appointment->patient->user->name }}
+                            </a>
                             @if ($appointment->patient->activeAllergies->isNotEmpty())
                                 <span class="rounded-full border border-danger-border bg-danger-tint px-2 py-0.5 text-[10px] font-semibold text-danger"
                                       title="{{ $appointment->patient->activeAllergies->pluck('allergen')->implode(', ') }}">
@@ -105,7 +113,10 @@
                 </thead>
                 <tbody>
                     @foreach ($queue as $appointment)
-                        <tr class="table-row">
+                        @php
+                            $isCallingRow = $appointment->called_at !== null && $appointment->status === 'confirmed';
+                        @endphp
+                        <tr class="table-row {{ $isCallingRow ? 'table-row-calling' : '' }}">
                             <td class="table-cell cs-num">
                                 <span class="inline-flex h-8 min-w-9 items-center justify-center rounded-md border border-brand-border bg-brand-tint px-2.5 font-mono text-sm font-bold text-brand">
                                     #{{ $appointment->queue_number }}
@@ -116,7 +127,10 @@
                                     <x-avatar :name="$appointment->patient->user->name" size="sm" />
                                     <div class="min-w-0">
                                         <div class="flex flex-wrap items-center gap-1.5">
-                                            <p class="font-semibold text-bright">{{ $appointment->patient->user->name }}</p>
+                                            <a href="{{ route('physician.patients.show', $appointment->patient) }}"
+                                               class="font-semibold text-bright hover:text-brand hover:underline">
+                                                {{ $appointment->patient->user->name }}
+                                            </a>
                                             @if ($appointment->patient->activeAllergies->isNotEmpty())
                                                 <span class="rounded-full border border-danger-border bg-danger-tint px-2 py-0.5 text-[10px] font-semibold text-danger"
                                                       title="{{ $appointment->patient->activeAllergies->pluck('allergen')->implode(', ') }}">
@@ -135,7 +149,9 @@
                                 {{ $appointment->chief_complaint ?: '—' }}
                             </td>
                             <td class="table-cell">
-                                <span class="badge badge-{{ $appointment->status }}">{{ \Illuminate\Support\Str::headline($appointment->status) }}</span>
+                                <span class="badge badge-{{ $isCallingRow ? 'in_progress' : $appointment->status }}">
+                                    {{ $isCallingRow ? 'Called' : \Illuminate\Support\Str::headline($appointment->status) }}
+                                </span>
                             </td>
                             <td class="table-cell text-right">
                                 @if (in_array($appointment->status, ['pending', 'confirmed'], true))
