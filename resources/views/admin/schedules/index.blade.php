@@ -91,13 +91,21 @@
                     <div>
                         <label for="schedule-from" class="label">Effective from</label>
                         <input id="schedule-from" type="date" name="effective_from"
-                               value="{{ old('effective_from') }}" class="input cs-num">
+                               value="{{ old('effective_from') }}"
+                               class="input cs-num @error('effective_from') input-invalid @enderror">
+                        @error('effective_from')
+                            <p class="field-error">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div>
                         <label for="schedule-until" class="label">Effective until</label>
                         <input id="schedule-until" type="date" name="effective_until"
-                               value="{{ old('effective_until') }}" class="input cs-num">
+                               value="{{ old('effective_until') }}"
+                               class="input cs-num @error('effective_until') input-invalid @enderror">
+                        @error('effective_until')
+                            <p class="field-error">{{ $message }}</p>
+                        @enderror
                     </div>
                 </div>
 
@@ -303,7 +311,15 @@
             </section>
         @empty
             <x-empty icon="calendar" title="No schedules yet"
-                     description="Use “Add schedule” to publish a physician’s recurring clinic hours." />
+                     description="Use “Add schedule” to publish a physician’s recurring clinic hours.">
+                @if ($physicianId)
+                    <x-slot:action>
+                        <a href="{{ route('admin.schedules.index') }}" class="btn btn-secondary btn-sm">
+                            Show all physicians
+                        </a>
+                    </x-slot:action>
+                @endif
+            </x-empty>
         @endforelse
     </div>
 @endsection
