@@ -26,8 +26,12 @@
                     <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-meta">
                         <x-icon name="magnifying-glass" class="h-4 w-4" />
                     </span>
-                    <input id="q" type="search" name="q" value="{{ $search }}" class="input pl-9"
+                    <input id="q" type="search" name="q" value="{{ $search }}" class="input pr-9 pl-9"
                            placeholder="Patient name, patient #, encounter #, diagnosis">
+                    <kbd aria-hidden="true"
+                         class="pointer-events-none absolute inset-y-0 right-2.5 my-auto hidden h-5 items-center rounded border border-hairline bg-surface-subtle px-1.5 font-mono text-[10px] font-semibold text-meta sm:inline-flex">
+                        /
+                    </kbd>
                 </div>
             </div>
         </x-slot:fields>
@@ -83,7 +87,15 @@
                 @empty
                     <div class="p-6">
                         <x-empty icon="clipboard" title="No encounters matched your query."
-                                 description="Completed or in-progress consultations will be listed here." />
+                                 description="Completed or in-progress consultations will be listed here.">
+                            @if ($search !== '')
+                                <x-slot:action>
+                                    <a href="{{ route('physician.encounters.index') }}" class="btn btn-secondary btn-sm">
+                                        Clear search
+                                    </a>
+                                </x-slot:action>
+                            @endif
+                        </x-empty>
                     </div>
                 @endforelse
             </div>
@@ -161,7 +173,15 @@
                             <tr>
                                 <td class="px-4 py-10" colspan="8">
                                     <x-empty icon="clipboard" title="No encounters matched your query."
-                                             description="Completed or in-progress consultations will be listed here." />
+                                             description="Completed or in-progress consultations will be listed here.">
+                                        @if ($search !== '')
+                                            <x-slot:action>
+                                                <a href="{{ route('physician.encounters.index') }}" class="btn btn-secondary btn-sm">
+                                                    Clear search
+                                                </a>
+                                            </x-slot:action>
+                                        @endif
+                                    </x-empty>
                                 </td>
                             </tr>
                         @endforelse
