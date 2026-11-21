@@ -32,8 +32,12 @@
                     <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-meta">
                         <x-icon name="magnifying-glass" class="h-4 w-4" />
                     </span>
-                    <input id="action" type="text" name="action" value="{{ $action }}" class="input pl-9"
+                    <input id="action" type="search" name="action" value="{{ $action }}" class="input pr-9 pl-9"
                            placeholder="e.g. appointment.booked">
+                    <kbd aria-hidden="true"
+                         class="pointer-events-none absolute inset-y-0 right-2.5 my-auto hidden h-5 items-center rounded border border-hairline bg-surface-subtle px-1.5 font-mono text-[10px] font-semibold text-meta sm:inline-flex">
+                        /
+                    </kbd>
                 </div>
             </div>
 
