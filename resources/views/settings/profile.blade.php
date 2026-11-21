@@ -65,6 +65,92 @@
                     @enderror
                 </div>
 
+                @if ($user->patient)
+                    <fieldset class="space-y-4 border-t border-hairline pt-4">
+                        <legend class="section-title">Outpatient triage &amp; emergency contact</legend>
+
+                        <div class="grid gap-4 sm:grid-cols-2">
+                            <div>
+                                <label for="blood_type" class="label">Blood type</label>
+                                <select id="blood_type" name="blood_type" class="input font-mono @error('blood_type') input-invalid @enderror">
+                                    <option value="">Not specified</option>
+                                    @foreach (['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] as $bloodOption)
+                                        <option value="{{ $bloodOption }}" @selected(old('blood_type', $user->patient->blood_type) === $bloodOption)>
+                                            {{ $bloodOption }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('blood_type')
+                                    <p class="field-error">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label for="civil_status" class="label">Civil status</label>
+                                <select id="civil_status" name="civil_status" class="input @error('civil_status') input-invalid @enderror">
+                                    <option value="">Not specified</option>
+                                    @foreach (['single' => 'Single', 'married' => 'Married', 'widowed' => 'Widowed', 'separated' => 'Separated'] as $statusVal => $statusText)
+                                        <option value="{{ $statusVal }}" @selected(old('civil_status', $user->patient->civil_status) === $statusVal)>
+                                            {{ $statusText }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('civil_status')
+                                    <p class="field-error">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="address" class="label">Residential address</label>
+                            <input id="address" type="text" name="address"
+                                   value="{{ old('address', $user->patient->address) }}"
+                                   autocomplete="street-address"
+                                   class="input @error('address') input-invalid @enderror"
+                                   placeholder="Barangay, Municipality, Province">
+                            @error('address')
+                                <p class="field-error">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="grid gap-4 sm:grid-cols-3">
+                            <div>
+                                <label for="emergency_contact_name" class="label">Emergency contact</label>
+                                <input id="emergency_contact_name" type="text" name="emergency_contact_name"
+                                       value="{{ old('emergency_contact_name', $user->patient->emergency_contact_name) }}"
+                                       class="input @error('emergency_contact_name') input-invalid @enderror"
+                                       placeholder="Full name">
+                                @error('emergency_contact_name')
+                                    <p class="field-error">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label for="emergency_contact_phone" class="label">Contact phone</label>
+                                <input id="emergency_contact_phone" type="tel" name="emergency_contact_phone"
+                                       value="{{ old('emergency_contact_phone', $user->patient->emergency_contact_phone) }}"
+                                       inputmode="numeric" autocomplete="tel"
+                                       class="input cs-num @error('emergency_contact_phone') input-invalid @enderror"
+                                       placeholder="09XXXXXXXXX">
+                                @error('emergency_contact_phone')
+                                    <p class="field-error">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label for="emergency_contact_relationship" class="label">Relationship</label>
+                                <input id="emergency_contact_relationship" type="text" name="emergency_contact_relationship"
+                                       value="{{ old('emergency_contact_relationship', $user->patient->emergency_contact_relationship) }}"
+                                       class="input @error('emergency_contact_relationship') input-invalid @enderror"
+                                       placeholder="Parent, Spouse…">
+                                @error('emergency_contact_relationship')
+                                    <p class="field-error">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+                    </fieldset>
+                @endif
+
                 <dl class="divide-y divide-hairline border-y border-hairline bg-canvas/70">
                     <div class="flex flex-wrap items-center justify-between gap-2 px-3 py-2.5 text-sm">
                         <dt class="text-meta">Login email</dt>

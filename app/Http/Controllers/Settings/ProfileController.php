@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -25,26 +26,51 @@ class ProfileController extends Controller
     }
 
     /**
-     * Update the signed-in user's name, phone number and profile photo.
+     * Update the signed-in user's name, phone number, photo, and patient triage details.
      */
     public function update(Request $request): RedirectResponse
     {
-        $user = $request->user();
+        $user = $request->user()->load(['patient', 'physician']);
 
-        $data = $request->validate([
+        $rules = [
             'name' => ['required', 'string', 'max:250'],
             'phone' => ['nullable', 'string', 'max:30'],
             'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-        ], [
+        ];
+
+        if ($user->patient !== null) {
+            $rules += [
+                'blood_type' => ['nullable', 'string', Rule::in(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])],
+                'civil_status' => ['nullable', 'string', Rule::in(['single', 'married', 'widowed', 'separated'])],
+                'address' => ['nullable', 'string', 'max:500'],
+                'emergency_contact_name' => ['nullable', 'string', 'max:255'],
+                'emergency_contact_phone' => ['nullable', 'string', 'max:30'],
+                'emergency_contact_relationship' => ['nullable', 'string', 'max:50'],
+            ];
+        }
+
+        $data = $request->validate($rules, [
             'photo.image' => 'The photo must be a JPG, PNG or WebP image.',
             'photo.mimes' => 'The photo must be a JPG, PNG or WebP image.',
             'photo.max' => 'The photo may not be larger than 2 MB.',
         ]);
 
+        $patientFields = [
+            'blood_type',
+            'civil_status',
+            'address',
+            'emergency_contact_name',
+            'emergency_contact_phone',
+            'emergency_contact_relationship',
+        ];
+
         $before = $user->only(['name', 'phone']);
+        if ($user->patient !== null) {
+            $before['patient'] = $user->patient->only($patientFields);
+        }
 
         $user->name = $data['name'];
-        $user->phone = $data['phone'];
+        $user->phone = $data['phone'] ?? null;
 
         if ($request->hasFile('photo')) {
             $this->storePhoto($request, $user);
@@ -52,7 +78,26 @@ class ProfileController extends Controller
 
         $user->save();
 
-        AuditLogger::log($user, 'user.profile_updated', $user, $before, $user->fresh()->only(['name', 'phone']));
+        if ($user->patient !== null) {
+            $patientUpdates = [];
+            foreach ($patientFields as $field) {
+                if ($request->exists($field)) {
+                    $value = $data[$field] ?? null;
+                    $patientUpdates[$field] = is_string($value) && trim($value) === '' ? null : $value;
+                }
+            }
+
+            if ($patientUpdates !== []) {
+                $user->patient->update($patientUpdates);
+            }
+        }
+
+        $after = $user->fresh()->only(['name', 'phone']);
+        if ($user->patient !== null) {
+            $after['patient'] = $user->patient->fresh()->only($patientFields);
+        }
+
+        AuditLogger::log($user, 'user.profile_updated', $user, $before, $after);
 
         return redirect()
             ->route('profile.edit')
