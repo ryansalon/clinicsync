@@ -459,44 +459,100 @@
                         <legend class="section-title">Amend vitals</legend>
                         <div class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
                             <div>
-                                <label for="edit_temperature_c" class="label">Temp (°C)</label>
-                                <input id="edit_temperature_c" name="temperature_c" type="number" step="0.1"
-                                       class="input cs-num" value="{{ old('temperature_c', $vitals?->temperature_c) }}">
+                                <label for="edit_temperature_c" class="label">Temperature</label>
+                                <div class="relative">
+                                    <input id="edit_temperature_c" name="temperature_c" type="number" step="0.1"
+                                           class="input cs-num pr-12 @error('temperature_c') input-invalid @enderror"
+                                           value="{{ old('temperature_c', $vitals?->temperature_c) }}">
+                                    <span class="input-unit">°C</span>
+                                </div>
+                                @error('temperature_c')
+                                    <p class="field-error">{{ $message }}</p>
+                                @enderror
                             </div>
                             <div>
-                                <label for="edit_systolic_bp" class="label">Systolic</label>
-                                <input id="edit_systolic_bp" name="systolic_bp" type="number"
-                                       class="input cs-num" value="{{ old('systolic_bp', $vitals?->systolic_bp) }}">
+                                <label for="edit_systolic_bp" class="label">Systolic BP</label>
+                                <div class="relative">
+                                    <input id="edit_systolic_bp" name="systolic_bp" type="number"
+                                           class="input cs-num pr-16 @error('systolic_bp') input-invalid @enderror"
+                                           value="{{ old('systolic_bp', $vitals?->systolic_bp) }}">
+                                    <span class="input-unit">mmHg</span>
+                                </div>
+                                @error('systolic_bp')
+                                    <p class="field-error">{{ $message }}</p>
+                                @enderror
                             </div>
                             <div>
-                                <label for="edit_diastolic_bp" class="label">Diastolic</label>
-                                <input id="edit_diastolic_bp" name="diastolic_bp" type="number"
-                                       class="input cs-num" value="{{ old('diastolic_bp', $vitals?->diastolic_bp) }}">
+                                <label for="edit_diastolic_bp" class="label">Diastolic BP</label>
+                                <div class="relative">
+                                    <input id="edit_diastolic_bp" name="diastolic_bp" type="number"
+                                           class="input cs-num pr-16 @error('diastolic_bp') input-invalid @enderror"
+                                           value="{{ old('diastolic_bp', $vitals?->diastolic_bp) }}">
+                                    <span class="input-unit">mmHg</span>
+                                </div>
+                                @error('diastolic_bp')
+                                    <p class="field-error">{{ $message }}</p>
+                                @enderror
                             </div>
                             <div>
-                                <label for="edit_heart_rate" class="label">HR (bpm)</label>
-                                <input id="edit_heart_rate" name="heart_rate" type="number"
-                                       class="input cs-num" value="{{ old('heart_rate', $vitals?->heart_rate) }}">
+                                <label for="edit_heart_rate" class="label">Heart rate</label>
+                                <div class="relative">
+                                    <input id="edit_heart_rate" name="heart_rate" type="number"
+                                           class="input cs-num pr-14 @error('heart_rate') input-invalid @enderror"
+                                           value="{{ old('heart_rate', $vitals?->heart_rate) }}">
+                                    <span class="input-unit">bpm</span>
+                                </div>
+                                @error('heart_rate')
+                                    <p class="field-error">{{ $message }}</p>
+                                @enderror
                             </div>
                             <div>
-                                <label for="edit_respiratory_rate" class="label">RR (/min)</label>
-                                <input id="edit_respiratory_rate" name="respiratory_rate" type="number"
-                                       class="input cs-num" value="{{ old('respiratory_rate', $vitals?->respiratory_rate) }}">
+                                <label for="edit_respiratory_rate" class="label">Respiratory rate</label>
+                                <div class="relative">
+                                    <input id="edit_respiratory_rate" name="respiratory_rate" type="number"
+                                           class="input cs-num pr-14 @error('respiratory_rate') input-invalid @enderror"
+                                           value="{{ old('respiratory_rate', $vitals?->respiratory_rate) }}">
+                                    <span class="input-unit">/min</span>
+                                </div>
+                                @error('respiratory_rate')
+                                    <p class="field-error">{{ $message }}</p>
+                                @enderror
                             </div>
                             <div>
-                                <label for="edit_spo2" class="label">SpO₂ (%)</label>
-                                <input id="edit_spo2" name="spo2" type="number" min="40" max="100"
-                                       class="input cs-num" value="{{ old('spo2', $vitals?->spo2) }}">
+                                <label for="edit_spo2" class="label">SpO₂</label>
+                                <div class="relative">
+                                    <input id="edit_spo2" name="spo2" type="number" min="40" max="100"
+                                           class="input cs-num pr-10 @error('spo2') input-invalid @enderror"
+                                           value="{{ old('spo2', $vitals?->spo2) }}">
+                                    <span class="input-unit">%</span>
+                                </div>
+                                @error('spo2')
+                                    <p class="field-error">{{ $message }}</p>
+                                @enderror
                             </div>
                             <div>
-                                <label for="edit_weight_kg" class="label">Weight (kg)</label>
-                                <input id="edit_weight_kg" name="weight_kg" type="number" step="0.1" min="1" max="500"
-                                       class="input cs-num" value="{{ old('weight_kg', $vitals?->weight_kg) }}">
+                                <label for="edit_weight_kg" class="label">Weight</label>
+                                <div class="relative">
+                                    <input id="edit_weight_kg" name="weight_kg" type="number" step="0.1" min="1" max="500"
+                                           class="input cs-num pr-12 @error('weight_kg') input-invalid @enderror"
+                                           value="{{ old('weight_kg', $vitals?->weight_kg) }}">
+                                    <span class="input-unit">kg</span>
+                                </div>
+                                @error('weight_kg')
+                                    <p class="field-error">{{ $message }}</p>
+                                @enderror
                             </div>
                             <div>
-                                <label for="edit_height_cm" class="label">Height (cm)</label>
-                                <input id="edit_height_cm" name="height_cm" type="number" step="0.1" min="30" max="260"
-                                       class="input cs-num" value="{{ old('height_cm', $vitals?->height_cm) }}">
+                                <label for="edit_height_cm" class="label">Height</label>
+                                <div class="relative">
+                                    <input id="edit_height_cm" name="height_cm" type="number" step="0.1" min="30" max="260"
+                                           class="input cs-num pr-12 @error('height_cm') input-invalid @enderror"
+                                           value="{{ old('height_cm', $vitals?->height_cm) }}">
+                                    <span class="input-unit">cm</span>
+                                </div>
+                                @error('height_cm')
+                                    <p class="field-error">{{ $message }}</p>
+                                @enderror
                             </div>
                         </div>
                     </fieldset>
@@ -518,6 +574,21 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    {{-- Print-only attending physician signature and license verification footer --}}
+    <div class="print-only mt-10 border-t border-hairline pt-6">
+        <div class="flex items-end justify-between gap-6">
+            <div class="text-xs text-meta">
+                <p class="font-semibold text-bright">Patient: {{ $encounter->patient->user->name }} ({{ $encounter->patient->patient_number }})</p>
+                <p class="cs-num mt-0.5">Printed {{ now()->isoFormat('MMM D, YYYY · h:mm A') }} · CPSC Outpatient Clinic</p>
+            </div>
+            <div class="w-64 border-t border-bright pt-2 text-right text-xs">
+                <p class="font-semibold text-bright">Dr. {{ $encounter->physician->user->name }}</p>
+                <p class="text-meta">{{ $encounter->physician->specialization }}</p>
+                <p class="cs-num font-mono text-[11px] text-meta">License No. {{ $encounter->physician->license_number ?: 'On file' }}</p>
+            </div>
         </div>
     </div>
 @endsection
