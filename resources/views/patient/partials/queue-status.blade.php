@@ -55,7 +55,7 @@
             <div class="border-t border-hairline px-5 py-3">
                 <ol class="grid grid-cols-5 gap-2 text-center" aria-label="Visit progress">
                     @foreach ($pipelineSteps as $step)
-                        <li class="flex flex-col items-center gap-1">
+                        <li class="flex flex-col items-center gap-1" @if ($step['current']) aria-current="step" @endif>
                             <span class="h-1.5 w-full rounded-full {{ $step['done'] || $step['current'] ? 'bg-brand' : 'bg-hairline' }}"></span>
                             <span class="text-[11px] {{ $step['current'] ? 'font-semibold text-brand' : ($step['done'] ? 'font-medium text-bright' : 'text-meta') }}">
                                 {{ $step['label'] }}
