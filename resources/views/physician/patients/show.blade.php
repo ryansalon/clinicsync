@@ -96,16 +96,67 @@
 
     {{-- Allergies & Medical history --}}
     <div class="mt-6 grid gap-6 lg:grid-cols-2">
-        <section class="card">
+        <section class="card self-start">
             <div class="card-header flex items-center justify-between gap-2">
                 <x-card-title>Allergy list</x-card-title>
                 <span class="cs-num font-mono text-xs text-meta">{{ $allergies->count() }} recorded</span>
             </div>
+
+            <details class="border-b border-hairline bg-surface-subtle/65 group" @if ($errors->hasAny(['allergen', 'severity', 'reaction'])) open @endif>
+                <summary class="flex cursor-pointer list-none items-center justify-between gap-2 px-5 py-2.5 text-xs font-semibold text-brand transition hover:bg-canvas">
+                    <span class="inline-flex items-center gap-1.5">
+                        <x-icon name="plus" class="h-3.5 w-3.5" />
+                        Record allergy
+                    </span>
+                    <x-icon name="chevron-right" class="h-3.5 w-3.5 transition-transform group-open:rotate-90" />
+                </summary>
+                <form method="POST" action="{{ route('physician.patients.allergies.store', $patient) }}" class="space-y-3 border-t border-hairline bg-surface p-4">
+                    @csrf
+                    <div class="grid gap-3 sm:grid-cols-3">
+                        <div class="sm:col-span-2">
+                            <label for="allergen" class="label">Allergen <span class="text-danger">*</span></label>
+                            <input id="allergen" type="text" name="allergen" value="{{ old('allergen') }}" required
+                                   class="input @error('allergen') input-invalid @enderror" placeholder="e.g. Penicillin, Ibuprofen">
+                            @error('allergen')
+                                <p class="field-error">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label for="severity" class="label">Severity <span class="text-danger">*</span></label>
+                            <select id="severity" name="severity" required class="input @error('severity') input-invalid @enderror">
+                                @foreach (\App\Models\Allergy::SEVERITIES as $sev)
+                                    <option value="{{ $sev }}" @selected(old('severity', 'moderate') === $sev)>
+                                        {{ \Illuminate\Support\Str::headline($sev) }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('severity')
+                                <p class="field-error">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                    <div>
+                        <label for="reaction" class="label">Reaction</label>
+                        <input id="reaction" type="text" name="reaction" value="{{ old('reaction') }}"
+                               class="input @error('reaction') input-invalid @enderror" placeholder="e.g. Urticaria, bronchospasm">
+                        @error('reaction')
+                            <p class="field-error">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            <x-icon name="plus" class="h-3.5 w-3.5" />
+                            Save allergy
+                        </button>
+                    </div>
+                </form>
+            </details>
+
             <div class="card-body p-0">
                 @if ($allergies->isNotEmpty())
                     <ul class="divide-y divide-hairline">
                         @foreach ($allergies as $allergy)
-                            <li class="flex items-start justify-between gap-3 px-5 py-3.5 {{ $allergy->is_active ? '' : 'bg-canvas' }}">
+                            <li class="flex flex-wrap items-start justify-between gap-3 px-5 py-3.5 {{ $allergy->is_active ? '' : 'bg-canvas' }}">
                                 <div class="min-w-0">
                                     <p class="text-sm font-semibold {{ $allergy->is_active ? 'text-bright' : 'text-meta' }}">
                                         {{ $allergy->allergen }}
@@ -119,6 +170,14 @@
                                     <span class="badge badge-{{ $allergy->is_active ? 'enabled' : 'inactive' }}">
                                         {{ $allergy->is_active ? 'Active' : 'Inactive' }}
                                     </span>
+                                    <form method="POST" action="{{ route('physician.patients.allergies.toggle', [$patient, $allergy]) }}">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="btn btn-ghost btn-sm text-xs text-meta hover:text-bright"
+                                                title="{{ $allergy->is_active ? 'Mark allergy inactive' : 'Reactivate allergy' }}">
+                                            {{ $allergy->is_active ? 'Deactivate' : 'Activate' }}
+                                        </button>
+                                    </form>
                                 </div>
                             </li>
                         @endforeach
@@ -132,11 +191,84 @@
             </div>
         </section>
 
-        <section class="card">
+        <section class="card self-start">
             <div class="card-header flex items-center justify-between gap-2">
                 <x-card-title>Medical history</x-card-title>
                 <span class="cs-num font-mono text-xs text-meta">{{ $histories->count() }} {{ \Illuminate\Support\Str::plural('condition', $histories->count()) }}</span>
             </div>
+
+            <details class="border-b border-hairline bg-surface-subtle/65 group" @if ($errors->hasAny(['condition_name', 'type', 'year_diagnosed', 'status', 'notes'])) open @endif>
+                <summary class="flex cursor-pointer list-none items-center justify-between gap-2 px-5 py-2.5 text-xs font-semibold text-brand transition hover:bg-canvas">
+                    <span class="inline-flex items-center gap-1.5">
+                        <x-icon name="plus" class="h-3.5 w-3.5" />
+                        Add condition
+                    </span>
+                    <x-icon name="chevron-right" class="h-3.5 w-3.5 transition-transform group-open:rotate-90" />
+                </summary>
+                <form method="POST" action="{{ route('physician.patients.histories.store', $patient) }}" class="space-y-3 border-t border-hairline bg-surface p-4">
+                    @csrf
+                    <div class="grid gap-3 sm:grid-cols-2">
+                        <div>
+                            <label for="condition_name" class="label">Condition <span class="text-danger">*</span></label>
+                            <input id="condition_name" type="text" name="condition_name" value="{{ old('condition_name') }}" required
+                                   class="input @error('condition_name') input-invalid @enderror" placeholder="e.g. Bronchial asthma">
+                            @error('condition_name')
+                                <p class="field-error">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label for="history_type" class="label">Category <span class="text-danger">*</span></label>
+                            <select id="history_type" name="type" required class="input @error('type') input-invalid @enderror">
+                                @foreach (\App\Models\MedicalHistory::TYPES as $typeOption)
+                                    <option value="{{ $typeOption }}" @selected(old('type', 'past_medical') === $typeOption)>
+                                        {{ \Illuminate\Support\Str::headline($typeOption) }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('type')
+                                <p class="field-error">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="grid gap-3 sm:grid-cols-2">
+                        <div>
+                            <label for="year_diagnosed" class="label">Year diagnosed</label>
+                            <input id="year_diagnosed" type="number" name="year_diagnosed" min="1900" max="{{ now()->year }}"
+                                   value="{{ old('year_diagnosed') }}"
+                                   class="input cs-num @error('year_diagnosed') input-invalid @enderror" placeholder="{{ now()->year }}">
+                            @error('year_diagnosed')
+                                <p class="field-error">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label for="history_status" class="label">Status <span class="text-danger">*</span></label>
+                            <select id="history_status" name="status" required class="input @error('status') input-invalid @enderror">
+                                @foreach (['active' => 'Active', 'chronic' => 'Chronic', 'resolved' => 'Resolved'] as $stVal => $stLabel)
+                                    <option value="{{ $stVal }}" @selected(old('status', 'active') === $stVal)>{{ $stLabel }}</option>
+                                @endforeach
+                            </select>
+                            @error('status')
+                                <p class="field-error">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                    <div>
+                        <label for="history_notes" class="label">Clinical notes</label>
+                        <input id="history_notes" type="text" name="notes" value="{{ old('notes') }}"
+                               class="input @error('notes') input-invalid @enderror" placeholder="Maintenance medication or context">
+                        @error('notes')
+                            <p class="field-error">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            <x-icon name="plus" class="h-3.5 w-3.5" />
+                            Save condition
+                        </button>
+                    </div>
+                </form>
+            </details>
+
             <div class="card-body p-0">
                 @if ($histories->isNotEmpty())
                     <ul class="divide-y divide-hairline">

@@ -125,6 +125,9 @@ Route::middleware('auth')->group(function () {
         Route::post('appointments/{appointment}/encounters', [EncounterController::class, 'store'])->name('encounters.store');
 
         Route::get('patients/{patient}', [PhysicianPatientController::class, 'show'])->name('patients.show');
+        Route::post('patients/{patient}/allergies', [PhysicianPatientController::class, 'storeAllergy'])->name('patients.allergies.store');
+        Route::patch('patients/{patient}/allergies/{allergy}/toggle', [PhysicianPatientController::class, 'toggleAllergy'])->name('patients.allergies.toggle');
+        Route::post('patients/{patient}/histories', [PhysicianPatientController::class, 'storeHistory'])->name('patients.histories.store');
     });
 
     /*
