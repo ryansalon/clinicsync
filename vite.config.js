@@ -11,9 +11,11 @@ export default defineConfig({
             fonts: [
                 bunny('Public Sans', {
                     weights: [400, 500, 600, 700],
+                    optimizedFallbacks: false,
                 }),
                 bunny('JetBrains Mono', {
                     weights: [400, 500, 600],
+                    optimizedFallbacks: false,
                 }),
             ],
         }),

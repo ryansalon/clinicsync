@@ -9,19 +9,19 @@ ClinicSync is an outpatient clinic management web application built with **Larav
 - Appointment booking with real-time physician slot availability and availability calendar
 - Appointment rescheduling and cancellation
 - Personal medical records view (encounters, vitals, prescriptions, allergies, and medical history)
-- In-app notification center and profile/password settings
+- In-app notification center, outpatient triage profile completion (blood type, civil status, address, emergency contact), and password settings
 
 ### Physician Workspace (`physician`)
-- Daily consultation dashboard and live patient queue
+- Daily consultation dashboard and live patient queue with called-patient indicators and direct EMR chart links
 - Availability schedule management and daily patient limit configuration
-- Clinical encounter recording (chief complaint, diagnosis, assessment, treatment plan, clinical notes, vitals)
-- E-prescription issuance per encounter
-- Full patient chart review (medical history, allergies, and past encounters)
+- Clinical encounter recording (chief complaint, diagnosis, assessment, treatment plan, clinical notes, vitals) with sticky tabbed EMR reference rail
+- E-prescription issuance per encounter and printable clinical summary / prescription sheet
+- Full patient chart review with inline allergy recording, active/inactive allergy toggling, and medical history condition management
 
 ### Reception & Clinic Operations (`receptionist`, `administrator`)
-- Live clinic queue management (walk-in registration, patient search, calling patients, status transitions)
+- Live clinic queue management (walk-in patient intake with auto-generated `PT-XXXXXX` Patient IDs, calling patients, status transitions, and slide-over row inspector drawers)
 - Physician schedule management and availability calendar
-- Clinic operational reports
+- Daily census operational reports with CSV export and print layout
 
 ### System Administration (`administrator`)
 - Includes all Reception & Clinic Operations capabilities
