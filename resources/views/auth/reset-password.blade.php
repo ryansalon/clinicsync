@@ -13,8 +13,13 @@
 
         <div>
             <label for="email" class="label">Email address</label>
-            <input id="email" type="email" name="email" value="{{ old('email', $email) }}" required
-                   autocomplete="email" class="input @error('email') input-invalid @enderror">
+            <div class="relative">
+                <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-meta">
+                    <x-icon name="envelope" class="h-[18px] w-[18px]" />
+                </span>
+                <input id="email" type="email" name="email" value="{{ old('email', $email) }}" required
+                       autocomplete="email" class="input pl-10 @error('email') input-invalid @enderror">
+            </div>
             @error('email')
                 <p class="field-error">{{ $message }}</p>
             @enderror
@@ -23,8 +28,11 @@
         <div>
             <label for="password" class="label">New password</label>
             <div class="relative">
+                <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-meta">
+                    <x-icon name="lock" class="h-[18px] w-[18px]" />
+                </span>
                 <input id="password" type="password" name="password" required autofocus
-                       autocomplete="new-password" class="input pr-16 @error('password') input-invalid @enderror"
+                       autocomplete="new-password" class="input pr-16 pl-10 @error('password') input-invalid @enderror"
                        placeholder="At least 8 characters">
                 <x-password-toggle for="#password" />
             </div>
@@ -36,8 +44,11 @@
         <div>
             <label for="password_confirmation" class="label">Confirm new password</label>
             <div class="relative">
+                <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-meta">
+                    <x-icon name="lock" class="h-[18px] w-[18px]" />
+                </span>
                 <input id="password_confirmation" type="password" name="password_confirmation" required
-                       autocomplete="new-password" class="input pr-16" placeholder="Repeat password">
+                       autocomplete="new-password" class="input pr-16 pl-10" placeholder="Repeat password">
                 <x-password-toggle for="#password_confirmation" />
             </div>
         </div>
