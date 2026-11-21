@@ -152,8 +152,12 @@
                     <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-meta">
                         <x-icon name="magnifying-glass" class="h-4 w-4" />
                     </span>
-                    <input id="q" type="search" name="q" value="{{ $search }}" class="input pl-9"
+                    <input id="q" type="search" name="q" value="{{ $search }}" class="input pr-9 pl-9"
                            placeholder="Name or email address">
+                    <kbd aria-hidden="true"
+                         class="pointer-events-none absolute inset-y-0 right-2.5 my-auto hidden h-5 items-center rounded border border-hairline bg-surface-subtle px-1.5 font-mono text-[10px] font-semibold text-meta sm:inline-flex">
+                        /
+                    </kbd>
                 </div>
             </div>
 
@@ -228,7 +232,15 @@
             @empty
                 <div class="p-8">
                     <x-empty icon="users" title="No user accounts found"
-                             description="No user accounts match the current filters." />
+                             description="No user accounts match the current filters.">
+                        @if ($search || $role)
+                            <x-slot:action>
+                                <a href="{{ route('admin.users.index') }}" class="btn btn-secondary btn-sm">
+                                    Clear filters
+                                </a>
+                            </x-slot:action>
+                        @endif
+                    </x-empty>
                 </div>
             @endforelse
         </div>
@@ -294,7 +306,15 @@
                         <tr>
                             <td colspan="5" class="px-4 py-12">
                                 <x-empty icon="users" title="No user accounts found"
-                                         description="No user accounts match the current filters." />
+                                         description="No user accounts match the current filters.">
+                                    @if ($search || $role)
+                                        <x-slot:action>
+                                            <a href="{{ route('admin.users.index') }}" class="btn btn-secondary btn-sm">
+                                                Clear filters
+                                            </a>
+                                        </x-slot:action>
+                                    @endif
+                                </x-empty>
                             </td>
                         </tr>
                     @endforelse
