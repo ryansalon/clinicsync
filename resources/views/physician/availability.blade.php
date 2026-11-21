@@ -76,7 +76,11 @@
                     <div>
                         <label for="schedule-from" class="label">Effective from</label>
                         <input id="schedule-from" type="date" name="effective_from"
-                               value="{{ old('effective_from') }}" class="input cs-num">
+                               value="{{ old('effective_from') }}"
+                               class="input cs-num @error('effective_from') input-invalid @enderror">
+                        @error('effective_from')
+                            <p class="field-error">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div>
@@ -147,7 +151,9 @@
                         <span class="cs-num font-mono font-medium text-bright">{{ $bookedToday }} / {{ $physician->daily_patient_limit }} booked today</span>
                         <span class="font-mono {{ $isCapFull ? 'font-semibold text-danger' : 'text-brand' }}">{{ $capPct }}%</span>
                     </div>
-                    <div class="capacity-bar mt-1.5">
+                    <div class="capacity-bar mt-1.5" role="progressbar"
+                         aria-valuenow="{{ $bookedToday }}" aria-valuemin="0" aria-valuemax="{{ $physician->daily_patient_limit }}"
+                         aria-label="Daily patient limit progress">
                         <span class="capacity-fill {{ $isCapFull ? 'capacity-fill-full' : '' }}" style="width: {{ $capPct }}%"></span>
                     </div>
                     <p class="mt-2 cs-num text-xs text-meta">
