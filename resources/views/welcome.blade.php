@@ -20,6 +20,13 @@
             at CPSC Outpatient Clinic to gain access to the system.
         </p>
 
+        @auth
+            <div class="mt-5 rounded-md border border-hairline bg-canvas px-4 py-2.5 text-xs">
+                <p class="font-semibold text-bright">{{ auth()->user()->name }}</p>
+                <p class="font-mono text-meta">{{ auth()->user()->email }}</p>
+            </div>
+        @endauth
+
         <div class="mt-8 flex justify-center">
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
