@@ -18,17 +18,25 @@
         </div>
 
         @if (count($chips) > 0)
-            <div class="flex flex-wrap items-center gap-2 border-t border-hairline bg-surface-subtle/60 px-4 py-2">
-                <span class="font-mono text-[10px] font-semibold tracking-wider text-meta uppercase">Active</span>
+            <div class="flex flex-wrap items-center justify-between gap-2 border-t border-hairline bg-surface-subtle/60 px-4 py-2">
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="font-mono text-[10px] font-semibold tracking-wider text-meta uppercase">Active</span>
 
-                @foreach ($chips as $chip)
-                    <a href="{{ $chip['url'] }}"
-                       class="chip min-h-8 bg-surface transition hover:border-brand hover:bg-brand-tint hover:text-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand"
-                       aria-label="Remove filter {{ $chip['label'] }}">
-                        {{ $chip['label'] }}
-                        <x-icon name="x" class="h-3.5 w-3.5" />
+                    @foreach ($chips as $chip)
+                        <a href="{{ $chip['url'] }}"
+                           class="chip min-h-8 bg-surface transition hover:border-brand hover:bg-brand-tint hover:text-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                           aria-label="Remove filter {{ $chip['label'] }}">
+                            {{ $chip['label'] }}
+                            <x-icon name="x" class="h-3.5 w-3.5" />
+                        </a>
+                    @endforeach
+                </div>
+
+                @if (count($chips) > 1)
+                    <a href="{{ $action }}" class="text-xs font-semibold text-brand hover:underline">
+                        Clear all
                     </a>
-                @endforeach
+                @endif
             </div>
         @endif
     </form>
