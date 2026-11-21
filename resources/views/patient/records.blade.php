@@ -3,10 +3,22 @@
 @section('title', 'My medical records')
 
 @section('content')
-    <x-page-header title="My medical records" description="Read-only clinical summary of your outpatient chart and prescriptions." />
+    <div class="print-only mb-5 border-b border-hairline pb-3">
+        <p class="font-mono text-[10px] font-semibold tracking-wider text-meta uppercase">Camiguin Polytechnic State College · Outpatient Clinic</p>
+        <p class="mt-0.5 text-base font-bold text-bright">Patient Medical Record &amp; Prescription Summary — {{ $patient->user?->name }} ({{ $patient->patient_number }})</p>
+    </div>
+
+    <x-page-header title="My medical records" description="Read-only clinical summary of your outpatient chart and prescriptions.">
+        <x-slot:actions>
+            <button type="button" class="btn btn-secondary no-print" onclick="window.print()">
+                <x-icon name="document" class="h-4 w-4" />
+                Print records
+            </button>
+        </x-slot:actions>
+    </x-page-header>
 
     {{-- Sticky in-page section index --}}
-    <nav aria-label="Record sections" class="sticky top-0 z-20 -mx-4 -mt-2 mb-5 flex items-center gap-2 overflow-x-auto border-b border-hairline bg-canvas/95 px-4 py-2.5 backdrop-blur-xs sm:-mx-6 sm:px-6">
+    <nav aria-label="Record sections" class="no-print sticky top-0 z-20 -mx-4 -mt-2 mb-5 flex items-center gap-2 overflow-x-auto border-b border-hairline bg-canvas/95 px-4 py-2.5 backdrop-blur-xs sm:-mx-6 sm:px-6">
         <a href="#patient-info" class="chip min-h-11 shrink-0 bg-surface hover:border-brand hover:text-brand md:min-h-9">
             <x-icon name="user" class="h-3.5 w-3.5 text-meta" />
             Patient info
