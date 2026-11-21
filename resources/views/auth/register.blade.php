@@ -40,7 +40,8 @@
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
                 <label for="date_of_birth" class="label">Date of birth</label>
-                <input id="date_of_birth" type="date" name="date_of_birth" value="{{ old('date_of_birth') }}" required
+                <input id="date_of_birth" type="date" name="date_of_birth" value="{{ old('date_of_birth') }}"
+                       max="{{ now()->toDateString() }}" required
                        class="input cs-num @error('date_of_birth') input-invalid @enderror">
                 @error('date_of_birth')
                     <p class="field-error">{{ $message }}</p>
@@ -88,8 +89,12 @@
                     </div>
                     <div>
                         <label for="blood_type" class="label">Blood type</label>
-                        <input id="blood_type" type="text" name="blood_type" value="{{ old('blood_type') }}"
-                               class="input @error('blood_type') input-invalid @enderror" placeholder="O+">
+                        <select id="blood_type" name="blood_type" class="input font-mono @error('blood_type') input-invalid @enderror">
+                            <option value="">Select…</option>
+                            @foreach (['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] as $bloodOption)
+                                <option value="{{ $bloodOption }}" @selected(old('blood_type') === $bloodOption)>{{ $bloodOption }}</option>
+                            @endforeach
+                        </select>
                         @error('blood_type')
                             <p class="field-error">{{ $message }}</p>
                         @enderror
